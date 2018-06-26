@@ -1,0 +1,101 @@
+buildscript {
+	ext {
+		kotlinVersion = '1.2.20'
+		springBootVersion = '1.5.10.RELEASE'
+	}
+	repositories {
+        mavenCentral()
+        maven { url 'https://plugins.gradle.org/m2/' }
+        jcenter()
+	}
+	dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+        classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.13.0')	}
+}
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'ge.boxwood'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+repositories {
+	mavenCentral()
+}
+
+
+ext {
+	springBootAdminVersion = '1.5.7'
+}
+
+dependencies {
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2")
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-jdbc')
+    compile('org.springframework.boot:spring-boot-starter-mobile')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('com.fasterxml.jackson.module:jackson-module-kotlin')
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    runtime('org.springframework.boot:spring-boot-devtools')
+    runtime('mysql:mysql-connector-java')
+    compile('org.springframework.boot:spring-boot-starter-validation')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('com.google.guava:guava:16.0.1')
+    compile('org.springframework.boot:spring-boot-starter-web-services')
+    compile('org.springframework.boot:spring-boot-starter-websocket')
+    testCompile('org.springframework.security:spring-security-test')
+    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.7.0'
+    compile group: 'joda-time', name: 'joda-time', version: '2.8.1'
+    compile group: 'org.springframework', name: 'spring-support', version: '2.0.6'
+    compile group: 'org.springframework', name: 'spring-context-support', version: '3.2.0.RELEASE'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+// https://mvnrepository.com/artifact/commons-lang/commons-lang
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.11'
+// https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '6.2.1'
+    // https://mvnrepository.com/artifact/org.simplejavamail/simple-java-mail
+    compile group: 'org.simplejavamail', name: 'simple-java-mail', version: '5.0.1'
+
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.1.1'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.8.5'
+    compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:6.2.2'
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+    // https://mvnrepository.com/artifact/org.json/json
+    compile group: 'org.json', name: 'json', version: '20180130'
+
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "de.codecentric:spring-boot-admin-dependencies:${springBootAdminVersion}"
+	}
+}
