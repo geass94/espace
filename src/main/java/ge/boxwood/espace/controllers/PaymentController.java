@@ -122,7 +122,7 @@ public class PaymentController {
             paymentAvailResponse.purchase.accountAmount.id = gelAccountId;
             DecimalFormat df = new DecimalFormat("#.##");
 
-            paymentAvailResponse.purchase.accountAmount.amount = new BigDecimal(df.format(payment.getPrice() * 100L));
+            paymentAvailResponse.purchase.accountAmount.amount = new BigDecimal(Float.valueOf(payment.getPrice() * 100L));
             paymentAvailResponse.purchase.accountAmount.currencyCode = "981";
             paymentAvailResponse.purchase.accountAmount.exponent = "2";
             //paymentAvailResponse.purchase.accountAmount.fee = new BigDecimal(order.);
