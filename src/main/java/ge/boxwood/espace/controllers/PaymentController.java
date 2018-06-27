@@ -120,9 +120,9 @@ public class PaymentController {
             paymentAvailResponse.purchase.shortDesc = String.valueOf(order.getId());
             paymentAvailResponse.purchase.longDesc = "პროდუქტები პროდუქტები";
             paymentAvailResponse.purchase.accountAmount.id = gelAccountId;
-            DecimalFormat df = new DecimalFormat("#.##");
+            DecimalFormat df = new DecimalFormat("#.#");
 
-            paymentAvailResponse.purchase.accountAmount.amount = new BigDecimal(Float.valueOf(payment.getPrice())).multiply(BigDecimal.valueOf(100));
+            paymentAvailResponse.purchase.accountAmount.amount = BigDecimal.valueOf(Long.parseLong(df.format( payment.getPrice() * 100 )));
             paymentAvailResponse.purchase.accountAmount.currencyCode = "981";
             paymentAvailResponse.purchase.accountAmount.exponent = "2";
             //paymentAvailResponse.purchase.accountAmount.fee = new BigDecimal(order.);
