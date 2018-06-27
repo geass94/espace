@@ -6,6 +6,7 @@ import ge.boxwood.espace.models.enums.PaymentType;
 import ge.boxwood.espace.repositories.ChargerRepository;
 import ge.boxwood.espace.repositories.ConnectorRepository;
 import ge.boxwood.espace.repositories.OrderRepository;
+import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.PlaceService;
 import ge.boxwood.espace.services.UserService;
@@ -39,6 +40,8 @@ public class ChargerServiceImpl implements ChargerService {
     private PlaceService placeService;
     @Autowired
     private ConnectorRepository connectorRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
     @Override
     public Charger create(Charger charger) {
         if (charger.getPlace() != null){
@@ -138,7 +141,7 @@ public class ChargerServiceImpl implements ChargerService {
 
 
     @Override
-    public ChargerInfo start(Long cID) {
+    public ChargerInfo start(Long cID, Long conID) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
 
@@ -148,15 +151,29 @@ public class ChargerServiceImpl implements ChargerService {
         Charger charger = this.getOneByCID(cID);
         if(order == null && charger.getStatus() != 0){
             try {
-                ChargerInfo chargerInfo = chargerRequestUtils.start(cID);
+                ChargerInfo chargerInfo = new ChargerInfo();
+                JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
+                chargerInfo.setChargerTransactionId(String.valueOf(chargerStart.get("data")));
+                JSONObject transactionInfo = chargerRequestUtils.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
+                JSONObject transaction = transactionInfo.getJSONObject("data");
                 chargerInfo.setCharger(charger);
+                chargerInfo.setTransStart((long)transaction.get("transStart"));
+                chargerInfo.setTransStop((long)transaction.get("transStop"));
+                chargerInfo.setMeterStart((long)(int)transaction.get("meterStart"));
+                chargerInfo.setMeterStop((long)(int)transaction.get("meterStop"));
+
+                chargerInfo.setResponseCode((Integer) chargerStart.get("responseCode"));
+
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
                     Order newOrder = new Order(user);
                     newOrder.setPaymentType(PaymentType.CREDITCARD);
                     newOrder.setCharger(chargerInfo.getCharger());
                     newOrder.setChargerTransactionId(Integer.parseInt(chargerInfo.getChargerTransactionId()));
                     chargerInfo.setOrder(newOrder);
+                    Payment payment = new Payment(0f, newOrder);
                     orderRepository.save(newOrder);
+                    paymentRepository.save(payment);
+                    orderRepository.flush();
                     return chargerInfo;
                 }else
                 {
@@ -180,8 +197,8 @@ public class ChargerServiceImpl implements ChargerService {
         Order order = orderRepository.findByChargerAndUserAndConfirmed(charger, user, false);
         if(order != null){
             try {
-                ChargerInfo chargerInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
-                chargerInfo.setCharger(charger);
+                JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
+                ChargerInfo chargerInfo = new ChargerInfo();
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
                     order.confirm();
                     chargerInfo.setOrder(order);
@@ -220,14 +237,30 @@ public class ChargerServiceImpl implements ChargerService {
         return charger;
     }
 
-
-
-
-
-
-
-
-
+    @Override
+    public ChargerInfo transaction(Long trid) {
+        try {
+            JSONObject transactionInfo = chargerRequestUtils.transaction(trid);
+            ChargerInfo chargerInfo = new ChargerInfo();
+            chargerInfo.setResponseCode((Integer) transactionInfo.get("responseCode"));
+            if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
+                JSONObject transaction = transactionInfo.getJSONObject("data");
+                Charger charger = this.getOneByCID(Long.valueOf(transaction.get("id").toString()));
+                chargerInfo.setCharger(charger);
+                chargerInfo.setTransStart((long)transaction.get("transStart"));
+                chargerInfo.setTransStop((long)transaction.get("transStop"));
+                chargerInfo.setMeterStart((long)(int)transaction.get("meterStart"));
+                chargerInfo.setMeterStop((long)(int)transaction.get("meterStop"));
+                chargerInfo.setChargerTransactionId(String.valueOf(trid));
+                return chargerInfo;
+            }else
+            {
+                throw new RuntimeException("Something wrong with charger");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     @Override

@@ -1,18 +1,13 @@
 package ge.boxwood.espace.controllers;
 
-import ge.boxwood.espace.config.utils.ChargerRequestUtils;
 import ge.boxwood.espace.models.*;
-import ge.boxwood.espace.repositories.OrderRepository;
-import ge.boxwood.espace.security.TokenHelper;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.PlaceService;
-import ge.boxwood.espace.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -28,24 +23,36 @@ public class ChargerController {
         return ResponseEntity.ok(chargerService.freeChargers());
     }
 
-    @GetMapping("/start/{chargerID}")
+    @GetMapping("/start")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> startCharging(@PathVariable("chargerID") Long cid) throws Exception {
-        ChargerInfo chargerInfo = chargerService.start(cid);
+    public ResponseEntity<?> startCharging(@RequestParam("chargerId")Long cid, @RequestParam("connectorId")Long conid) throws Exception {
+        ChargerInfo chargerInfo = chargerService.start(cid, conid);
         return ResponseEntity.ok(chargerInfo);
     }
 
-    @GetMapping("/stop/{chargerID}")
+    @GetMapping("/stop")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> stopCharging(@PathVariable("chargerID") Long cid) throws Exception {
+    public ResponseEntity<?> stopCharging(@RequestParam("chargerId") Long cid) throws Exception {
         ChargerInfo chargerInfo = chargerService.stop(cid);
         return ResponseEntity.ok(chargerInfo);
     }
 
-    @GetMapping("/info/{chargerID}")
+    @GetMapping("/info")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> chargerInfo(@PathVariable("chargerID") Long cid) throws Exception {
+    public ResponseEntity<?> chargerInfo(@RequestParam("chargerId") Long cid) throws Exception {
         Charger chargerInfo = chargerService.info(cid);
+        if(chargerInfo != null){
+            return ResponseEntity.ok(chargerInfo);
+        }
+        else{
+            throw new RuntimeException("Something went wrong");
+        }
+    }
+
+    @GetMapping("/transaction")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<?> chargerTransactionInfo(@RequestParam("trId") Long trid) throws Exception {
+        ChargerInfo chargerInfo = chargerService.transaction(trid);
         if(chargerInfo != null){
             return ResponseEntity.ok(chargerInfo);
         }

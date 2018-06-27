@@ -101,7 +101,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/place/**",
                 "/charger/free",
                 "/static/images/**",
-                "/payment/InitiatePayment"
+                "/payment/InitiatePayment",
+                "/slave/**"
         );
     }
 
