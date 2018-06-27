@@ -50,8 +50,8 @@ public class Order {
     @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Payment> payments;
-    @ManyToOne
-    @JoinColumn(name = "charger_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "charger_id", nullable = false)
     private Charger charger;
     @JsonIgnore
     @Column

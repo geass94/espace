@@ -4,6 +4,7 @@ import ge.boxwood.espace.config.utils.ChargerRequestUtils;
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
 import ge.boxwood.espace.repositories.ChargerRepository;
+import ge.boxwood.espace.repositories.ConnectorRepository;
 import ge.boxwood.espace.repositories.OrderRepository;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.PlaceService;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +37,8 @@ public class ChargerServiceImpl implements ChargerService {
     private EntityManager em;
     @Autowired
     private PlaceService placeService;
+    @Autowired
+    private ConnectorRepository connectorRepository;
     @Override
     public Charger create(Charger charger) {
         if (charger.getPlace() != null){
@@ -46,14 +51,31 @@ public class ChargerServiceImpl implements ChargerService {
             place1.getChargers().add(charger1);
             placeService.update(place1, place1.getId());
         }
-        return null;
+        return charger1;
+    }
+
+    @Override
+    public void importChargers(List<Charger> chargers) {
+        for (Charger charger:chargers) {
+            Charger chrg = chargerRepository.save(charger);
+            List<Connector> connectorList = new ArrayList<>();
+            if(charger.getConnectors() != null){
+                for(Connector connector:charger.getConnectors()){
+                    connector.setCharger(chrg);
+                    Connector cntr = connectorRepository.save(connector);
+                    connectorList.add(cntr);
+                }
+                chrg.setConnectors(connectorList);
+            }
+            chargerRepository.flush();
+        }
     }
 
     @Override
     public Charger update(Charger charger, Long id) {
         Charger raw = chargerRepository.findOne(id);
-        if (raw.getAddress() != charger.getAddress() && charger.getAddress() != null){
-            raw.setAddress(charger.getAddress());
+        if (raw.getDescription() != charger.getDescription() && charger.getDescription() != null){
+            raw.setDescription(charger.getDescription());
         }
         if (raw.getLatitude() != charger.getLatitude() && charger.getLatitude() != null){
             raw.setLatitude(charger.getLatitude());
@@ -67,6 +89,9 @@ public class ChargerServiceImpl implements ChargerService {
         if(raw.getPlace() == null && charger.getPlace() != null){
             Place place = placeService.create(charger.getPlace());
             raw.setPlace(place);
+        }
+        if (raw.getCode() != charger.getCode() && charger.getCode() != null){
+            raw.setCode(charger.getCode());
         }
         return chargerRepository.save(raw);
     }

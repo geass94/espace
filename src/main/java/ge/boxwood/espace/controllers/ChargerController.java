@@ -92,4 +92,11 @@ public class ChargerController {
             throw new RuntimeException("error while updating");
         }
     }
+
+    @PostMapping("/import")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<?> importChargers(@RequestBody List<Charger> chargers){
+        chargerService.importChargers(chargers);
+        return ResponseEntity.ok("DONE");
+    }
 }

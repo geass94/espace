@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ChargerService {
     Charger create(Charger charger);
+    void importChargers(List<Charger> chargers);
     Charger update(Charger charger, Long id);
     void delete(Long id);
     Charger getOne(Long id);

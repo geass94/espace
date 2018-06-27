@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Table(name = "chargers")
 @Entity
@@ -22,9 +23,9 @@ public class Charger extends BaseEntity {
     @Column
     private Integer type;
     @Column
-    private String uuid;
+    private String description;
     @Column
-    private String address;
+    private String code;
 
     @JsonIgnore
     @OneToMany(mappedBy = "charger", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -33,7 +34,10 @@ public class Charger extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="place_id", nullable = true)
     private Place place;
-
+    @OneToMany(cascade = CascadeType.MERGE,
+            fetch = FetchType.LAZY,
+            mappedBy = "charger")
+    private List<Connector> connectors;
 
     public Double getLongitude() {
         return longitude;
@@ -67,22 +71,6 @@ public class Charger extends BaseEntity {
         this.type = type;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public List<Order> getOrders() {
         return orders;
     }
@@ -105,5 +93,29 @@ public class Charger extends BaseEntity {
 
     public void setPlace(Place place) {
         this.place = place;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Connector> getConnectors() {
+        return connectors;
+    }
+
+    public void setConnectors(List<Connector> connectors) {
+        this.connectors = connectors;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }
