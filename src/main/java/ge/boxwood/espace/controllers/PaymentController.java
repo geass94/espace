@@ -85,6 +85,7 @@ public class PaymentController {
 
         }
         System.out.println("Redirecting to payment page!");
+        System.out.println(redirectUrl);
         response.sendRedirect(redirectUrl);
     }
 
