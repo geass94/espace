@@ -84,7 +84,7 @@ public class PaymentController {
         } catch (Exception ex) {
 
         }
-
+        System.out.println("Redirecting to payment page!");
         response.sendRedirect(redirectUrl);
     }
 
@@ -97,7 +97,7 @@ public class PaymentController {
             return "orderParam is null:";
         }
         String paymentId = orderParam.value.trim();
-
+        System.out.println("Enetered payement check!");
 
         // get Transaction using id here
         // if transaction exists and payment is available then return OK and all the other stuff
