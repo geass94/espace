@@ -120,7 +120,7 @@ public class PaymentController {
             paymentAvailResponse.purchase.shortDesc = String.valueOf(order.getId());
             paymentAvailResponse.purchase.longDesc = "პროდუქტები პროდუქტები";
             paymentAvailResponse.purchase.accountAmount.id = gelAccountId;
-            DecimalFormat df = new DecimalFormat("#.#");
+            DecimalFormat df = new DecimalFormat("#.##");
 
             paymentAvailResponse.purchase.accountAmount.amount = new BigDecimal(df.format(payment.getPrice() * 100L));
             paymentAvailResponse.purchase.accountAmount.currencyCode = "981";
