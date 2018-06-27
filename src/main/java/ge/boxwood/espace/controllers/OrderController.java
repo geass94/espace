@@ -37,7 +37,7 @@ public class OrderController {
         Order order = new Order(user);
         order.setPaymentType(PaymentType.CASH);
         order = orderRepository.save(order);
-        Payment payment = new Payment((float) 123.321, order);
+        Payment payment = new Payment((float) 123.32, order);
         paymentRepository.save(payment);
         return ResponseEntity.ok(order);
     }
