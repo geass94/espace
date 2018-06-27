@@ -7,6 +7,7 @@ import ge.boxwood.espace.models.enums.PaymentType;
 import ge.boxwood.espace.repositories.OrderRepository;
 import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.security.TokenHelper;
+import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,8 @@ public class OrderController {
     private UserService userService;
     @Autowired
     private TokenHelper tokenHelper;
+    @Autowired
+    private ChargerService chargerService;
     @PostMapping("/giveOrder")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> giveOrder(HttpServletRequest request){
@@ -35,6 +38,7 @@ public class OrderController {
         String username = tokenHelper.getUsernameFromToken(authToken);
         User user = userService.getByUsername(username);
         Order order = new Order(user);
+        order.setCharger(chargerService.getOneByCID(7L));
         order.setPaymentType(PaymentType.CASH);
         order = orderRepository.save(order);
         Payment payment = new Payment((float) 123.32, order);
