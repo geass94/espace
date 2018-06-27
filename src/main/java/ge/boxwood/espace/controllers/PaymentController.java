@@ -70,7 +70,7 @@ public class PaymentController {
         String serviceUrl = "https://3dacq.georgiancard.ge/payment/start.wsm";
         String lang = "KA";
 
-        PaymentController.orderId = orderId;
+        PaymentController.orderId = orderId.trim();
         String back_url_s = "https://www.api.e-space.ge/checkoutComplete?store=undefined&region=1";
         String back_url_f = "https://www.api.e-space.ge/checkoutFailed?store=undefined&region=1";
 
@@ -79,7 +79,7 @@ public class PaymentController {
 
         String redirectUrl = "";
         try {
-            redirectUrl = String.format("%1s?lang=%2s&merch_id=%3s&o.mer_trx_id=%4s&back_url_s=%5s&back_url_f=%6s", serviceUrl, lang, merchId, String.valueOf(orderId),
+            redirectUrl = String.format("%1s?lang=%2s&merch_id=%3s&o.mer_trx_id=%4s&back_url_s=%5s&back_url_f=%6s", serviceUrl, lang, merchId, String.valueOf(orderId).trim(),
                     URLEncoder.encode(back_url_s, "UTF-8"), URLEncoder.encode(back_url_f, "UTF-8"));
         } catch (Exception ex) {
 
