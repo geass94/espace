@@ -92,13 +92,13 @@ public class PaymentController {
     @GetMapping(path = "/payments/check", produces = MediaType.APPLICATION_XML_VALUE)
     @ResponseBody
     public String checkAvailable(@RequestParam Map<String, String> params, HttpServletRequest request) {
+        System.out.println("Entered payemnet check");
         PaymentAvailRequest paymentAvailRequest = mapPaymentAvailRequest(params);
         OrderParam orderParam = paymentAvailRequest.params.stream().filter(param -> param.name.equals("mer_trx_id")).findFirst().orElse(null);
         if (orderParam == null) {
             return "orderParam is null:";
         }
         String paymentId = orderParam.value.trim();
-        System.out.println("Enetered payement check!");
 
         // get Transaction using id here
         // if transaction exists and payment is available then return OK and all the other stuff
