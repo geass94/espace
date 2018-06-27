@@ -20,7 +20,7 @@ import java.net.URLEncoder;
 @Component
 public class ChargerRequestUtils {
     private final String USER_AGENT = "Mozilla/5.0";
-    private final String SERVICE_URL = "http://localhost:8443/slave";
+    private final String SERVICE_URL = "https://localhost/slave";
 
     public JSONObject start(Long cid, Long conid) throws Exception {
         URL obj = new URL(SERVICE_URL+"/start/"+cid+"/"+conid);
