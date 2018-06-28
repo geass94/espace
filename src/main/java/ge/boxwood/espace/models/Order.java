@@ -51,7 +51,7 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Payment> payments;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "charger_id", nullable = false)
+    @JoinColumn(name = "charger_id", nullable = true)
     private Charger charger;
     @JsonIgnore
     @Column
