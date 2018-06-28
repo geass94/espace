@@ -81,4 +81,6 @@ public class SlaveController {
         resp.put("data", data);
         return ResponseEntity.ok(resp);
     }
+
+
 }
