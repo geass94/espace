@@ -22,6 +22,6 @@ public interface ChargerService {
 
     ChargerInfo start(Long cID, Long conID);
     ChargerInfo stop(Long cID);
-    Charger info(Long cid);
+    ChargerInfo info(Long cid);
     ChargerInfo transaction(Long trid);
 }

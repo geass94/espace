@@ -45,4 +45,21 @@ public class OrderController {
         paymentRepository.save(payment);
         return ResponseEntity.ok(order);
     }
+
+    @PostMapping("/confirmUserCreditCard")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> confirmCreditCard(HttpServletRequest request){
+        String authToken = tokenHelper.getToken( request );
+        String username = tokenHelper.getUsernameFromToken(authToken);
+        User user = userService.getByUsername(username);
+        Order order = new Order(user);
+        order.setPaymentType(PaymentType.CREDITCARD);
+        order.setCashPayment(false);
+        order.setPrice(1f);
+        orderRepository.save(order);
+        Payment payment = new Payment(1f, order);
+        paymentRepository.save(payment);
+        orderRepository.flush();
+        return ResponseEntity.ok(payment);
+    }
 }

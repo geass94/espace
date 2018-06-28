@@ -40,7 +40,7 @@ public class ChargerController {
     @GetMapping("/info")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> chargerInfo(@RequestParam("chargerId") Long cid) throws Exception {
-        Charger chargerInfo = chargerService.info(cid);
+        ChargerInfo chargerInfo = chargerService.info(cid);
         if(chargerInfo != null){
             return ResponseEntity.ok(chargerInfo);
         }

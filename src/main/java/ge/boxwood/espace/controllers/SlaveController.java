@@ -2,6 +2,7 @@ package ge.boxwood.espace.controllers;
 
 
 import ge.boxwood.espace.security.TokenHelper;
+import ge.boxwood.espace.services.smsservice.GeoSms.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/slave")
@@ -18,11 +22,43 @@ public class SlaveController {
     private TokenHelper tokenHelper;
     @GetMapping("/start/{chID}/{conID}")
     public ResponseEntity<?> start(@PathVariable("chID")Long cID, @PathVariable("conID")Long conID){
-        HashMap resp = new HashMap();
-        resp.put("status", 0);
-        resp.put("description", "");
-        resp.put("data", 2451);
-        return ResponseEntity.ok(resp);
+        HashMap start = new HashMap();
+        start.put("status", 0);
+        start.put("description", "");
+        start.put("data", 2411);
+        return ResponseEntity.ok(start);
+    }
+
+    @GetMapping("/stop/{chID}/{trID}")
+    public ResponseEntity<?> stop(@PathVariable("chID") Long cid, @PathVariable("trID") Long trid){
+        HashMap stop = new HashMap();
+        stop.put("status", 0);
+        stop.put("description", "");
+        stop.put("data", 2321);
+        return ResponseEntity.ok(stop);
+    }
+
+    @GetMapping("/info/{chID}")
+    public ResponseEntity<?> info(@PathVariable("chID") Long cid){
+        HashMap info = new HashMap();
+        info.put("status", 0);
+        info.put("description", "");
+        HashMap data = new HashMap();
+        data.put("id", 7);
+        data.put("latitude", 43.12312);
+        data.put("longitude", 43.53211);
+        data.put("status", -1);
+        data.put("type", 0);
+        data.put("description", "test device");
+        data.put("code", 4322);
+        HashMap conns = new HashMap();
+        ArrayList arr = new ArrayList();
+        conns.put("type", "ChadeMo");
+        conns.put("id", 1);
+        arr.add(conns);
+        data.put("connectors", arr);
+        info.put("data", data);
+        return ResponseEntity.ok(info);
     }
 
     @GetMapping("/transaction/info/{trID}")

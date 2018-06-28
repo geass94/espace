@@ -69,8 +69,8 @@ public class ChargerRequestUtils {
         return jsonObj;
     }
 
-    public String info(Long cid) throws Exception {
-        URL obj = new URL("http://localhost:8082/apiV1/start");
+    public JSONObject info(Long cid) throws Exception {
+        URL obj = new URL(SERVICE_URL+"/info/"+cid);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
@@ -86,7 +86,10 @@ public class ChargerRequestUtils {
         }
         in.close();
 
-        return response.toString();
+        String json = response.toString();
+        JSONObject jsonObj = new JSONObject(json);
+        jsonObj.put("responseCode", con.getResponseCode());
+        return jsonObj;
     }
 
     public JSONObject transaction(Long trid) throws Exception {

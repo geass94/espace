@@ -217,24 +217,21 @@ public class ChargerServiceImpl implements ChargerService {
     }
 
     @Override
-    public Charger info(Long cid) {
-        Charger charger = this.getOneByCID(cid);
-        if(charger == null)
-        {
-            charger = new Charger();
-        }
+    public ChargerInfo info(Long cid) {
+        ChargerInfo chargerInfo = new ChargerInfo();
         try {
-            JSONObject jsonObj = new JSONObject(chargerRequestUtils.info(cid));
-            charger.setId(Long.valueOf((Integer) jsonObj.getJSONArray("chargers").getJSONObject(0).get("id")));
-            charger.setLatitude((Double) jsonObj.getJSONArray("chargers").getJSONObject(0).get("latitude") );
-            charger.setLongitude((Double) jsonObj.getJSONArray("chargers").getJSONObject(0).get("longitude"));
-            charger.setStatus((Integer) jsonObj.getJSONArray("chargers").getJSONObject(0).get("status"));
-            charger.setType((Integer) jsonObj.getJSONArray("chargers").getJSONObject(0).get("type"));
+            JSONObject info = new JSONObject(chargerRequestUtils.info(cid));
+            JSONObject chrgInfo = info.getJSONObject("data");
+            Long chargerId = Long.valueOf(chrgInfo.get("id").toString());
+            Charger charger = chargerRepository.findByChargerId(chargerId);
+            charger.setStatus( Integer.valueOf(chrgInfo.get("status").toString()) );
+            charger.setCode( chrgInfo.get("code").toString() );
+            chargerRepository.save(charger);
+            chargerInfo.setCharger(charger);
+            return chargerInfo;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return charger;
     }
 
     @Override
