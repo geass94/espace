@@ -46,7 +46,7 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
-    @PostMapping("/confirmUserCreditCard")
+    @PostMapping("/addUserCreditCard")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> confirmCreditCard(HttpServletRequest request){
         String authToken = tokenHelper.getToken( request );
