@@ -102,7 +102,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/charger/free",
                 "/static/images/**",
                 "/payment/InitiatePayment",
-                "/slave/**"
+                "/slave/**",
+                "/checkoutComplete",
+                "/checkoutFailed"
         );
     }
 
