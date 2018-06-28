@@ -71,8 +71,8 @@ public class PaymentController {
         String lang = "KA";
 
         PaymentController.orderId = orderId.trim();
-        String back_url_s = "https://www.api.e-space.ge/checkoutComplete?store=undefined&region=1";
-        String back_url_f = "https://www.api.e-space.ge/checkoutFailed?store=undefined&region=1";
+        String back_url_s = "https://www.api.e-space.ge/checkoutComplete";
+        String back_url_f = "https://www.api.e-space.ge/checkoutFailed";
 
         //TODO register order here and get unique id
         // merTrxId = addOrder(Order) /returns transaction id (unique in merchant system)
