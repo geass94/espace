@@ -75,7 +75,7 @@ public class AuthenticationController {
         int expiresIn = tokenHelper.getExpiredIn(device);
         // Return the token
         UserTokenState userTokenState = new UserTokenState(jws, jwsr, expiresIn, user.getSmsActive() || user.getEmailActive());
-        System.out.println(userTokenState);
+        System.out.println(jws);
         return ResponseEntity.ok(userTokenState);
     }
 
