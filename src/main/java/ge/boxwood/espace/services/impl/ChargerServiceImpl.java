@@ -160,7 +160,8 @@ public class ChargerServiceImpl implements ChargerService {
                 chargerInfo.setTransStop((long)transaction.get("transStop"));
                 chargerInfo.setMeterStart((long)(int)transaction.get("meterStart"));
                 chargerInfo.setMeterStop((long)(int)transaction.get("meterStop"));
-
+                chargerInfo.setChargingPower((long)(int)transaction.get("kiloWattHour"));
+                chargerInfo.setChargeTime((long)transaction.get("chargingTime"));
                 chargerInfo.setResponseCode((Integer) chargerStart.get("responseCode"));
 
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
@@ -252,6 +253,8 @@ public class ChargerServiceImpl implements ChargerService {
                 chargerInfo.setTransStop((long)transaction.get("transStop"));
                 chargerInfo.setMeterStart((long)(int)transaction.get("meterStart"));
                 chargerInfo.setMeterStop((long)(int)transaction.get("meterStop"));
+                chargerInfo.setChargingPower((long)(int)transaction.get("kiloWattHour"));
+                chargerInfo.setChargeTime((long)transaction.get("chargingTime"));
                 chargerInfo.setChargerTransactionId(String.valueOf(trid));
                 return chargerInfo;
             }else

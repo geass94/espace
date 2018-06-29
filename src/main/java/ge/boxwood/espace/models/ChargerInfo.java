@@ -9,6 +9,8 @@ public class ChargerInfo {
     private Long transStop;
     private Long meterStart;
     private Long meterStop;
+    private double chargingPower;
+    private Long chargeTime;
 
     public Charger getCharger() {
         return charger;
@@ -72,5 +74,21 @@ public class ChargerInfo {
 
     public void setMeterStop(Long meterStop) {
         this.meterStop = meterStop;
+    }
+
+    public double getChargingPower() {
+        return chargingPower;
+    }
+
+    public void setChargingPower(double chargingPower) {
+        this.chargingPower = chargingPower;
+    }
+
+    public Long getChargeTime() {
+        return chargeTime;
+    }
+
+    public void setChargeTime(Long chargeTime) {
+        this.chargeTime = chargeTime;
     }
 }
