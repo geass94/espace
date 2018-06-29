@@ -1,7 +1,10 @@
 package ge.boxwood.espace.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import ge.boxwood.espace.models.converters.PaymentTypeConverter;
 import ge.boxwood.espace.models.enums.PaymentType;
 import org.joda.time.DateTime;
@@ -11,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -47,7 +52,7 @@ public class Order {
     private User user;
     @Column
     private boolean cashPayment;
-    @JsonIgnore
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Payment> payments;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -149,11 +154,11 @@ public class Order {
         this.user = user;
     }
 
-
+    @JsonProperty
     public List<Payment> getPayments() {
         return payments;
     }
-
+    @JsonIgnore
     public void setPayments(List<Payment> payments) {
         this.payments = payments;
     }
