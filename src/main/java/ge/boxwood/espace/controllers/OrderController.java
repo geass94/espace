@@ -1,5 +1,6 @@
 package ge.boxwood.espace.controllers;
 
+import ge.boxwood.espace.models.CreditCard;
 import ge.boxwood.espace.models.Order;
 import ge.boxwood.espace.models.Payment;
 import ge.boxwood.espace.models.User;
@@ -11,13 +12,11 @@ import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.security.TokenHelper;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.UserService;
+import ge.boxwood.espace.services.smsservice.GeoSms.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -58,6 +57,21 @@ public class OrderController {
         String username = tokenHelper.getUsernameFromToken(authToken);
         User user = userService.getByUsername(username);
         return ResponseEntity.ok(creditCardRepository.findAllByUserAndStatus(user, Status.ACTIVE));
+    }
+
+    @DeleteMapping("/cards/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> deleteCard(@PathVariable("id")Long id){
+        CreditCard creditCard = creditCardRepository.findOne(id);
+        creditCard.setStatus(Status.DELETED);
+        creditCard = creditCardRepository.save(creditCard);
+        if(creditCard != null) {
+            return ResponseEntity.ok(true);
+        }
+        else{
+            throw new RuntimeException("Error while deleting");
+        }
+
     }
 
     @PostMapping("/addUserCreditCard")
