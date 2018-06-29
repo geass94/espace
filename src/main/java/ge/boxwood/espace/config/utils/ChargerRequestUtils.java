@@ -36,7 +36,7 @@ public class ChargerRequestUtils {
         return jsonObj;
     }
 
-    public JSONObject stop(Long cid, int trid) throws Exception{
+    public JSONObject stop(Long cid, Long trid) throws Exception{
         URL obj = new URL(SERVICE_URL+"/charger/stop/"+cid+"/"+trid);
 
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();

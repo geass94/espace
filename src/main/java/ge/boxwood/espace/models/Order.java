@@ -55,7 +55,7 @@ public class Order {
     private Charger charger;
     @JsonIgnore
     @Column
-    private Integer chargerTransactionId;
+    private Long chargerTransactionId;
     @Column
     @Convert(converter = PaymentTypeConverter.class)
     private PaymentType paymentType;
@@ -237,11 +237,11 @@ public class Order {
         this.charger = charger;
     }
 
-    public Integer getChargerTransactionId() {
+    public Long getChargerTransactionId() {
         return chargerTransactionId;
     }
 
-    public void setChargerTransactionId(Integer chargerTransactionId) {
+    public void setChargerTransactionId(Long chargerTransactionId) {
         this.chargerTransactionId = chargerTransactionId;
     }
 }
