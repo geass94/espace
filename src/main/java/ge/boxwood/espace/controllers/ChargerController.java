@@ -33,7 +33,7 @@ public class ChargerController {
     @GetMapping("/stop")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> stopCharging(@RequestParam("chargerId") Long cid) throws Exception {
-        ChargerInfo chargerInfo = chargerService.stop(cid);
+        ChargerInfoDTO chargerInfo = chargerService.stop(cid);
         return ResponseEntity.ok(chargerInfo);
     }
 
