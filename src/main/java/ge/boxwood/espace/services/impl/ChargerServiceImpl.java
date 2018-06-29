@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ChargerServiceImpl implements ChargerService {
@@ -178,7 +175,7 @@ public class ChargerServiceImpl implements ChargerService {
                     }
 
                     paymentRepository.save(payment);
-
+                    order.setPayments(Collections.singletonList(payment));
                     orderRepository.flush();
                     return chargerInfo;
                 }else
