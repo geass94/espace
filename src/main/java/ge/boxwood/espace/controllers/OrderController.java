@@ -56,6 +56,7 @@ public class OrderController {
         String authToken = tokenHelper.getToken( request );
         String username = tokenHelper.getUsernameFromToken(authToken);
         User user = userService.getByUsername(username);
+        System.out.println(authToken);
         return ResponseEntity.ok(creditCardRepository.findAllByUserAndStatus(user, Status.ACTIVE));
     }
 
