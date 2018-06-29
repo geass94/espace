@@ -176,8 +176,9 @@ public class ChargerServiceImpl implements ChargerService {
                         payment.setCreditCard(creditCard);
                     }
 
-                    paymentRepository.save(payment);
-                    order.setPayments(Collections.singletonList(payment));
+                    payment = paymentRepository.save(payment);
+                    newOrder.setPayments(Collections.singletonList(payment));
+                    paymentRepository.flush();
                     orderRepository.flush();
                     return chargerInfo;
                 }else
