@@ -20,7 +20,7 @@ import java.util.Map;
 public class SlaveController {
     @Autowired
     private TokenHelper tokenHelper;
-    @GetMapping("/start/{chID}/{conID}")
+    @GetMapping("/charger/start/{chID}/{conID}")
     public ResponseEntity<?> start(@PathVariable("chID")Long cID, @PathVariable("conID")Long conID){
         HashMap start = new HashMap();
         start.put("status", 0);
@@ -29,7 +29,7 @@ public class SlaveController {
         return ResponseEntity.ok(start);
     }
 
-    @GetMapping("/stop/{chID}/{trID}")
+    @GetMapping("/charger/stop/{chID}/{trID}")
     public ResponseEntity<?> stop(@PathVariable("chID") Long cid, @PathVariable("trID") Long trid){
         HashMap stop = new HashMap();
         stop.put("status", 0);
@@ -38,7 +38,7 @@ public class SlaveController {
         return ResponseEntity.ok(stop);
     }
 
-    @GetMapping("/info/{chID}")
+    @GetMapping("/charger/info/{chID}")
     public ResponseEntity<?> info(@PathVariable("chID") Long cid){
         HashMap info = new HashMap();
         info.put("status", 0);
