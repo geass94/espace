@@ -2,6 +2,7 @@ package ge.boxwood.espace.services;
 
 import ge.boxwood.espace.models.Charger;
 import ge.boxwood.espace.models.ChargerInfo;
+import ge.boxwood.espace.models.ChargerInfoDTO;
 import ge.boxwood.espace.models.Place;
 
 import java.util.List;
@@ -20,8 +21,8 @@ public interface ChargerService {
 
     Long freeChargers();
 
-    ChargerInfo start(Long cID, Long conID, Long cardID);
+    ChargerInfoDTO start(Long cID, Long conID, Long cardID);
     ChargerInfo stop(Long cID);
     ChargerInfo info(Long cid);
-    ChargerInfo transaction(Long trid);
+    ChargerInfoDTO transaction(Long trid);
 }

@@ -137,10 +137,10 @@ public class ChargerServiceImpl implements ChargerService {
 
 
     @Override
-    public ChargerInfo start(Long cID, Long conID, Long cardID) {
+    public ChargerInfoDTO start(Long cID, Long conID, Long cardID) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
-
+        ChargerInfoDTO dto = new ChargerInfoDTO();
         User user = userService.getByUsername(username);
         Order order = orderRepository.findByChargerAndUserAndConfirmed(chargerRepository.findByChargerId(cID), user, false);
 
@@ -180,7 +180,19 @@ public class ChargerServiceImpl implements ChargerService {
                     newOrder.setPayments(Collections.singletonList(payment));
                     paymentRepository.flush();
                     orderRepository.flush();
-                    return chargerInfo;
+
+                    dto.setChargerId(chargerInfo.getCharger().getChargerId());
+                    dto.setChargePower(chargerInfo.getChargingPower());
+                    dto.setChargeTime(chargerInfo.getChargeTime());
+                    dto.setChargerStatus(chargerInfo.getCharger().getStatus());
+                    dto.setChargerType(chargerInfo.getCharger().getType());
+                    dto.setOrderUUID(chargerInfo.getOrder().getUuid());
+                    dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
+                    dto.setChargerTrId(chargerInfo.getChargerTransactionId());
+                    dto.setChargingFinished(false);
+                    dto.setConsumedPower(0L);
+
+                    return dto;
                 }else
                 {
                     throw new RuntimeException("Something wrong with charger");
@@ -242,7 +254,8 @@ public class ChargerServiceImpl implements ChargerService {
     }
 
     @Override
-    public ChargerInfo transaction(Long trid) {
+    public ChargerInfoDTO transaction(Long trid) {
+        ChargerInfoDTO dto = new ChargerInfoDTO();
         try {
             JSONObject transactionInfo = chargerRequestUtils.transaction(trid);
             ChargerInfo chargerInfo = new ChargerInfo();
@@ -262,7 +275,19 @@ public class ChargerServiceImpl implements ChargerService {
                 chargerInfo.setChargerTransactionId(String.valueOf(trid));
                 chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
                 chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
-                return chargerInfo;
+
+                dto.setChargerId(chargerInfo.getCharger().getChargerId());
+                dto.setChargePower(chargerInfo.getChargingPower());
+                dto.setChargeTime(chargerInfo.getChargeTime());
+                dto.setChargerStatus(chargerInfo.getCharger().getStatus());
+                dto.setChargerType(chargerInfo.getCharger().getType());
+                dto.setOrderUUID(chargerInfo.getOrder().getUuid());
+                dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
+                dto.setChargerTrId(chargerInfo.getChargerTransactionId());
+                dto.setChargingFinished(false);
+                dto.setConsumedPower(0L);
+
+                return dto;
             }else
             {
                 throw new RuntimeException("Something wrong with charger");
