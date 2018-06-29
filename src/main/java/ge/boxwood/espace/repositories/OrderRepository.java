@@ -11,5 +11,6 @@ import javax.transaction.Transactional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Order findByChargerAndConfirmed(Charger charger, boolean confirmed);
     Order findByChargerAndUserAndConfirmed(Charger charger, User user, boolean confirmed);
-    Order findByChargerAndChargerTransactionIdAndUser(Charger charger, Integer chargerTransactionId, User user);
+    Order findByChargerAndChargerTransactionIdAndUser(Charger charger, Long chargerTransactionId, User user);
+    Order findByChargerAndChargerTransactionId(Charger charger, Long chargerTransactionId);
 }

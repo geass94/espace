@@ -247,7 +247,9 @@ public class ChargerServiceImpl implements ChargerService {
             if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
                 JSONObject transaction = transactionInfo.getJSONObject("data");
                 Charger charger = this.getOneByCID(Long.valueOf(transaction.get("id").toString()));
+                Order order = orderRepository.findByChargerAndChargerTransactionId(charger, trid);
                 chargerInfo.setCharger(charger);
+                chargerInfo.setOrder(order);
                 chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
                 chargerInfo.setTransStop(transaction.get("transStop") != null && !transaction.get("transStop").equals(null) ? (long)transaction.get("transStop") : 0L);
                 chargerInfo.setMeterStart(transaction.get("meterStart") != null && !transaction.get("meterStart").equals(null) ? (long)(int)transaction.get("meterStart") : 0L);
