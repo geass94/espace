@@ -205,6 +205,7 @@ public class ChargerServiceImpl implements ChargerService {
             try {
                 JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
                 ChargerInfo chargerInfo = new ChargerInfo();
+                chargerInfo.setResponseCode((Integer) stopInfo.get("responseCode"));
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
                     order.confirm();
                     chargerInfo.setOrder(order);
