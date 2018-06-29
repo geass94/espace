@@ -156,12 +156,12 @@ public class ChargerServiceImpl implements ChargerService {
                 JSONObject transactionInfo = chargerRequestUtils.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
                 JSONObject transaction = transactionInfo.getJSONObject("data");
                 chargerInfo.setCharger(charger);
-                chargerInfo.setTransStart((long)transaction.get("transStart"));
-                chargerInfo.setTransStop((long)transaction.get("transStop"));
-                chargerInfo.setMeterStart((long)(int)transaction.get("meterStart"));
-                chargerInfo.setMeterStop((long)(int)transaction.get("meterStop"));
+                chargerInfo.setTransStart(transaction.get("transStart") != null ? (long) transaction.get("transStart") : 0L);
+                chargerInfo.setTransStop(transaction.get("transStop") != null ? (long)transaction.get("transStop") : 0L);
+                chargerInfo.setMeterStart(transaction.get("meterStart") != null ? (long)(int)transaction.get("meterStart") : 0L);
+                chargerInfo.setMeterStop(transaction.get("meterStop") != null ? (long)(int)transaction.get("meterStop") : 0L);
                 chargerInfo.setChargingPower(Double.valueOf(transaction.get("kiloWattHour").toString()));
-                chargerInfo.setChargeTime((long)(int)transaction.get("chargingTime"));
+                chargerInfo.setChargeTime(transaction.get("chargingTime") != null ? (long)(int)transaction.get("chargingTime") : 0L);
                 chargerInfo.setResponseCode((Integer) chargerStart.get("responseCode"));
 
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
@@ -250,12 +250,12 @@ public class ChargerServiceImpl implements ChargerService {
                 JSONObject transaction = transactionInfo.getJSONObject("data");
                 Charger charger = this.getOneByCID(Long.valueOf(transaction.get("id").toString()));
                 chargerInfo.setCharger(charger);
-                chargerInfo.setTransStart((long)transaction.get("transStart"));
-                chargerInfo.setTransStop((long)transaction.get("transStop"));
-                chargerInfo.setMeterStart((long)(int)transaction.get("meterStart"));
-                chargerInfo.setMeterStop((long)(int)transaction.get("meterStop"));
+                chargerInfo.setTransStart(transaction.get("transStart") != null ? (long) transaction.get("transStart") : 0L);
+                chargerInfo.setTransStop(transaction.get("transStop") != null ? (long)transaction.get("transStop") : 0L);
+                chargerInfo.setMeterStart(transaction.get("meterStart") != null ? (long)(int)transaction.get("meterStart") : 0L);
+                chargerInfo.setMeterStop(transaction.get("meterStop") != null ? (long)(int)transaction.get("meterStop") : 0L);
                 chargerInfo.setChargingPower(Double.valueOf(transaction.get("kiloWattHour").toString()));
-                chargerInfo.setChargeTime((long)(int)transaction.get("chargingTime"));
+                chargerInfo.setChargeTime(transaction.get("chargingTime") != null ? (long)(int)transaction.get("chargingTime") : 0L);
                 chargerInfo.setChargerTransactionId(String.valueOf(trid));
                 return chargerInfo;
             }else
