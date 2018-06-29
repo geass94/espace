@@ -241,7 +241,7 @@ public class ChargerServiceImpl implements ChargerService {
     @Override
     public Charger info(Long cid) {
         try {
-            JSONObject info = new JSONObject(chargerRequestUtils.info(cid));
+            JSONObject info = chargerRequestUtils.info(cid);
             JSONObject chrgInfo = info.getJSONObject("data");
             Long chargerId = Long.valueOf(chrgInfo.get("id").toString());
             Charger charger = chargerRepository.findByChargerId(chargerId);
