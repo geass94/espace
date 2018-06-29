@@ -143,9 +143,9 @@ public class ChargerServiceImpl implements ChargerService {
         ChargerInfoDTO dto = new ChargerInfoDTO();
         User user = userService.getByUsername(username);
         Order order = orderRepository.findByChargerAndUserAndConfirmed(chargerRepository.findByChargerId(cID), user, false);
+        Charger charger = this.info(cID);
 
-        Charger charger = this.getOneByCID(cID);
-        if(order == null && charger.getStatus() != 0){
+        if(order == null && charger.getStatus() == 0){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
@@ -191,7 +191,8 @@ public class ChargerServiceImpl implements ChargerService {
                     dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                     dto.setChargingFinished(false);
                     dto.setConsumedPower(0L);
-
+                    charger.setStatus(1);
+                    chargerRepository.save(charger);
                     return dto;
                 }else
                 {
@@ -207,11 +208,11 @@ public class ChargerServiceImpl implements ChargerService {
 
 
     @Override
-    public ChargerInfo stop(Long cID) {
+    public ChargerInfoDTO stop(Long cID) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
-        Charger charger = this.getOneByCID(cID);
+        Charger charger = this.info(cID);
         Order order = orderRepository.findByChargerAndUserAndConfirmed(charger, user, false);
         if(order != null){
             try {
@@ -222,7 +223,9 @@ public class ChargerServiceImpl implements ChargerService {
                     order.confirm();
                     chargerInfo.setOrder(order);
                     orderRepository.save(order);
-                    return chargerInfo;
+                    ChargerInfoDTO dto = this.transaction(order.getChargerTransactionId());
+
+                    return dto;
                 }else
                 {
                     throw new RuntimeException("Something wrong with charger");
@@ -236,8 +239,7 @@ public class ChargerServiceImpl implements ChargerService {
     }
 
     @Override
-    public ChargerInfo info(Long cid) {
-        ChargerInfo chargerInfo = new ChargerInfo();
+    public Charger info(Long cid) {
         try {
             JSONObject info = new JSONObject(chargerRequestUtils.info(cid));
             JSONObject chrgInfo = info.getJSONObject("data");
@@ -246,8 +248,7 @@ public class ChargerServiceImpl implements ChargerService {
             charger.setStatus( Integer.valueOf(chrgInfo.get("status").toString()) );
             charger.setCode( chrgInfo.get("code").toString() );
             chargerRepository.save(charger);
-            chargerInfo.setCharger(charger);
-            return chargerInfo;
+            return charger;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -284,9 +285,15 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setOrderUUID(chargerInfo.getOrder().getUuid());
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
-                dto.setChargingFinished(false);
-                dto.setConsumedPower(0L);
-
+                if(!chargerInfo.getStopUUID().isEmpty()){
+                    dto.setChargingFinished(true);
+                    dto.setConsumedPower(12424L);
+                    chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
+                }
+                else{
+                    dto.setChargingFinished(false);
+                    dto.setConsumedPower(0L);
+                }
                 return dto;
             }else
             {

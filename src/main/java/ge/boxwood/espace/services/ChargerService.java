@@ -22,7 +22,7 @@ public interface ChargerService {
     Long freeChargers();
 
     ChargerInfoDTO start(Long cID, Long conID, Long cardID);
-    ChargerInfo stop(Long cID);
-    ChargerInfo info(Long cid);
+    ChargerInfoDTO stop(Long cID);
+    Charger info(Long cid);
     ChargerInfoDTO transaction(Long trid);
 }
