@@ -1,21 +1,11 @@
 package ge.boxwood.espace.config.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import ge.boxwood.espace.models.Charger;
-import ge.boxwood.espace.models.ChargerInfo;
-import ge.boxwood.espace.services.ChargerService;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-
 
 @Component
 public class ChargerRequestUtils {
