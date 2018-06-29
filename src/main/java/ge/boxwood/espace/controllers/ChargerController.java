@@ -26,7 +26,7 @@ public class ChargerController {
     @GetMapping("/start")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> startCharging(@RequestParam(value = "chargerId")Long cid, @RequestParam(value = "connectorId")Long conid, @RequestParam(value = "cardId", required = false, defaultValue = "0")Long cardid) throws Exception {
-        ChargerInfo chargerInfo = chargerService.start(cid, conid, cardid);
+        ChargerInfoDTO chargerInfo = chargerService.start(cid, conid, cardid);
         return ResponseEntity.ok(chargerInfo);
     }
 
@@ -52,7 +52,7 @@ public class ChargerController {
     @GetMapping("/transaction")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> chargerTransactionInfo(@RequestParam("trId") Long trid) throws Exception {
-        ChargerInfo chargerInfo = chargerService.transaction(trid);
+        ChargerInfoDTO chargerInfo = chargerService.transaction(trid);
         if(chargerInfo != null){
             return ResponseEntity.ok(chargerInfo);
         }
