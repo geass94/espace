@@ -152,8 +152,8 @@ public class ChargerServiceImpl implements ChargerService {
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
-                chargerInfo.setChargerTransactionId(chargerStart.get("data").toString());
-                JSONObject transactionInfo = chargerRequestUtils.transaction(chargerInfo.getChargerTransactionId() != null && !chargerInfo.getChargerTransactionId().equals(null) ? Long.valueOf(chargerInfo.getChargerTransactionId()) : 0L);
+                chargerInfo.setChargerTransactionId(chargerStart.get("data") != null && !chargerStart.get("data").equals(null) ? chargerStart.get("data").toString() : "0");
+                JSONObject transactionInfo = chargerRequestUtils.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
                 JSONObject transaction = transactionInfo.getJSONObject("data");
                 chargerInfo.setCharger(charger);
                 chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
