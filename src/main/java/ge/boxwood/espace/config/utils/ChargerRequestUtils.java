@@ -10,10 +10,10 @@ import java.net.URL;
 @Component
 public class ChargerRequestUtils {
     private final String USER_AGENT = "Mozilla/5.0";
-    private final String SERVICE_URL = "http://devel.ge:9090/es-services/mobile/ws/charger";
+    private final String SERVICE_URL = "http://devel.ge:9090/es-services/mobile/ws";
 
     public JSONObject start(Long cid, Long conid) throws Exception {
-        URL obj = new URL(SERVICE_URL+"/start/"+cid+"/"+conid);
+        URL obj = new URL(SERVICE_URL+"/charger/start/"+cid+"/"+conid);
 
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
@@ -37,7 +37,7 @@ public class ChargerRequestUtils {
     }
 
     public JSONObject stop(Long cid, int trid) throws Exception{
-        URL obj = new URL(SERVICE_URL+"/stop/"+cid+"/"+trid);
+        URL obj = new URL(SERVICE_URL+"/charger/stop/"+cid+"/"+trid);
 
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
@@ -60,7 +60,7 @@ public class ChargerRequestUtils {
     }
 
     public JSONObject info(Long cid) throws Exception {
-        URL obj = new URL(SERVICE_URL+"/info/"+cid);
+        URL obj = new URL(SERVICE_URL+"/charger/info/"+cid);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
