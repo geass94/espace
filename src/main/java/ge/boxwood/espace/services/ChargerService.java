@@ -20,7 +20,7 @@ public interface ChargerService {
 
     Long freeChargers();
 
-    ChargerInfo start(Long cID, Long conID);
+    ChargerInfo start(Long cID, Long conID, Long cardID);
     ChargerInfo stop(Long cID);
     ChargerInfo info(Long cid);
     ChargerInfo transaction(Long trid);

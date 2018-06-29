@@ -4,6 +4,8 @@ import ge.boxwood.espace.models.Order;
 import ge.boxwood.espace.models.Payment;
 import ge.boxwood.espace.models.User;
 import ge.boxwood.espace.models.enums.PaymentType;
+import ge.boxwood.espace.models.enums.Status;
+import ge.boxwood.espace.repositories.CreditCardRepository;
 import ge.boxwood.espace.repositories.OrderRepository;
 import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.security.TokenHelper;
@@ -12,6 +14,7 @@ import ge.boxwood.espace.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +34,8 @@ public class OrderController {
     private TokenHelper tokenHelper;
     @Autowired
     private ChargerService chargerService;
+    @Autowired
+    private CreditCardRepository creditCardRepository;
     @PostMapping("/giveOrder")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> giveOrder(HttpServletRequest request){
@@ -44,6 +49,15 @@ public class OrderController {
         Payment payment = new Payment((float) 123.32, order);
         paymentRepository.save(payment);
         return ResponseEntity.ok(order);
+    }
+
+    @GetMapping("/cards")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> getCards(HttpServletRequest request){
+        String authToken = tokenHelper.getToken( request );
+        String username = tokenHelper.getUsernameFromToken(authToken);
+        User user = userService.getByUsername(username);
+        return ResponseEntity.ok(creditCardRepository.findAllByUserAndStatus(user, Status.ACTIVE));
     }
 
     @PostMapping("/addUserCreditCard")

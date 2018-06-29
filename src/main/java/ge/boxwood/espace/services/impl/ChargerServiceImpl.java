@@ -3,10 +3,7 @@ package ge.boxwood.espace.services.impl;
 import ge.boxwood.espace.config.utils.ChargerRequestUtils;
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
-import ge.boxwood.espace.repositories.ChargerRepository;
-import ge.boxwood.espace.repositories.ConnectorRepository;
-import ge.boxwood.espace.repositories.OrderRepository;
-import ge.boxwood.espace.repositories.PaymentRepository;
+import ge.boxwood.espace.repositories.*;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.PlaceService;
 import ge.boxwood.espace.services.UserService;
@@ -42,6 +39,8 @@ public class ChargerServiceImpl implements ChargerService {
     private ConnectorRepository connectorRepository;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private CreditCardRepository creditCardRepository;
     @Override
     public Charger create(Charger charger) {
         if (charger.getPlace() != null){
@@ -141,7 +140,7 @@ public class ChargerServiceImpl implements ChargerService {
 
 
     @Override
-    public ChargerInfo start(Long cID, Long conID) {
+    public ChargerInfo start(Long cID, Long conID, Long cardID) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
 
@@ -172,6 +171,11 @@ public class ChargerServiceImpl implements ChargerService {
                     chargerInfo.setOrder(newOrder);
                     Payment payment = new Payment(0f, newOrder);
                     orderRepository.save(newOrder);
+                    CreditCard creditCard = new CreditCard();
+                    if(cardID != null && cardID > 0){
+                        creditCard = creditCardRepository.findOne(cardID);
+                    }
+                    payment.setCreditCard(creditCard);
                     paymentRepository.save(payment);
                     orderRepository.flush();
                     return chargerInfo;
