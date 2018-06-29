@@ -253,7 +253,7 @@ public class ChargerServiceImpl implements ChargerService {
                 chargerInfo.setTransStop((long)transaction.get("transStop"));
                 chargerInfo.setMeterStart((long)(int)transaction.get("meterStart"));
                 chargerInfo.setMeterStop((long)(int)transaction.get("meterStop"));
-                chargerInfo.setChargingPower((long)(int)transaction.get("kiloWattHour"));
+                chargerInfo.setChargingPower(Double.valueOf(transaction.get("kiloWattHour").toString()));
                 chargerInfo.setChargeTime((long)transaction.get("chargingTime"));
                 chargerInfo.setChargerTransactionId(String.valueOf(trid));
                 return chargerInfo;
