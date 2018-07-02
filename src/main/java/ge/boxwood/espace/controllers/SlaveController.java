@@ -47,7 +47,7 @@ public class SlaveController {
         data.put("id", 60);
         data.put("latitude", 43.12312);
         data.put("longitude", 43.53211);
-        data.put("status", -1);
+        data.put("status", 0);
         data.put("type", 0);
         data.put("description", "test device");
         data.put("code", 4322);
