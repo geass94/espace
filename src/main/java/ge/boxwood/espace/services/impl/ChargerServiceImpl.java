@@ -5,9 +5,7 @@ import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
 import ge.boxwood.espace.repositories.*;
 import ge.boxwood.espace.services.ChargerService;
-import ge.boxwood.espace.services.PlaceService;
 import ge.boxwood.espace.services.UserService;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -81,13 +79,6 @@ public class ChargerServiceImpl implements ChargerService {
         }
         if (raw.getLongitude() != charger.getLongitude() && charger.getLongitude() != null){
             raw.setLongitude(charger.getLongitude());
-        }
-        if (raw.getPlace() != null && raw.getPlace() != charger.getPlace() && charger.getPlace() != null){
-            raw.setPlace(charger.getPlace());
-        }
-        if(raw.getPlace() == null && charger.getPlace() != null){
-            Place place = placeService.create(charger.getPlace());
-            raw.setPlace(place);
         }
         if (raw.getCode() != charger.getCode() && charger.getCode() != null){
             raw.setCode(charger.getCode());

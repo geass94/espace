@@ -1,9 +1,7 @@
 package ge.boxwood.espace.services;
 
 import ge.boxwood.espace.models.Charger;
-import ge.boxwood.espace.models.ChargerInfo;
 import ge.boxwood.espace.models.ChargerInfoDTO;
-import ge.boxwood.espace.models.Place;
 
 import java.util.List;
 

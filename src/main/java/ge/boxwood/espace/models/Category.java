@@ -1,5 +1,7 @@
 package ge.boxwood.espace.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -8,10 +10,19 @@ import java.util.List;
 public class Category extends BaseEntity {
     @Column
     private String name;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             mappedBy = "category")
-    private List<Place> places;
+    private List<Charger> chargers;
+
+    public List<Charger> getChargers() {
+        return chargers;
+    }
+
+    public void setChargers(List<Charger> chargers) {
+        this.chargers = chargers;
+    }
 
     public String getName() {
         return name;
@@ -19,13 +30,5 @@ public class Category extends BaseEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Place> getPlaces() {
-        return places;
-    }
-
-    public void setPlaces(List<Place> places) {
-        this.places = places;
     }
 }

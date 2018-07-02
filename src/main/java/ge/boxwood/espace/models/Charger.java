@@ -31,13 +31,23 @@ public class Charger extends BaseEntity {
     @OneToMany(mappedBy = "charger", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Order> orders;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="place_id", nullable = true)
-    private Place place;
     @OneToMany(cascade = CascadeType.MERGE,
             fetch = FetchType.LAZY,
             mappedBy = "charger")
     private List<Connector> connectors;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="category_id", nullable = true)
+    private Category category;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public Double getLongitude() {
         return longitude;
@@ -81,18 +91,6 @@ public class Charger extends BaseEntity {
 
     public Long getChargerId() {
         return chargerId;
-    }
-
-    public void setChargerId(Long chargerId) {
-        this.chargerId = chargerId;
-    }
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    public Place getPlace() {
-        return place;
-    }
-
-    public void setPlace(Place place) {
-        this.place = place;
     }
 
     public String getDescription() {

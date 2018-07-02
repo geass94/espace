@@ -2,7 +2,6 @@ package ge.boxwood.espace.controllers;
 
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.services.ChargerService;
-import ge.boxwood.espace.services.PlaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +14,6 @@ import java.util.List;
 public class ChargerController {
     @Autowired
     private ChargerService chargerService;
-    @Autowired
-    private PlaceService placeService;
 
     @GetMapping("/free")
     public ResponseEntity<?> getFreeChargers(){
@@ -72,18 +69,10 @@ public class ChargerController {
 
     }
 
-    @GetMapping("/closest/by-charger")
+    @GetMapping("/closest")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> getClosestChargers(@RequestParam("lat") double lat, @RequestParam("lng") double lng){
         return ResponseEntity.ok( chargerService.getClosestChargers(lat, lng) );
-    }
-
-    @GetMapping("/closest/by-place")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> getClosestChargersByPlace(@RequestParam("lat") double lat, @RequestParam("lng") double lng){
-        List<Place> placeList = placeService.getClosestPlaces(lat, lng);
-        List<Charger> chargerList = chargerService.getAllChargersByClosestPlaces(placeList);
-        return ResponseEntity.ok( chargerList );
     }
 
     @PutMapping("/edit/{cID}")
