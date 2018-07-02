@@ -254,16 +254,15 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 Long seconds = TimeUnit.MILLISECONDS.toSeconds(dto.getChargeTime());
-                double p = pricingService.getPriceForChargingPower(dto.getChargePower()) * (seconds / 60 / 60);
-                DecimalFormat df = new DecimalFormat("#.#");
-                String price = df.format(p);
-                System.out.println(seconds);
-                System.out.println(pricingService.getPriceForChargingPower(dto.getChargePower()));
-                dto.setCurrentPrice(Float.valueOf(price));
+                String p = String.valueOf(pricingService.getPriceForChargingPower(dto.getChargePower()) * (seconds / 60 / 60));
+                DecimalFormat df = new DecimalFormat("#.##");
+                float price = Float.valueOf(df.format(p));
+                System.out.println(price);
+                dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
-                order.setPrice(dto.getCurrentPrice());
+                order.setPrice(price);
                 Payment payment = order.getPayments().get(0);
-                payment.setPrice(dto.getCurrentPrice());
+                payment.setPrice(price);
                 orderRepository.save(order);
                 paymentRepository.save(payment);
                 if(!chargerInfo.getStopUUID().isEmpty()){
