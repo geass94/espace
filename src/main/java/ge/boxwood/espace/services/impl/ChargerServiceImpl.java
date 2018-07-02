@@ -5,6 +5,7 @@ import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
 import ge.boxwood.espace.repositories.*;
 import ge.boxwood.espace.services.ChargerService;
+import ge.boxwood.espace.services.PricingService;
 import ge.boxwood.espace.services.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ChargerServiceImpl implements ChargerService {
@@ -34,6 +36,8 @@ public class ChargerServiceImpl implements ChargerService {
     private PaymentRepository paymentRepository;
     @Autowired
     private CreditCardRepository creditCardRepository;
+    @Autowired
+    private PricingService pricingService;
     @Override
     public Charger create(Charger charger) {
 
@@ -248,14 +252,16 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
+                Long hours = TimeUnit.MILLISECONDS.toHours(dto.getChargeTime());
+                float price = pricingService.getPriceForChargingPower(dto.getChargePower()) * hours;
+                dto.setCurrentPrice(price);
+                dto.setConsumedPower(chargerInfo.getConsumedPower());
                 if(!chargerInfo.getStopUUID().isEmpty()){
                     dto.setChargingFinished(true);
-                    dto.setConsumedPower(12424L);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
                 }
                 else{
                     dto.setChargingFinished(false);
-                    dto.setConsumedPower(0L);
                 }
                 return dto;
             }else
