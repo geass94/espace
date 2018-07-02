@@ -237,7 +237,7 @@ public class ChargerServiceImpl implements ChargerService {
                 chargerInfo.setChargerTransactionId(String.valueOf(trid));
                 chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
                 chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
-                chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("uuidEnd").toString()) : 0L);
+                chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("consumed").toString()) : 0L);
 
                 dto.setChargerId(chargerInfo.getCharger().getChargerId());
                 dto.setChargePower(chargerInfo.getChargingPower());
