@@ -32,9 +32,9 @@ public class SlaveController {
     @GetMapping("/charger/stop/{chID}/{trID}")
     public ResponseEntity<?> stop(@PathVariable("chID") Long cid, @PathVariable("trID") Long trid){
         HashMap stop = new HashMap();
-        stop.put("status", 0);
+        stop.put("status", 1);
         stop.put("description", "");
-        stop.put("data", 2321);
+        stop.put("data", 2411);
         return ResponseEntity.ok(stop);
     }
 
@@ -44,7 +44,7 @@ public class SlaveController {
         info.put("status", 0);
         info.put("description", "");
         HashMap data = new HashMap();
-        data.put("id", 7);
+        data.put("id", 60);
         data.put("latitude", 43.12312);
         data.put("longitude", 43.53211);
         data.put("status", -1);
@@ -77,6 +77,7 @@ public class SlaveController {
         data.put("meterStart", 2869777);
         data.put("meterStop", 2872589);
         data.put("kiloWattHour", 3.8);
+        data.put("consumed", 32532L);
         data.put("chargingTime", 2852110);
         resp.put("status", 0);
         resp.put("description", "");
