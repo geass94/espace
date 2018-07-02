@@ -227,7 +227,7 @@ public class ChargerServiceImpl implements ChargerService {
                 Charger charger = this.getOneByCID(Long.valueOf(transaction.get("id").toString()));
                 Order order = orderRepository.findByChargerAndChargerTransactionId(charger, trid);
                 chargerInfo.setCharger(charger);
-                chargerInfo.setOrder(order);
+                chargerInfo.setOrder(order != null ? order : new Order());
                 chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
                 chargerInfo.setTransStop(transaction.get("transStop") != null && !transaction.get("transStop").equals(null) ? (long)transaction.get("transStop") : 0L);
                 chargerInfo.setMeterStart(transaction.get("meterStart") != null && !transaction.get("meterStart").equals(null) ? (long)(int)transaction.get("meterStart") : 0L);
