@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -253,11 +254,18 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 Long seconds = TimeUnit.MILLISECONDS.toSeconds(dto.getChargeTime());
-                float price = pricingService.getPriceForChargingPower(dto.getChargePower()) * (seconds / 60 / 60);
+                double p = pricingService.getPriceForChargingPower(dto.getChargePower()) * (seconds / 60 / 60);
+                DecimalFormat df = new DecimalFormat("#.#");
+                String price = df.format(p);
                 System.out.println(seconds);
                 System.out.println(pricingService.getPriceForChargingPower(dto.getChargePower()));
-                dto.setCurrentPrice(price);
+                dto.setCurrentPrice(Float.valueOf(price));
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
+                order.setPrice(dto.getCurrentPrice());
+                Payment payment = order.getPayments().get(0);
+                payment.setPrice(dto.getCurrentPrice());
+                orderRepository.save(order);
+                paymentRepository.save(payment);
                 if(!chargerInfo.getStopUUID().isEmpty()){
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
