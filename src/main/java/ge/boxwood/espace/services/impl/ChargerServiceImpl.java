@@ -29,8 +29,6 @@ public class ChargerServiceImpl implements ChargerService {
     @Autowired
     private EntityManager em;
     @Autowired
-    private PlaceService placeService;
-    @Autowired
     private ConnectorRepository connectorRepository;
     @Autowired
     private PaymentRepository paymentRepository;
@@ -38,16 +36,9 @@ public class ChargerServiceImpl implements ChargerService {
     private CreditCardRepository creditCardRepository;
     @Override
     public Charger create(Charger charger) {
-        if (charger.getPlace() != null){
-            Place place = placeService.create(charger.getPlace());
-            charger.setPlace(place);
-        }
+
         Charger charger1 = chargerRepository.save(charger);
-        if (charger1 != null && charger.getPlace() != null){
-            Place place1 = charger1.getPlace();
-            place1.getChargers().add(charger1);
-            placeService.update(place1, place1.getId());
-        }
+
         return charger1;
     }
 
@@ -274,17 +265,6 @@ public class ChargerServiceImpl implements ChargerService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    @Override
-    public List<Charger> getAllChargersByPlace(Long id) {
-        return chargerRepository.findAllByPlace( placeService.getOne(id) );
-    }
-
-    @Override
-    public List<Charger> getAllChargersByClosestPlaces(List<Place> places) {
-        return chargerRepository.findAllByPlaceIn(places);
     }
 
     @Override

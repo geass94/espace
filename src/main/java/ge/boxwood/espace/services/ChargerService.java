@@ -14,8 +14,6 @@ public interface ChargerService {
     Charger getOneByCID(Long id);
     List<Charger> getAll();
     List<Charger> getClosestChargers(Double latitude, Double longitude);
-    List<Charger> getAllChargersByPlace(Long id);
-    List<Charger> getAllChargersByClosestPlaces(List<Place> places);
 
     Long freeChargers();
 
