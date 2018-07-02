@@ -155,10 +155,11 @@ public class ChargerServiceImpl implements ChargerService {
                     newOrder.setPayments(Collections.singletonList(payment));
                     paymentRepository.flush();
                     orderRepository.flush();
-                    ChargerInfoDTO dto = this.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
                     charger.setStatus(1);
-                    dto.setChargerStatus(charger.getStatus());
                     chargerRepository.save(charger);
+                    chargerRepository.flush();
+                    ChargerInfoDTO dto = this.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
+                    dto.setChargerStatus(charger.getStatus());
                     return dto;
                 }else
                 {
