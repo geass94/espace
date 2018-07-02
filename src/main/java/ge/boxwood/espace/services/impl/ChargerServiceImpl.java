@@ -255,6 +255,7 @@ public class ChargerServiceImpl implements ChargerService {
                 Long seconds = TimeUnit.MILLISECONDS.toSeconds(dto.getChargeTime());
                 float price = pricingService.getPriceForChargingPower(dto.getChargePower()) * (seconds / 60 / 60);
                 System.out.println(seconds);
+                System.out.println(pricingService.getPriceForChargingPower(dto.getChargePower()));
                 dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 if(!chargerInfo.getStopUUID().isEmpty()){
