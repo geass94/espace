@@ -12,7 +12,7 @@ public class PricingServiceImpl implements PricingService {
     private PricingRepository pricingRepository;
     @Override
     public Float getPriceForChargingPower(Double chargingPower) {
-        Pricing pricing = pricingRepository.findPricingByRangeStartIsNearAndRangeEndIsNear(chargingPower);
+        Pricing pricing = pricingRepository.findPricingByRangeStartIsNearAndRangeEndIsNear(chargingPower, chargingPower);
         return pricing.getPrice();
     }
 }
