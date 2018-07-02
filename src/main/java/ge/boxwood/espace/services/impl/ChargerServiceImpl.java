@@ -254,7 +254,7 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 Long seconds = TimeUnit.MILLISECONDS.toSeconds(dto.getChargeTime());
-                String p = String.valueOf(pricingService.getPriceForChargingPower(dto.getChargePower()) * (seconds / 60 / 60));
+                Float p = (pricingService.getPriceForChargingPower(dto.getChargePower()) * (seconds / 60 / 60));
                 DecimalFormat df = new DecimalFormat("#.##");
                 float price = Float.parseFloat(df.format(p));
                 System.out.println(price);
