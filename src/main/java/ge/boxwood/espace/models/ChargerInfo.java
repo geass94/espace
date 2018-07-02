@@ -13,6 +13,7 @@ public class ChargerInfo {
     private Long chargeTime;
     private String startUUID;
     private String stopUUID;
+    private Long consumedPower;
 
     public Charger getCharger() {
         return charger;
@@ -108,5 +109,13 @@ public class ChargerInfo {
 
     public void setStopUUID(String stopUUID) {
         this.stopUUID = stopUUID;
+    }
+
+    public Long getConsumedPower() {
+        return consumedPower;
+    }
+
+    public void setConsumedPower(Long consumedPower) {
+        this.consumedPower = consumedPower;
     }
 }

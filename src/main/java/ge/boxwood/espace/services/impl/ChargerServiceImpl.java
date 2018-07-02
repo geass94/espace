@@ -162,7 +162,7 @@ public class ChargerServiceImpl implements ChargerService {
                 chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
                 chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
                 chargerInfo.setResponseCode((Integer) chargerStart.get("responseCode"));
-
+                chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("uuidEnd").toString()) : 0L);
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
                     Order newOrder = new Order(user);
                     newOrder.setPaymentType(PaymentType.CREDITCARD);
@@ -190,7 +190,7 @@ public class ChargerServiceImpl implements ChargerService {
                     dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                     dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                     dto.setChargingFinished(false);
-                    dto.setConsumedPower(0L);
+                    dto.setConsumedPower(chargerInfo.getConsumedPower());
                     charger.setStatus(1);
                     chargerRepository.save(charger);
                     return dto;
@@ -276,6 +276,7 @@ public class ChargerServiceImpl implements ChargerService {
                 chargerInfo.setChargerTransactionId(String.valueOf(trid));
                 chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
                 chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
+                chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("uuidEnd").toString()) : 0L);
 
                 dto.setChargerId(chargerInfo.getCharger().getChargerId());
                 dto.setChargePower(chargerInfo.getChargingPower());
@@ -285,6 +286,7 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setOrderUUID(chargerInfo.getOrder().getUuid());
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
+                dto.setConsumedPower(chargerInfo.getConsumedPower());
                 if(!chargerInfo.getStopUUID().isEmpty()){
                     dto.setChargingFinished(true);
                     dto.setConsumedPower(12424L);
