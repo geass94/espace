@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PricingRepository extends JpaRepository<Pricing, Long> {
-    Pricing findDistinctFirstByRangeStartIsGreaterThanEqualAndRangeEndIsLessThanEqual(double start, double end);
+    @Query("select p from Pricing p where p.rangeStart<= ?1 AND p.rangeEnd>= ?1 ORDER BY id DESC")
+    Pricing findPriceWithinRanges(double start);
 }
