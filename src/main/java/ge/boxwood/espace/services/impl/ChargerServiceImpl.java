@@ -261,7 +261,7 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
-                Payment payment = order.getPayments().get(0);
+                Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
                 payment.setPrice(price);
                 orderRepository.save(order);
                 paymentRepository.save(payment);
