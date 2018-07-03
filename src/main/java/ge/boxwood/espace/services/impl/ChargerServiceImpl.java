@@ -289,7 +289,7 @@ public class ChargerServiceImpl implements ChargerService {
                 float price = (pricingService.getPriceForChargingPower(dto.getChargePower()));
                 System.out.println("price: "+price);
                 DecimalFormat df = new DecimalFormat("#.##");
-                String time = df.format(seconds / 60l / 60l);
+                String time = df.format( ( seconds / (60l * 60l) ) );
                 System.out.println("time: "+time);
                 price = Float.parseFloat(time) * price;
                 System.out.println("current price: "+price);
