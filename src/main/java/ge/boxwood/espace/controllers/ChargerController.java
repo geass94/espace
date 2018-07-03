@@ -24,6 +24,7 @@ public class ChargerController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> startCharging(@RequestParam(value = "chargerId")Long cid, @RequestParam(value = "connectorId")Long conid, @RequestParam(value = "cardId", required = false, defaultValue = "0")Long cardid) throws Exception {
         cardid = 0L;
+        cardid = Long.valueOf(cardid);
         ChargerInfoDTO chargerInfo = chargerService.start(cid, conid, cardid);
         return ResponseEntity.ok(chargerInfo);
     }
