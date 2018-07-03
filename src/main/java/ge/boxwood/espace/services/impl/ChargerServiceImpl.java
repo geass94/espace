@@ -112,7 +112,7 @@ public class ChargerServiceImpl implements ChargerService {
                 " AS distance_in_km\n" +
                 "FROM espace.chargers AS ch WHERE ch.latitude IS NOT NULL AND ch.longitude IS NOT NULL \n" +
                 "ORDER BY distance_in_km ASC\n" +
-                "LIMIT 0,10", Charger.class);
+                "LIMIT 0,50", Charger.class);
 
         q.setParameter("lat", latitude);
         q.setParameter("lng", longitude);
@@ -122,7 +122,9 @@ public class ChargerServiceImpl implements ChargerService {
 
 
 
-
+// როდესაც ეშვება start მეთოდი პირველ რიგში მოწმდება არსებობს თუ არა დაუსრულებელი ორდერი ამ ჩარჯერეზე.
+//    შემდეგ ეშვება info მეთოდი და ახლდება ჩარჯერის ინფორმაცია და ინახება ჩემთან ბაზაში.
+//    იქმნება ორდერი, ფეიმენტი და ინახება როგორც დაუსულებელი გადახდა.
     @Override
     public ChargerInfoDTO start(Long cID, Long conID, Long cardID) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
@@ -205,6 +207,7 @@ public class ChargerServiceImpl implements ChargerService {
         }
     }
 
+// როდესაც ეშვება info მეთოდი, მოწმდება ჩარჯერთან მისი ახლანდელი ინფორმაცია და ჩემთან ბაზაში ახლდება ჩანაწერი იმ კონკრეტული ჩარჯერის ID-ზე.
     @Override
     public Charger info(Long cid) {
         try {
@@ -221,6 +224,9 @@ public class ChargerServiceImpl implements ChargerService {
         }
     }
 
+//    ეს მეთოდი ამომწმებს ჩარჯერის სტატუს, მის მეტერებს და ინფორმაციას დატენვაზე.
+//    თუ არსებობს uuidEnd სტრიქონი ეს იმას ნიშნავს რომ ჩარჯერი გამოაერთეს მანქანიდან და დატენვის პროცესი დასრულდა.
+//    ამ შემთხვევაში ეშვება ჩემთამ stop მეთოდი და ბრუნდება ფეიმენტის ID რაზეც უკვე ხორციელდება გადახდა საბანკო ბარათით
     @Override
     public ChargerInfoDTO transaction(Long trid) {
         ChargerInfoDTO dto = new ChargerInfoDTO();
