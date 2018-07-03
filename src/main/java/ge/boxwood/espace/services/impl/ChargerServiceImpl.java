@@ -229,6 +229,9 @@ public class ChargerServiceImpl implements ChargerService {
 //    ამ შემთხვევაში ეშვება ჩემთამ stop მეთოდი და ბრუნდება ფეიმენტის ID რაზეც უკვე ხორციელდება გადახდა საბანკო ბარათით
     @Override
     public ChargerInfoDTO transaction(Long trid) {
+        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        String username = currentUser.getName();
+        User user = userService.getByUsername(username);
         ChargerInfoDTO dto = new ChargerInfoDTO();
         try {
             JSONObject transactionInfo = chargerRequestUtils.transaction(trid);
@@ -236,9 +239,10 @@ public class ChargerServiceImpl implements ChargerService {
             chargerInfo.setResponseCode((Integer) transactionInfo.get("responseCode"));
             if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
                 JSONObject transaction = transactionInfo.getJSONObject("data");
-                Charger charger = this.getOneByCID(Long.valueOf(transaction.get("id").toString()));
+//                Charger charger = this.getOneByCID(Long.valueOf(transaction.get("id").toString()));
                 System.out.println("charger ID: "+Long.valueOf(transaction.get("id").toString()));
-                Order order = orderRepository.findByChargerAndChargerTransactionIdAndConfirmed(charger, trid, false);
+                Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, trid, false);
+                Charger charger = order.getCharger();
                 chargerInfo.setCharger(charger);
                 chargerInfo.setOrder(order != null ? order : new Order());
                 chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
