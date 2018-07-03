@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class ChargerServiceImpl implements ChargerService {
+    private int finisher = 0;
     @Autowired
     private ChargerRepository chargerRepository;
     @Autowired
@@ -293,13 +294,14 @@ public class ChargerServiceImpl implements ChargerService {
 //                payment.setPrice(price);
 //                orderRepository.save(order);
 //                paymentRepository.save(payment);
-                if(!chargerInfo.getStopUUID().isEmpty()){
+                if(!chargerInfo.getStopUUID().isEmpty() || this.finisher == 3){
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
                 }
                 else{
                     dto.setChargingFinished(false);
                 }
+                this.finisher++;
                 return dto;
             }else
             {
