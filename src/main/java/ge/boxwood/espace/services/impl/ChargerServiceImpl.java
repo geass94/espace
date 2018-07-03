@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -286,19 +287,19 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 Long seconds = TimeUnit.MILLISECONDS.toSeconds(dto.getChargeTime());
-                float price = (pricingService.getPriceForChargingPower(dto.getChargePower()));
-                System.out.println("price: "+price);
-                Long time = seconds /60/60;
-                System.out.println("time: "+time);
-                price = time * price;
+                float minutes = Float.valueOf(seconds.toString()) / 60;
+                float hours = minutes / 60;
+                float pr = (pricingService.getPriceForChargingPower(dto.getChargePower()));
+                System.out.println("time: "+hours);
+                float price = hours * pr;
                 System.out.println("current price: "+price);
                 dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
-//                order.setPrice(price);
-//                Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
-//                payment.setPrice(price);
-//                orderRepository.save(order);
-//                paymentRepository.save(payment);
+                order.setPrice(price);
+                Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
+                payment.setPrice(price);
+                orderRepository.save(order);
+                paymentRepository.save(payment);
                 if(!chargerInfo.getStopUUID().isEmpty() || this.finisher == 3){
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
