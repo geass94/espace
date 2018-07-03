@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class ChargerServiceImpl implements ChargerService {
-    private int finisher = 0;
+    private static int finisher = 0;
     @Autowired
     private ChargerRepository chargerRepository;
     @Autowired
@@ -301,7 +301,8 @@ public class ChargerServiceImpl implements ChargerService {
                 else{
                     dto.setChargingFinished(false);
                 }
-                this.finisher++;
+                this.finisher ++;
+                System.out.println(this.finisher);
                 return dto;
             }else
             {
