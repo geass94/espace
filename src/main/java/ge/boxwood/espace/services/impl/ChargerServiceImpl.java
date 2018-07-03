@@ -134,7 +134,8 @@ public class ChargerServiceImpl implements ChargerService {
         User user = userService.getByUsername(username);
         Order order = orderRepository.findByChargerAndUserAndConfirmed(chargerRepository.findByChargerId(cID), user, false);
         Charger charger = this.info(cID);
-
+        this.finisher = 0;
+        System.out.println(this.finisher);
         if(order == null && charger.getStatus() == 0){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
