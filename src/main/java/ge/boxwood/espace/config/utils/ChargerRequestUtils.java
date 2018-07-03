@@ -10,8 +10,9 @@ import java.net.URL;
 @Component
 public class ChargerRequestUtils {
     private final String USER_AGENT = "Mozilla/5.0";
-//    private final String SERVICE_URL = "http://devel.ge:9090/es-services/mobile/ws";
-        private final String SERVICE_URL = "http://localhost:8443/slave";
+//  private final String SERVICE_URL = "http://devel.ge:9090/es-services/mobile/ws";
+//  private final String SERVICE_URL = "http://localhost:8443/slave";
+    private final String SERVICE_URL = "https://api.e-space.ge/slave";
     public JSONObject start(Long cid, Long conid) throws Exception {
         URL obj = new URL(SERVICE_URL+"/charger/start/"+cid+"/"+conid);
 
