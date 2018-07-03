@@ -258,10 +258,10 @@ public class ChargerServiceImpl implements ChargerService {
             ChargerInfo chargerInfo = new ChargerInfo();
             chargerInfo.setResponseCode((Integer) transactionInfo.get("responseCode"));
             if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
-
                 JSONObject transaction = transactionInfo.getJSONObject("data");
                 System.out.println("resp trid: "+Long.valueOf(transaction.get("id").toString()));
                 Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, Long.valueOf(transaction.get("id").toString()), false);
+                Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
                 Charger charger = order.getCharger();
                 System.out.println("order chTrId: "+order.getChargerTransactionId());
                 chargerInfo.setCharger(charger != null ? charger : new Charger());
@@ -291,15 +291,19 @@ public class ChargerServiceImpl implements ChargerService {
                 float hours = minutes / 60;
                 float pr = (pricingService.getPriceForChargingPower(dto.getChargePower()));
                 System.out.println("time: "+hours);
-                float price = hours * pr;
+                DecimalFormat df = new DecimalFormat("##.##");
+                float p = hours * pr;
+                String prc = df.format(p);
+                float price = Float.valueOf(prc);
                 System.out.println("current price: "+price);
                 dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
-                Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
                 payment.setPrice(price);
-                orderRepository.save(order);
-                paymentRepository.save(payment);
+
+//                paymentRepository.save(payment);
+//                orderRepository.save(order);
+
                 if(!chargerInfo.getStopUUID().isEmpty() || this.finisher == 3){
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
