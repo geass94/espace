@@ -229,6 +229,7 @@ public class ChargerServiceImpl implements ChargerService {
 //    ამ შემთხვევაში ეშვება ჩემთამ stop მეთოდი და ბრუნდება ფეიმენტის ID რაზეც უკვე ხორციელდება გადახდა საბანკო ბარათით
     @Override
     public ChargerInfoDTO transaction(Long trid) {
+        System.out.println("raw trid: "+trid);
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
@@ -238,12 +239,12 @@ public class ChargerServiceImpl implements ChargerService {
             ChargerInfo chargerInfo = new ChargerInfo();
             chargerInfo.setResponseCode((Integer) transactionInfo.get("responseCode"));
             if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
+
                 JSONObject transaction = transactionInfo.getJSONObject("data");
+                System.out.println("resp trid: "+Long.valueOf(transaction.get("id").toString()));
                 Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, Long.valueOf(transaction.get("id").toString()), false);
                 Charger charger = order.getCharger();
-//                Charger charger = this.getOneByCID(Long.valueOf(transaction.get("id").toString()));
-                System.out.println("charger ID: "+charger.getChargerId());
-
+                System.out.println("order chTrId: "+order.getChargerTransactionId());
                 chargerInfo.setCharger(charger != null ? charger : new Charger());
                 chargerInfo.setOrder(order != null ? order : new Order());
                 chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
@@ -269,8 +270,6 @@ public class ChargerServiceImpl implements ChargerService {
                 Long seconds = TimeUnit.MILLISECONDS.toSeconds(dto.getChargeTime());
                 float price = (pricingService.getPriceForChargingPower(dto.getChargePower()));
 //                DecimalFormat df = new DecimalFormat("#.##");
-
-                System.out.println(price);
                 dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
 //                order.setPrice(price);
