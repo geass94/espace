@@ -7,6 +7,7 @@ import ge.boxwood.espace.repositories.*;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.PricingService;
 import ge.boxwood.espace.services.UserService;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -213,11 +214,26 @@ public class ChargerServiceImpl implements ChargerService {
         try {
             JSONObject info = chargerRequestUtils.info(cid);
             JSONObject chrgInfo = info.getJSONObject("data");
+
             Long chargerId = Long.valueOf(chrgInfo.get("id").toString());
             Charger charger = chargerRepository.findByChargerId(chargerId);
             charger.setStatus( Integer.valueOf(chrgInfo.get("status").toString()) );
             charger.setCode( chrgInfo.get("code").toString() );
-            chargerRepository.save(charger);
+            try {
+                JSONArray jArray = chrgInfo.getJSONArray("connectors");
+                for (int i = 0; i < jArray.length(); i++) {
+                    JSONObject jb = jArray.getJSONObject(i);
+                    String type = jb.getString("type");
+                    Long connectorId = jb.getLong("connectorId");
+                    Connector connector = connectorRepository.findByChargerAndConnectorId(charger, connectorId);
+                    connector.setType(type);
+                    connectorRepository.save(connector);
+                }
+
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+            chargerRepository.flush();
             return charger;
         } catch (Exception e) {
             throw new RuntimeException(e);
