@@ -224,7 +224,7 @@ public class ChargerServiceImpl implements ChargerService {
                 for (int i = 0; i < jArray.length(); i++) {
                     JSONObject jb = jArray.getJSONObject(i);
                     String type = jb.getString("type");
-                    Long connectorId = jb.getLong("connectorId");
+                    Long connectorId = jb.getLong("id");
                     Connector connector = connectorRepository.findByChargerAndConnectorId(charger, connectorId);
                     connector.setType(type);
                     connectorRepository.save(connector);
