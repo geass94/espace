@@ -285,8 +285,8 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
-                Long hours = TimeUnit.MILLISECONDS.toHours(dto.getChargeTime());
-                System.out.println("hours passed: "+hours);
+                Long seconds = TimeUnit.MILLISECONDS.toSeconds(dto.getChargeTime());
+                System.out.println("hours passed: "+ Float.valueOf(seconds) / 60f / 60f);
                 float price = (pricingService.getPriceForChargingPower(dto.getChargePower()));
 
 //                DecimalFormat df = new DecimalFormat("#.##");
