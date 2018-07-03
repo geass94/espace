@@ -65,12 +65,12 @@ public class SlaveController {
     public ResponseEntity<?> transaction(@PathVariable("trID")Long trID){
         HashMap resp = new HashMap();
         HashMap data = new HashMap();
-        data.put("id", 60);
+        data.put("id", 2411);
         data.put("chargePointName", "espace-0009");
         data.put("chargePointCode", null);
         data.put("version", 9);
         data.put("uuidStart", "uuid:1ed8e7fd-642d-45d1-8313-c04b09cb2f47");
-        data.put("uuidEnd", "uuid:f20aeaad-1576-48b6-ab85-021c16997585");
+        data.put("uuidEnd", "");
         data.put("connectorId", 1);
         data.put("transStart", 1537432959751L);
         data.put("transStop", 1537435811861L);
