@@ -26,25 +26,32 @@ public class ChargerController {
     public ResponseEntity<?> startCharging(@RequestParam(value = "chargerId")Long cid, @RequestParam(value = "connectorId")Long conid, @RequestParam(value = "cardId", required = false, defaultValue = "0")Long cardid) throws Exception {
         cardid = 0L;
         cardid = Long.valueOf(cardid);
-        ChargerInfoDTO chargerInfo = chargerService.start(cid, conid, cardid);
+        ChargerInfoDTO chargerInfo = chargerService.start(cid, conid, cardid, 0f);
         return ResponseEntity.ok(chargerInfo);
     }
 
     @PostMapping("/start")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> startChargingByCode(@RequestBody Map<String, String> data) throws Exception {
-        String code = data.get("code");
-        String cardId = data.get("cardId");
-        Charger charger = chargerService.getOneByCode(code);
-        if (charger.getConnectors().size() > 1) {
-            return ResponseEntity.ok(charger);
-        }
-        else {
-            Long conId = charger.getConnectors().get(0).getConnectorId();
-            ChargerInfoDTO chargerInfo = chargerService.start(charger.getChargerId(), conId, Long.valueOf(cardId));
-            return ResponseEntity.ok(chargerInfo);
-        }
 
+        Long chargerId = !data.get("chargerId").isEmpty() ? Long.valueOf(data.get("chargerId")) : 0L;
+        Long connectorId = !data.get("connectorId").isEmpty() ? Long.valueOf(data.get("connectorId")) : 0L;
+        Long cardId = !data.get("cardId").isEmpty() ? Long.valueOf(data.get("cardId")) : 0L;
+        float targetPrice = !data.get("targetPrice").isEmpty() ? Float.valueOf(data.get("targetPrice")) : 0f;
+        String code = !data.get("code").isEmpty() ? data.get("targetPrice") : "";
+
+        if(!code.isEmpty()){
+            Charger charger = chargerService.getOneByCode(code);
+            if(charger.getConnectors().size() > 1){
+                return ResponseEntity.ok(charger);
+            }else{
+                ChargerInfoDTO dto = chargerService.start(charger.getChargerId(), charger.getConnectors().get(0).getConnectorId(), cardId, targetPrice);
+                return ResponseEntity.ok(dto);
+            }
+        }else{
+            ChargerInfoDTO dto = chargerService.start(chargerId, connectorId, cardId, targetPrice);
+            return ResponseEntity.ok(dto);
+        }
     }
 
     @GetMapping("/stop")

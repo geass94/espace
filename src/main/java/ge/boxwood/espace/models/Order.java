@@ -66,6 +66,7 @@ public class Order {
     private PaymentType paymentType;
     @Column
     private float price;
+    private float targetPrice;
 
     public Order(User user) {
         this.user = user;
@@ -248,5 +249,13 @@ public class Order {
 
     public void setChargerTransactionId(Long chargerTransactionId) {
         this.chargerTransactionId = chargerTransactionId;
+    }
+
+    public float getTargetPrice() {
+        return targetPrice;
+    }
+
+    public void setTargetPrice(float targetPrice) {
+        this.targetPrice = targetPrice;
     }
 }

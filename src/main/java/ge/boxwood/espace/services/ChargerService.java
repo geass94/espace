@@ -18,7 +18,7 @@ public interface ChargerService {
 
     Long freeChargers();
 
-    ChargerInfoDTO start(Long cID, Long conID, Long cardID);
+    ChargerInfoDTO start(Long cID, Long conID, Long cardID, Float targetPrice);
     ChargerInfoDTO stop(Long cID);
     Charger info(Long cid);
     ChargerInfoDTO transaction(Long trid);

@@ -134,7 +134,7 @@ public class ChargerServiceImpl implements ChargerService {
 //    შემდეგ ეშვება info მეთოდი და ახლდება ჩარჯერის ინფორმაცია და ინახება ჩემთან ბაზაში.
 //    იქმნება ორდერი, ფეიმენტი და ინახება როგორც დაუსულებელი გადახდა.
     @Override
-    public ChargerInfoDTO start(Long cID, Long conID, Long cardID) {
+    public ChargerInfoDTO start(Long cID, Long conID, Long cardID, Float targetPrice) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
@@ -155,6 +155,7 @@ public class ChargerServiceImpl implements ChargerService {
                     newOrder.setPaymentType(PaymentType.CREDITCARD);
                     newOrder.setCharger(chargerInfo.getCharger());
                     newOrder.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
+                    newOrder.setTargetPrice(targetPrice);
                     newOrder = orderRepository.save(newOrder);
                     chargerInfo.setOrder(newOrder);
                     Payment payment = new Payment(0f, newOrder);
@@ -267,6 +268,7 @@ public class ChargerServiceImpl implements ChargerService {
                 System.out.println("resp trid: "+Long.valueOf(transaction.get("id").toString()));
                 Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, Long.valueOf(transaction.get("id").toString()), false);
                 Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
+                float currentPrice = payment.getPrice();
                 Charger charger = order.getCharger();
                 System.out.println("order chTrId: "+order.getChargerTransactionId());
                 chargerInfo.setCharger(charger != null ? charger : new Charger());
@@ -299,19 +301,19 @@ public class ChargerServiceImpl implements ChargerService {
                 DecimalFormat df = new DecimalFormat("##.##");
                 float p = hours * pr;
                 String prc = df.format(p);
-                float price = Float.valueOf(prc);
+                float price = Float.valueOf(prc) + currentPrice;
                 System.out.println("current price: "+price);
                 dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
                 payment.setPrice(price);
-
                 paymentRepository.save(payment);
 //                orderRepository.save(order);
 
-                if(!chargerInfo.getStopUUID().isEmpty() || this.finisher == 3){
+                if(!chargerInfo.getStopUUID().isEmpty() || order.getTargetPrice() <= price || this.finisher >= 4){
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
+                    this.finisher = 5;
                 }
                 else{
                     dto.setChargingFinished(false);
