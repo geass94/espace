@@ -10,7 +10,8 @@ import java.util.List;
 public class Category extends BaseEntity {
     @Column
     private String name;
-    @JsonIgnore
+    @Column
+    private String logo;
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             mappedBy = "category")
@@ -30,5 +31,13 @@ public class Category extends BaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 }
