@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/charger")
@@ -27,6 +28,23 @@ public class ChargerController {
         cardid = Long.valueOf(cardid);
         ChargerInfoDTO chargerInfo = chargerService.start(cid, conid, cardid);
         return ResponseEntity.ok(chargerInfo);
+    }
+
+    @PostMapping("/start")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<?> startChargingByCode(@RequestBody Map<String, String> data) throws Exception {
+        String code = data.get("code");
+        String cardId = data.get("cardId");
+        Charger charger = chargerService.getOneByCode(code);
+        if (charger.getConnectors().size() > 1) {
+            return ResponseEntity.ok(charger);
+        }
+        else {
+            Long conId = charger.getConnectors().get(0).getConnectorId();
+            ChargerInfoDTO chargerInfo = chargerService.start(charger.getChargerId(), conId, Long.valueOf(cardId));
+            return ResponseEntity.ok(chargerInfo);
+        }
+
     }
 
     @GetMapping("/stop")

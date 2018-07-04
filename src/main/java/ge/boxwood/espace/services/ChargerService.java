@@ -12,6 +12,7 @@ public interface ChargerService {
     void delete(Long id);
     Charger getOne(Long id);
     Charger getOneByCID(Long id);
+    Charger getOneByCode(String code);
     List<Charger> getAll();
     List<Charger> getClosestChargers(Double latitude, Double longitude);
 

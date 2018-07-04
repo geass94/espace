@@ -9,4 +9,5 @@ public interface ChargerRepository extends JpaRepository<Charger, Long> {
     List<Charger> findAllByLatitudeAndLongitude(Double latitude, Double longitude);
     Charger findByChargerId(Long id);
     Long countAllByStatus(Integer status);
+    Charger findByCode(String code);
 }

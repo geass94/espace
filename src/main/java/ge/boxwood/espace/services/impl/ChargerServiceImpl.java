@@ -101,6 +101,11 @@ public class ChargerServiceImpl implements ChargerService {
     }
 
     @Override
+    public Charger getOneByCode(String code) {
+        return chargerRepository.findByCode(code);
+    }
+
+    @Override
     public List<Charger> getAll() {
         return chargerRepository.findAll();
     }
@@ -301,7 +306,7 @@ public class ChargerServiceImpl implements ChargerService {
                 order.setPrice(price);
                 payment.setPrice(price);
 
-//                paymentRepository.save(payment);
+                paymentRepository.save(payment);
 //                orderRepository.save(order);
 
                 if(!chargerInfo.getStopUUID().isEmpty() || this.finisher == 3){
