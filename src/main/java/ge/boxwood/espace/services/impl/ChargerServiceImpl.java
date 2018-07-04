@@ -305,10 +305,9 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
                 payment.setPrice(price);
-                paymentRepository.save(payment);
 //                orderRepository.save(order);
-
-                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - 1f > price && order.getTargetPrice() <= price) || this.finisher >= 10){
+                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0) || this.finisher >= 10){
+                    payment.setPrice(order.getTargetPrice());
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
                     this.finisher = 11;
@@ -316,6 +315,7 @@ public class ChargerServiceImpl implements ChargerService {
                 else{
                     dto.setChargingFinished(false);
                 }
+                paymentRepository.save(payment);
                 this.finisher ++;
                 return dto;
             }else
