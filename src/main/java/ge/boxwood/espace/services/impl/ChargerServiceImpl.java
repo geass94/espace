@@ -120,7 +120,7 @@ public class ChargerServiceImpl implements ChargerService {
                 " AS distance_in_km\n" +
                 "FROM espace.chargers AS ch WHERE ch.latitude IS NOT NULL AND ch.longitude IS NOT NULL \n" +
                 "ORDER BY distance_in_km ASC\n" +
-                "LIMIT 0,50", Charger.class);
+                "LIMIT 0,10", Charger.class);
 
         q.setParameter("lat", latitude);
         q.setParameter("lng", longitude);
