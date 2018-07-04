@@ -21,6 +21,12 @@ public class ChargerController {
         return ResponseEntity.ok(chargerService.freeChargers());
     }
 
+    @GetMapping("/byCategories")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<?> getChargersByCategories(){
+        return ResponseEntity.ok(chargerService.categories());
+    }
+
     @GetMapping("/getByCode")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> startCharging(@RequestParam(value = "code")String code) throws Exception {

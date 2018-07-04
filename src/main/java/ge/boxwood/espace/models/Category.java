@@ -1,7 +1,5 @@
 package ge.boxwood.espace.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.List;
 

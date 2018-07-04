@@ -1,5 +1,6 @@
 package ge.boxwood.espace.services;
 
+import ge.boxwood.espace.models.Category;
 import ge.boxwood.espace.models.Charger;
 import ge.boxwood.espace.models.ChargerInfoDTO;
 
@@ -22,4 +23,5 @@ public interface ChargerService {
     ChargerInfoDTO stop(Long cID);
     Charger info(Long cid);
     ChargerInfoDTO transaction(Long trid);
+    List<Category> categories();
 }

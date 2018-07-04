@@ -42,6 +42,8 @@ public class ChargerServiceImpl implements ChargerService {
     private CreditCardRepository creditCardRepository;
     @Autowired
     private PricingService pricingService;
+    @Autowired
+    private CategoryRepository categoryRepository;
     @Override
     public Charger create(Charger charger) {
 
@@ -323,6 +325,11 @@ public class ChargerServiceImpl implements ChargerService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Category> categories() {
+        return categoryRepository.findAll();
     }
 
     @Override
