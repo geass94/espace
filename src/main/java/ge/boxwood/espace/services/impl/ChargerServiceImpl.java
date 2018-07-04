@@ -308,10 +308,10 @@ public class ChargerServiceImpl implements ChargerService {
                 paymentRepository.save(payment);
 //                orderRepository.save(order);
 
-                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - 1 > price && order.getTargetPrice() <= price) || this.finisher >= 4){
+                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - 1f > price && order.getTargetPrice() <= price) || this.finisher >= 10){
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
-                    this.finisher = 5;
+                    this.finisher = 11;
                 }
                 else{
                     dto.setChargingFinished(false);
