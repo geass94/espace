@@ -12,6 +12,8 @@ public class Category extends BaseEntity {
     private String name;
     @Column
     private String logo;
+    @Column
+    private Integer orderIndex;
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             mappedBy = "category")
@@ -39,5 +41,13 @@ public class Category extends BaseEntity {
 
     public void setLogo(String logo) {
         this.logo = logo;
+    }
+
+    public Integer getOrderIndex() {
+        return orderIndex;
+    }
+
+    public void setOrderIndex(Integer orderIndex) {
+        this.orderIndex = orderIndex;
     }
 }
