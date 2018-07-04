@@ -306,7 +306,7 @@ public class ChargerServiceImpl implements ChargerService {
                 order.setPrice(price);
                 payment.setPrice(price);
 //                orderRepository.save(order);
-                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0) || this.finisher >= 10){
+                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) || this.finisher >= 10){
                     payment.setPrice(order.getTargetPrice());
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
