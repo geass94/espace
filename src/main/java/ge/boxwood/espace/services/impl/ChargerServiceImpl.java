@@ -141,7 +141,6 @@ public class ChargerServiceImpl implements ChargerService {
         Order order = orderRepository.findByChargerAndUserAndConfirmed(chargerRepository.findByChargerId(cID), user, false);
         Charger charger = this.info(cID);
         this.finisher = 0;
-        System.out.println(this.finisher);
         if(order == null && charger.getStatus() == 0){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
@@ -254,7 +253,6 @@ public class ChargerServiceImpl implements ChargerService {
 //    ამ შემთხვევაში ეშვება ჩემთამ stop მეთოდი და ბრუნდება ფეიმენტის ID რაზეც უკვე ხორციელდება გადახდა საბანკო ბარათით
     @Override
     public ChargerInfoDTO transaction(Long trid) {
-        System.out.println("raw trid: "+trid);
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
@@ -265,12 +263,11 @@ public class ChargerServiceImpl implements ChargerService {
             chargerInfo.setResponseCode((Integer) transactionInfo.get("responseCode"));
             if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
                 JSONObject transaction = transactionInfo.getJSONObject("data");
-                System.out.println("resp trid: "+Long.valueOf(transaction.get("id").toString()));
                 Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, Long.valueOf(transaction.get("id").toString()), false);
                 Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
                 float currentPrice = payment.getPrice();
+                System.out.println("current price in paymenr: "+currentPrice);
                 Charger charger = order.getCharger();
-                System.out.println("order chTrId: "+order.getChargerTransactionId());
                 chargerInfo.setCharger(charger != null ? charger : new Charger());
                 chargerInfo.setOrder(order != null ? order : new Order());
                 chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
@@ -283,7 +280,6 @@ public class ChargerServiceImpl implements ChargerService {
                 chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
                 chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
                 chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("consumed").toString()) : 0L);
-                System.out.println("charger ID from charger obj: "+charger.getChargerId());
                 dto.setChargerId(chargerInfo.getCharger().getChargerId());
                 dto.setChargePower(chargerInfo.getChargingPower());
                 dto.setChargeTime(chargerInfo.getChargeTime());
@@ -297,12 +293,12 @@ public class ChargerServiceImpl implements ChargerService {
                 float minutes = Float.valueOf(seconds.toString()) / 60;
                 float hours = minutes / 60;
                 float pr = (pricingService.getPriceForChargingPower(dto.getChargePower()));
-                System.out.println("time: "+hours);
                 DecimalFormat df = new DecimalFormat("##.##");
                 float p = hours * pr;
+                System.out.println("calculated price: "+p);
                 String prc = df.format(p);
                 float price = Float.valueOf(prc) + currentPrice;
-                System.out.println("current price: "+price);
+                System.out.println("new price: "+price);
                 dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
@@ -319,7 +315,6 @@ public class ChargerServiceImpl implements ChargerService {
                     dto.setChargingFinished(false);
                 }
                 this.finisher ++;
-                System.out.println(this.finisher);
                 return dto;
             }else
             {
