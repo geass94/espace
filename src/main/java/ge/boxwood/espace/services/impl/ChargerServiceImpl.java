@@ -183,6 +183,7 @@ public class ChargerServiceImpl implements ChargerService {
                     counter.setConsumedPower(0L);
                     counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
                     counter.setStartTime(Calendar.getInstance().getTimeInMillis());
+                    counter.setPricing(0f);
                     counterRepository.save(counter);
                     ChargerInfoDTO dto = this.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
                     dto.setChargerStatus(charger.getStatus());
@@ -280,8 +281,6 @@ public class ChargerServiceImpl implements ChargerService {
                 JSONObject transaction = transactionInfo.getJSONObject("data");
                 Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, Long.valueOf(transaction.get("id").toString()), false);
                 Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
-                float currentPrice = payment.getPrice();
-                System.out.println("current price in paymenr: "+currentPrice);
                 Charger charger = order.getCharger();
                 chargerInfo.setCharger(charger != null ? charger : new Charger());
                 chargerInfo.setOrder(order != null ? order : new Order());
@@ -304,28 +303,27 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
-                Counter counter = new Counter();
 
+                Counter counter = new Counter();
                 counter.setConsumedPower(dto.getConsumedPower());
                 counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
                 counter.setChargerTrId(trid.toString());
                 counter.setChargePower(dto.getChargePower());
                 counter.setChargerId(dto.getChargerId());
                 counter.setChargeTime(dto.getChargeTime());
-//                counter = counterRepository.save(counter);
-                List<Counter> counters = counterRepository.findAllByChargerIdAndAndChargerTrId(charger.getChargerId(), trid.toString());
+                counter.setPricing(pricingService.getPriceForChargingPower(dto.getChargePower()));
+                counter = counterRepository.save(counter);
 
+                List<Counter> counters = counterRepository.findAllByChargerIdAndAndChargerTrId(charger.getChargerId(), trid.toString());
                 float price = this.calculatePrice(counters);
+
                 counter.setCurrentPrice(price);
                 counterRepository.save(counter);
-                counterRepository.flush();
-
                 System.out.println("new price: "+price);
                 dto.setCurrentPrice(counter.getCurrentPrice());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
                 payment.setPrice(price);
-//                orderRepository.save(order);
                 if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) || this.finisher >= 15){
                     if(order.getTargetPrice() > 0){
                         payment.setPrice(order.getTargetPrice());
@@ -365,15 +363,13 @@ public class ChargerServiceImpl implements ChargerService {
         Float price = 0f;
         for(int i = 0; i < counterList.size(); i++){
             int next = i + 1 >= counterList.size() ? counterList.size() -1 : i +1;
-            int prev = i - 1 < 0 ? 0 : i - 1;
             Counter counter = counterList.get(i);
             Counter nextCounter = counterList.get(next);
-            Counter prevCounter = counterList.get(prev);
-            if(counter.getChargePower() == nextCounter.getChargePower()){
-                price = msToHours(nextCounter.getChargeTime()) * pricingService.getPriceForChargingPower(nextCounter.getChargePower());
-            }else{
-                price = counter.getCurrentPrice() + msToHours(nextCounter.getChargeTime() - (prevCounter.getLastUpdate() - nextCounter.getLastUpdate())) * pricingService.getPriceForChargingPower(nextCounter.getChargePower());
+            System.out.println("oee: "+msToHours( nextCounter.getLastUpdate() - counter.getLastUpdate()));
+            if(msToHours( nextCounter.getLastUpdate() - counter.getLastUpdate()) > 0){
+                price = counter.getCurrentPrice() + (msToHours( nextCounter.getLastUpdate() - counter.getLastUpdate()) * counter.getPricing());
             }
+
         }
         String formattedPrice = df.format(price);
         float finalPrice = Float.valueOf(formattedPrice);
@@ -381,9 +377,11 @@ public class ChargerServiceImpl implements ChargerService {
     }
 
     private Float msToHours(Long ms){
+        DecimalFormat df = new DecimalFormat("##.#####");
         Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         Float hours = minutes / 60;
-        return hours;
+        String formatted = df.format(hours);
+        return Float.valueOf(formatted);
     }
 }
