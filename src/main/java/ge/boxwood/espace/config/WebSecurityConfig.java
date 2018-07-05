@@ -106,6 +106,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/checkoutComplete",
                 "/checkoutFailed"
         );
+
+        web.ignoring().antMatchers(
+                HttpMethod.GET,
+                "/static/images/**"
+        );
     }
 
     @Bean
