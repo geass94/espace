@@ -38,6 +38,9 @@ public class CreditCard extends BaseStatusAuditEntity {
     @Column
     private String expDate;
 
+    @Column
+    private Integer orderIndex;
+
     @JsonIgnore
     @Column
     private String cardRef;
@@ -104,5 +107,13 @@ public class CreditCard extends BaseStatusAuditEntity {
 
     public void setCardName(String cardName) {
         this.cardName = cardName;
+    }
+
+    public Integer getOrderIndex() {
+        return orderIndex;
+    }
+
+    public void setOrderIndex(Integer orderIndex) {
+        this.orderIndex = orderIndex;
     }
 }

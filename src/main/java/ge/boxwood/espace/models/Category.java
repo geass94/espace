@@ -16,6 +16,10 @@ public class Category extends BaseEntity {
             fetch = FetchType.LAZY,
             mappedBy = "category")
     private List<Charger> chargers;
+    @Column
+    private String bodyColor;
+    @Column
+    private String footerColor;
 
     public List<Charger> getChargers() {
         return chargers;
@@ -47,5 +51,21 @@ public class Category extends BaseEntity {
 
     public void setOrderIndex(Integer orderIndex) {
         this.orderIndex = orderIndex;
+    }
+
+    public String getBodyColor() {
+        return bodyColor;
+    }
+
+    public void setBodyColor(String bodyColor) {
+        this.bodyColor = bodyColor;
+    }
+
+    public String getFooterColor() {
+        return footerColor;
+    }
+
+    public void setFooterColor(String footerColor) {
+        this.footerColor = footerColor;
     }
 }

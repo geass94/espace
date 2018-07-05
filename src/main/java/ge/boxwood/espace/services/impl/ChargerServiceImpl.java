@@ -328,6 +328,7 @@ public class ChargerServiceImpl implements ChargerService {
                     if(order.getTargetPrice() > 0){
                         payment.setPrice(order.getTargetPrice());
                     }
+
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
                     this.finisher = 16;
@@ -369,7 +370,6 @@ public class ChargerServiceImpl implements ChargerService {
             if(msToHours( nextCounter.getLastUpdate() - counter.getLastUpdate()) > 0){
                 price = counter.getCurrentPrice() + (msToHours( nextCounter.getLastUpdate() - counter.getLastUpdate()) * counter.getPricing());
             }
-
         }
         String formattedPrice = df.format(price);
         float finalPrice = Float.valueOf(formattedPrice);
@@ -382,6 +382,14 @@ public class ChargerServiceImpl implements ChargerService {
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         Float hours = minutes / 60;
         String formatted = df.format(hours);
+        return Float.valueOf(formatted);
+    }
+
+    private Float msToMinutes(Long ms){
+        DecimalFormat df = new DecimalFormat("##.#####");
+        Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
+        Float minutes = Float.valueOf(seconds.toString()) / 60;
+        String formatted = df.format(minutes);
         return Float.valueOf(formatted);
     }
 }
