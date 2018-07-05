@@ -218,7 +218,6 @@ public class ChargerServiceImpl implements ChargerService {
                     chargerInfo.setOrder(order);
                     orderRepository.save(order);
                     ChargerInfoDTO dto = this.transaction(order.getChargerTransactionId());
-
                     return dto;
                 }else
                 {
