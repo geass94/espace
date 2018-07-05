@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-@Entity(name = "coutner")
+@Entity(name = "counter")
 @Table
 public class Counter extends BaseEntity {
     @Column

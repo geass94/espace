@@ -181,8 +181,8 @@ public class ChargerServiceImpl implements ChargerService {
                     counter.setCurrentPrice(0f);
                     counter.setChargeTime(0L);
                     counter.setConsumedPower(0L);
-                    counter.setLastUpdate(new Date().getTime());
-                    counter.setStartTime(new Date().getTime());
+                    counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
+                    counter.setStartTime(Calendar.getInstance().getTimeInMillis());
                     counterRepository.save(counter);
                     ChargerInfoDTO dto = this.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
                     dto.setChargerStatus(charger.getStatus());
@@ -307,21 +307,21 @@ public class ChargerServiceImpl implements ChargerService {
                 Counter counter = new Counter();
 
                 counter.setConsumedPower(dto.getConsumedPower());
-                counter.setLastUpdate(new Date().getTime());
+                counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
                 counter.setChargerTrId(trid.toString());
                 counter.setChargePower(dto.getChargePower());
                 counter.setChargerId(dto.getChargerId());
                 counter.setChargeTime(dto.getChargeTime());
-                counter = counterRepository.save(counter);
-                List<Counter> counters = counterRepository.findAllByChargerIdAndAndChargerTrId(charger.getChargerId(), trid);
+//                counter = counterRepository.save(counter);
+                List<Counter> counters = counterRepository.findAllByChargerIdAndAndChargerTrId(charger.getChargerId(), trid.toString());
 
-                float price = this.calculatePrice(dto.getChargeTime(), counters);
+                float price = this.calculatePrice(counters);
                 counter.setCurrentPrice(price);
                 counterRepository.save(counter);
                 counterRepository.flush();
 
                 System.out.println("new price: "+price);
-                dto.setCurrentPrice(price);
+                dto.setCurrentPrice(counter.getCurrentPrice());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
                 payment.setPrice(price);
@@ -359,22 +359,25 @@ public class ChargerServiceImpl implements ChargerService {
         return chargerRepository.countAllByStatus(-1);
     }
 
-    private Float calculatePrice(Long ms, List<Counter> counterList){
-        Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
+    private Float calculatePrice(List<Counter> counterList){
         DecimalFormat df = new DecimalFormat("##.##");
         counterList.sort(Comparator.comparing(Counter::getChargePower));
         Float price = 0f;
         for(int i = 0; i < counterList.size(); i++){
-            int next = i + 1 > counterList.size() ? counterList.size() -1 : i +1;
+            int next = i + 1 >= counterList.size() ? counterList.size() -1 : i +1;
+            int prev = i - 1 < 0 ? 0 : i - 1;
             Counter counter = counterList.get(i);
             Counter nextCounter = counterList.get(next);
+            Counter prevCounter = counterList.get(prev);
             if(counter.getChargePower() == nextCounter.getChargePower()){
-                price = msToHours(nextCounter.getChargeTime() - nextCounter.getLastUpdate()) * pricingService.getPriceForChargingPower(nextCounter.getChargePower());
+                price = msToHours(nextCounter.getChargeTime()) * pricingService.getPriceForChargingPower(nextCounter.getChargePower());
             }else{
-                price = counter.getCurrentPrice() + msToHours(nextCounter.getChargeTime()) * pricingService.getPriceForChargingPower(nextCounter.getChargePower());
+                price = counter.getCurrentPrice() + msToHours(nextCounter.getChargeTime() - (prevCounter.getLastUpdate() - nextCounter.getLastUpdate())) * pricingService.getPriceForChargingPower(nextCounter.getChargePower());
             }
         }
-        return price;
+        String formattedPrice = df.format(price);
+        float finalPrice = Float.valueOf(formattedPrice);
+        return finalPrice;
     }
 
     private Float msToHours(Long ms){
