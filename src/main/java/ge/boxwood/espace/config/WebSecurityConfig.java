@@ -67,7 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/**").permitAll()
-                .antMatchers("/static/images/**").permitAll()
+                .antMatchers("/images/**").permitAll()
                 .anyRequest().authenticated().and()
                 .addFilterBefore(new TokenAuthenticationFilter(tokenHelper, jwtUserDetailsService), BasicAuthenticationFilter.class);
 
@@ -110,7 +110,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         web.ignoring().antMatchers(
                 HttpMethod.GET,
-                "/static/images/**"
+                "/images/**"
         );
     }
 
