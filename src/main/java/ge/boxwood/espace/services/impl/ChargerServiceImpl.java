@@ -1,5 +1,6 @@
 package ge.boxwood.espace.services.impl;
 
+import ch.qos.logback.core.util.TimeUtil;
 import ge.boxwood.espace.config.utils.ChargerRequestUtils;
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
@@ -44,6 +45,8 @@ public class ChargerServiceImpl implements ChargerService {
     private PricingService pricingService;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private CounterRepository counterRepository;
     @Override
     public Charger create(Charger charger) {
 
@@ -171,6 +174,16 @@ public class ChargerServiceImpl implements ChargerService {
                     charger.setStatus(1);
                     chargerRepository.save(charger);
                     chargerRepository.flush();
+                    Counter counter = new Counter();
+                    counter.setChargerId(charger.getChargerId());
+                    counter.setChargePower(0d);
+                    counter.setChargerTrId(chargerInfo.getChargerTransactionId());
+                    counter.setCurrentPrice(0f);
+                    counter.setChargeTime(0L);
+                    counter.setConsumedPower(0L);
+                    counter.setLastUpdate(new Date().getTime());
+                    counter.setStartTime(new Date().getTime());
+                    counterRepository.save(counter);
                     ChargerInfoDTO dto = this.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
                     dto.setChargerStatus(charger.getStatus());
                     return dto;
@@ -291,15 +304,22 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
-                Long seconds = TimeUnit.MILLISECONDS.toSeconds(dto.getChargeTime());
-                float minutes = Float.valueOf(seconds.toString()) / 60;
-                float hours = minutes / 60;
-                float pr = (pricingService.getPriceForChargingPower(dto.getChargePower()));
-                DecimalFormat df = new DecimalFormat("##.##");
-                float p = hours * pr;
-                System.out.println("calculated price: "+p);
-                String prc = df.format(p);
-                float price = Float.valueOf(prc) + currentPrice;
+                Counter counter = new Counter();
+
+                counter.setConsumedPower(dto.getConsumedPower());
+                counter.setLastUpdate(new Date().getTime());
+                counter.setChargerTrId(trid.toString());
+                counter.setChargePower(dto.getChargePower());
+                counter.setChargerId(dto.getChargerId());
+                counter.setChargeTime(dto.getChargeTime());
+                counter = counterRepository.save(counter);
+                List<Counter> counters = counterRepository.findAllByChargerIdAndAndChargerTrId(charger.getChargerId(), trid);
+
+                float price = this.calculatePrice(dto.getChargeTime(), counters);
+                counter.setCurrentPrice(price);
+                counterRepository.save(counter);
+                counterRepository.flush();
+
                 System.out.println("new price: "+price);
                 dto.setCurrentPrice(price);
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
@@ -337,5 +357,30 @@ public class ChargerServiceImpl implements ChargerService {
     @Override
     public Long freeChargers() {
         return chargerRepository.countAllByStatus(-1);
+    }
+
+    private Float calculatePrice(Long ms, List<Counter> counterList){
+        Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
+        DecimalFormat df = new DecimalFormat("##.##");
+        counterList.sort(Comparator.comparing(Counter::getChargePower));
+        Float price = 0f;
+        for(int i = 0; i < counterList.size(); i++){
+            int next = i + 1 > counterList.size() ? counterList.size() -1 : i +1;
+            Counter counter = counterList.get(i);
+            Counter nextCounter = counterList.get(next);
+            if(counter.getChargePower() == nextCounter.getChargePower()){
+                price = msToHours(nextCounter.getChargeTime() - nextCounter.getLastUpdate()) * pricingService.getPriceForChargingPower(nextCounter.getChargePower());
+            }else{
+                price = counter.getCurrentPrice() + msToHours(nextCounter.getChargeTime()) * pricingService.getPriceForChargingPower(nextCounter.getChargePower());
+            }
+        }
+        return price;
+    }
+
+    private Float msToHours(Long ms){
+        Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
+        Float minutes = Float.valueOf(seconds.toString()) / 60;
+        Float hours = minutes / 60;
+        return hours;
     }
 }
