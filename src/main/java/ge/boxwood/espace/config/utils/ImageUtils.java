@@ -38,7 +38,7 @@ public class ImageUtils {
             }
             Image scaledImage = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
             BufferedImage imageBuff = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_RGB);
-            imageBuff.getGraphics().drawImage(scaledImage, 0, 0, new Color(0,0,0), null);
+            imageBuff.getGraphics().drawImage(scaledImage, 0, 0, new Color(0,0,0, 0), null);
 
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
