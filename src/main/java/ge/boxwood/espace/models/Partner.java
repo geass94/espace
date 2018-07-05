@@ -20,6 +20,8 @@ public class Partner extends BaseStatusAuditEntity {
     private Long imageId;
     @Column
     private Integer orderIndex;
+    @Column
+    private String logo;
 
     @JsonIgnore
     @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL)
@@ -79,5 +81,13 @@ public class Partner extends BaseStatusAuditEntity {
 
     public void setOrderIndex(Integer orderIndex) {
         this.orderIndex = orderIndex;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 }
