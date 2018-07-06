@@ -60,6 +60,12 @@ public class OrderController {
         return ResponseEntity.ok(creditCardRepository.findAllByUserAndStatus(user, Status.ACTIVE));
     }
 
+    @PutMapping("/cards/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> arrangeCards(){
+        return null;
+    }
+
     @DeleteMapping("/cards/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> deleteCard(@PathVariable("id")Long id){

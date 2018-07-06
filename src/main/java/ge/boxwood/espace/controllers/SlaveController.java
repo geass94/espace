@@ -14,6 +14,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/slave")
@@ -63,6 +64,8 @@ public class SlaveController {
 
     @GetMapping("/transaction/info/{trID}")
     public ResponseEntity<?> transaction(@PathVariable("trID")Long trID){
+        Random r = new Random();
+        int koef = r.nextInt((50 - 2) + 1) + 2;
         HashMap resp = new HashMap();
         HashMap data = new HashMap();
         data.put("id", 2411);
@@ -76,7 +79,7 @@ public class SlaveController {
         data.put("transStop", 1537435811861L);
         data.put("meterStart", 2869777);
         data.put("meterStop", 2872589);
-        data.put("kiloWattHour", 25.8);
+        data.put("kiloWattHour", koef);
         data.put("consumed", 32532L);
         data.put("chargingTime", 2852110);
         resp.put("status", 0);
