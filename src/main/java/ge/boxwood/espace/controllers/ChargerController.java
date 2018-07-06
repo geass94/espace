@@ -21,6 +21,12 @@ public class ChargerController {
         return ResponseEntity.ok(chargerService.freeChargers());
     }
 
+    @PostMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<?> addCharger(@RequestBody Charger charger){
+        return ResponseEntity.ok(chargerService.create(charger));
+    }
+
     @GetMapping("/byCategories")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> getChargersByCategories(){
