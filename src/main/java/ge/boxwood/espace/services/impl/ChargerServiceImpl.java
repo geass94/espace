@@ -361,15 +361,6 @@ public class ChargerServiceImpl implements ChargerService {
         DecimalFormat df = new DecimalFormat("##.##");
         counterList.sort(Comparator.comparing(Counter::getChargePower));
         Float price = 0f;
-//        for(int i = 0; i < counterList.size(); i++){
-//            int next = i + 1 >= counterList.size() ? counterList.size() -1 : i +1;
-//            Counter counter = counterList.get(i);
-//            Counter nextCounter = counterList.get(next);
-//            System.out.println("oee: "+msToHours( nextCounter.getLastUpdate() - counter.getLastUpdate()));
-//            if(msToHours( nextCounter.getLastUpdate() - counter.getLastUpdate()) > 0){
-//                price = counter.getCurrentPrice() + (msToHours( nextCounter.getLastUpdate() - counter.getLastUpdate()) * counter.getPricing());
-//            }
-//        }
         int last = counterList.size() - 1 < 0 ? 0 : counterList.size() - 1;
         int prev = counterList.size() - 2 < 0 ? 0 : counterList.size() - 2;
         Counter lastCounter = counterList.get(last);

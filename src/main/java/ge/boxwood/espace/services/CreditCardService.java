@@ -8,7 +8,7 @@ import java.util.List;
 public interface CreditCardService {
     CreditCard create(CreditCard creditCard);
 
-    CreditCard update(CreditCard creditCard);
+    CreditCard update(CreditCard creditCard, Long id);
 
     CreditCard getOne(Long id);
     CreditCard findByUserAndTrxId(User user, String trxId);

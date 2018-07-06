@@ -5,6 +5,10 @@ import ge.boxwood.espace.models.User;
 import ge.boxwood.espace.models.enums.Status;
 import ge.boxwood.espace.repositories.CreditCardRepository;
 import ge.boxwood.espace.services.CreditCardService;
+import ge.boxwood.espace.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +16,8 @@ import java.util.List;
 @Service
 public class CreditCardServiceImpl implements CreditCardService {
     private final CreditCardRepository creditCardRepo;
-
+    @Autowired
+    private UserService userService;
 
     public CreditCardServiceImpl(CreditCardRepository creditCardRepo) {
         this.creditCardRepo = creditCardRepo;
@@ -25,8 +30,23 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     @Override
-    public CreditCard update(CreditCard creditCard) {
-        return creditCardRepo.save(creditCard);
+    public CreditCard update(CreditCard creditCard, Long id) {
+        CreditCard original = creditCardRepo.findOne(id);
+        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        String username = currentUser.getName();
+        if(creditCard.getOrderIndex() == 1){
+            User user = userService.getByUsername(username);
+            List<CreditCard> creditCards = creditCardRepo.findAllByOrderIndexAndUser(1, user);
+            int i = 2;
+            for (CreditCard cc : creditCards){
+                cc.setOrderIndex(i);
+                creditCardRepo.save(cc);
+                i++;
+            }
+            original.setOrderIndex( creditCard.getOrderIndex() );
+            return creditCardRepo.save(original);
+        }
+        return original;
     }
 
     @Override
@@ -41,7 +61,7 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     public List<CreditCard> getByUser(User user){
-        return creditCardRepo.findAllByUserAndStatus(user,Status.ACTIVE);
+        return creditCardRepo.findAllByUserAndStatus(user, Status.ACTIVE);
     }
 
     @Override
@@ -54,7 +74,6 @@ public class CreditCardServiceImpl implements CreditCardService {
         CreditCard creditCard = getOne(id);
         creditCard.setStatus(Status.DELETED);
         creditCard.setTrxId(null);
-
         creditCardRepo.save(creditCard);
     }
 }

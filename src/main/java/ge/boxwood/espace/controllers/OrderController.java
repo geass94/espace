@@ -11,6 +11,7 @@ import ge.boxwood.espace.repositories.OrderRepository;
 import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.security.TokenHelper;
 import ge.boxwood.espace.services.ChargerService;
+import ge.boxwood.espace.services.CreditCardService;
 import ge.boxwood.espace.services.UserService;
 import ge.boxwood.espace.services.smsservice.GeoSms.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,8 @@ public class OrderController {
     private ChargerService chargerService;
     @Autowired
     private CreditCardRepository creditCardRepository;
+    @Autowired
+    private CreditCardService creditCardService;
     @PostMapping("/giveOrder")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> giveOrder(HttpServletRequest request){
@@ -56,29 +59,20 @@ public class OrderController {
         String authToken = tokenHelper.getToken( request );
         String username = tokenHelper.getUsernameFromToken(authToken);
         User user = userService.getByUsername(username);
-        System.out.println(authToken);
-        return ResponseEntity.ok(creditCardRepository.findAllByUserAndStatus(user, Status.ACTIVE));
+        return ResponseEntity.ok(creditCardService.getByUser(user));
     }
 
     @PutMapping("/cards/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<?> arrangeCards(){
-        return null;
+    public ResponseEntity<?> arrangeCards(@PathVariable("id")Long id, @RequestBody CreditCard creditCard){
+        return ResponseEntity.ok(creditCardService.update(creditCard, id));
     }
 
     @DeleteMapping("/cards/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> deleteCard(@PathVariable("id")Long id){
-        CreditCard creditCard = creditCardRepository.findOne(id);
-        creditCard.setStatus(Status.DELETED);
-        creditCard = creditCardRepository.save(creditCard);
-        if(creditCard != null) {
-            return ResponseEntity.ok(true);
-        }
-        else{
-            throw new RuntimeException("Error while deleting");
-        }
-
+        creditCardService.delete(id);
+        return ResponseEntity.ok(true);
     }
 
     @PostMapping("/addUserCreditCard")
