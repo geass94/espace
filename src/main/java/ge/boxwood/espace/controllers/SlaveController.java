@@ -76,7 +76,7 @@ public class SlaveController {
         data.put("transStop", 1537435811861L);
         data.put("meterStart", 2869777);
         data.put("meterStop", 2872589);
-        data.put("kiloWattHour", 15.8);
+        data.put("kiloWattHour", 25.8);
         data.put("consumed", 32532L);
         data.put("chargingTime", 2852110);
         resp.put("status", 0);

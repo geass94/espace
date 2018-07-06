@@ -1,17 +1,20 @@
 package ge.boxwood.espace.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-@RestController
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
+@Controller
 public class PaymentStatusController {
-    @GetMapping("/checkoutComplete")
-    public String getCheckoutComplete(){
-        return "checkoutComplete";
+    @RequestMapping(path = "/checkoutComplete", method = GET)
+    public String completed(){
+        return "completed.html";
     }
 
-    @GetMapping("/checkoutFailed")
-    public String getCheckoutFailed(){
-        return "checkoutFailed";
+    @RequestMapping(path = "/checkoutFailed", method = GET)
+    public String failed(){
+        return "failed.html";
     }
 }
