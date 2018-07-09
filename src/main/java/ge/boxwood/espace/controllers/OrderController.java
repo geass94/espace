@@ -12,6 +12,7 @@ import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.security.TokenHelper;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.CreditCardService;
+import ge.boxwood.espace.services.PricingService;
 import ge.boxwood.espace.services.UserService;
 import ge.boxwood.espace.services.smsservice.GeoSms.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,9 @@ public class OrderController {
     @Autowired
     private ChargerService chargerService;
     @Autowired
-    private CreditCardRepository creditCardRepository;
-    @Autowired
     private CreditCardService creditCardService;
+    @Autowired
+    private PricingService pricingService;
     @PostMapping("/giveOrder")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> giveOrder(HttpServletRequest request){
@@ -90,5 +91,10 @@ public class OrderController {
         paymentRepository.save(payment);
         orderRepository.flush();
         return ResponseEntity.ok(payment);
+    }
+
+    @GetMapping("/pricing")
+    public ResponseEntity<?> pricingList(){
+        return ResponseEntity.ok(pricingService.getAll());
     }
 }

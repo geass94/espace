@@ -106,7 +106,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/slave/**",
                 "/checkoutComplete",
                 "/checkoutFailed",
-                "/partner"
+                "/partner",
+                "/orders/pricing"
         );
 
         web.ignoring().antMatchers(

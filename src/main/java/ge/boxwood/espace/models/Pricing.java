@@ -13,6 +13,8 @@ public class Pricing extends BaseStatusEntity {
     private Double rangeEnd;
     @Column
     private Float price;
+    @Column
+    private String name;
 
     public Double getRangeStart() {
         return rangeStart;
@@ -36,5 +38,13 @@ public class Pricing extends BaseStatusEntity {
 
     public void setPrice(Float price) {
         this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
