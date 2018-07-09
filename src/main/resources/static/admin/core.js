@@ -1,3 +1,4 @@
+var storage = window.localStorage;
 function request(cfg) {
 
     cfg.data = cfg.data || {};
@@ -30,45 +31,12 @@ function request(cfg) {
             if (cfg.onError) {
                 cfg.onError(r)
             } else {
-                alertMessage(r.message);
+                alert(r.message);
             }
-        }
-    })
-}
-
-
-var self = this;
-self.storage = window.localStorage;
-
-self.access_token = "";
-self.refresh_token = ""
-
-self.getToken = function () {
-
-}
-
-self.users = ko.observabelArray([]);
-self.login = function (username, password) {
-    request({
-        url : "https://api.e-space.ge/auth/login",
-        data : { username: username, password: password },
-        processData: false,
-        success: function (data) {
-            self.refresh_token = data.refresh_token;
-            self.access_token = data.access_token;
-        }
-    })
-}
-
-
-self.getUsers = function () {
-    request({
-        url : "https://api.e-space.ge/auth/login",
-        method : "GET",
-        processData: false,
-        success: function (data) {
-            self.refresh_token = data.refresh_token;
-            self.access_token = data.access_token;
-        }
+        },
+        headers: {
+            'Authorization':'Bearer '+storage.getItem("accessToken"),
+            'Content-Type':'application/json'
+        },
     })
 }
