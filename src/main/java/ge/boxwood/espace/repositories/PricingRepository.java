@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface PricingRepository extends JpaRepository<Pricing, Long> {
-    Pricing findDistinctFirstByRangeStartIsLessThanEqualAndRangeEndIsGreaterThanEqual(double start, double end);
+    Pricing findDistinctFirstByRangeStartIsLessThanEqualAndRangeEndIsGreaterThanEqualAndStatus(double start, double end, Status status);
     List<Pricing> findAllByStatus(Status status);
 }
