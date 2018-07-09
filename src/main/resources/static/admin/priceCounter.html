@@ -13,10 +13,11 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
     <script src="/admin/js/core.js"></script>
-    <script src="/admin/js/orders.js"></script>
+    <script src="/admin/js/counter.js"></script>
 </head>
-<body id="orders-page">
+<body id="counter-page">
 <nav class="container-fluid navbar navbar-inverse">
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -57,31 +58,25 @@
             <thead>
             <tr>
                 <th>ID</th>
-                <th>UUID</th>
-                <th>Status</th>
-                <th>Price</th>
-                <th>Confirmed</th>
-                <th>Confirm Date</th>
-                <th>User</th>
+                <th>Charger ID</th>
+                <th>Charge power</th>
+                <th>Charge time</th>
                 <th>Charger trId</th>
-                <th>Action</th>
+                <th>Last update</th>
+                <th>Pricing</th>
+                <th>Calcualted price</th>
             </tr>
             </thead>
-            <tbody data-bind="foreach: orders">
+            <tbody data-bind="foreach: counters">
             <tr>
                 <td data-bind="text: id"></td>
-                <td data-bind="text: uuid"></td>
-                <td data-bind="text: status"></td>
-                <td data-bind="text: price"></td>
-                <td data-bind="text: confirmed"></td>
-                <td data-bind="text: confirmDate"></td>
-                <td data-bind="text: user.username"></td>
-                <td> <a data-bind="attr: { href: '/admin/priceCounter.html?trid='+chargerTransactionId }">
-                    <span data-bind="text: chargerTransactionId"></span>
-                </a> </td>
-                <td>
-                    <button data-bind="click: $parent.confirmPayment" class="btn btn-sm btn-warning">Confirm</button>
-                </td>
+                <td data-bind="text: chargerId"></td>
+                <td data-bind="text: chargePower"></td>
+                <td data-bind="text: Math.floor((chargeTime/1000/60) << 0)"></td>
+                <td data-bind="text: chargerTrId"></td>
+                <td data-bind="text: moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')"></td>
+                <td data-bind="text: pricing"></td>
+                <td data-bind="text: currentPrice"></td>
             </tr>
             </tbody>
         </table>

@@ -313,7 +313,7 @@ public class ChargerServiceImpl implements ChargerService {
                 counter.setPricing(pricingService.getPriceForChargingPower(dto.getChargePower()));
                 counter = counterRepository.save(counter);
 
-                List<Counter> counters = counterRepository.findAllByChargerIdAndAndChargerTrId(charger.getChargerId(), trid.toString());
+                List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trid.toString());
                 float price = this.calculatePrice(counters);
 
                 counter.setCurrentPrice(price);

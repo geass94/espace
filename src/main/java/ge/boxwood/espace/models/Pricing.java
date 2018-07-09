@@ -7,11 +7,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "pricing_list")
 public class Pricing extends BaseStatusEntity {
-    @Column
+    @Column(nullable = false)
     private Double rangeStart;
-    @Column
+    @Column(nullable = false)
     private Double rangeEnd;
-    @Column
+    @Column(nullable = false)
     private Float price;
     @Column
     private String name;

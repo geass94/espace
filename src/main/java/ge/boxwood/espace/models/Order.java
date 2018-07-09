@@ -1,10 +1,7 @@
 package ge.boxwood.espace.models;
 
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import ge.boxwood.espace.models.converters.PaymentTypeConverter;
 import ge.boxwood.espace.models.enums.PaymentType;
 import org.joda.time.DateTime;
@@ -32,7 +29,6 @@ public class Order {
     @JsonIgnore
     private Date lastModifyDate;
     @Column
-    @JsonIgnore
     private Date confirmDate;
     @Column
     private boolean confirmed;
@@ -48,7 +44,6 @@ public class Order {
     private int status;
     @ManyToOne
     @JoinColumn(name = "userId")
-    @JsonIgnore
     private User user;
     @Column
     private boolean cashPayment;
@@ -58,7 +53,6 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "charger_id", nullable = true)
     private Charger charger;
-    @JsonIgnore
     @Column
     private Long chargerTransactionId;
     @Column
@@ -114,11 +108,11 @@ public class Order {
     public void setLastModifyDate(Date lastModifyDate) {
         this.lastModifyDate = lastModifyDate;
     }
-
+    @JsonProperty
     public Date getConfirmDate() {
         return confirmDate;
     }
-
+    @JsonIgnore
     public void setConfirmDate(Date confirmDate) {
         this.confirmDate = confirmDate;
     }
@@ -146,11 +140,11 @@ public class Order {
     public void setActive(boolean active) {
         this.active = active;
     }
-
+    @JsonProperty
     public User getUser() {
         return user;
     }
-
+    @JsonIgnore
     public void setUser(User user) {
         this.user = user;
     }
@@ -235,6 +229,7 @@ public class Order {
         this.price = price;
     }
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public Charger getCharger() {
         return charger;
     }
@@ -242,11 +237,11 @@ public class Order {
     public void setCharger(Charger charger) {
         this.charger = charger;
     }
-
+    @JsonProperty
     public Long getChargerTransactionId() {
         return chargerTransactionId;
     }
-
+    @JsonIgnore
     public void setChargerTransactionId(Long chargerTransactionId) {
         this.chargerTransactionId = chargerTransactionId;
     }
