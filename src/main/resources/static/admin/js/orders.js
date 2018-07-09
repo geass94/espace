@@ -29,12 +29,12 @@ var ordersVMModel = function () {
 }
 
 $(document).ready(function () {
-    console.log(window.localStorage.getItem("loggedIn"))
+    if ( window.localStorage.getItem("loggedIn") === "false" && window.localStorage.getItem("loggedIn") != null && typeof window.localStorage.getItem("loggedIn") != "undefined"){
+        window.location.href = "/admin/index.html";
+    }
     var ordersVM = new ordersVMModel();
     ordersVM.getOrders();
     ko.applyBindings(ordersVM, $('#orders-page')[0]);
+
 });
 
-if ( window.localStorage.getItem("loggedIn") === false ){
-    window.location.href = "/admin/index.html";
-}

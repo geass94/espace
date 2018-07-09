@@ -13,7 +13,7 @@ var loginModel = function () {
                 console.log(data)
                 window.localStorage.setItem("accessToken", data.access_token);
                 window.localStorage.setItem("refreshToken", data.refresh_token);
-                window.localStorage.setItem("active", data.user_active);
+                window.localStorage.setItem("active", data.userActivated);
                 window.localStorage.setItem("loggedIn", true);
                 window.location.reload();
             }
@@ -22,10 +22,12 @@ var loginModel = function () {
 }
 
 $(document).ready(function () {
+    if ( window.localStorage.getItem("loggedIn") !== "false" && window.localStorage.getItem("loggedIn") != null && typeof window.localStorage.getItem("loggedIn") != "undefined"){
+        window.location.href = "/admin/pricing.html";
+    }
+
     var loginVM = new loginModel();
     ko.applyBindings(loginVM, $('#auth-page')[0]);
+
 });
 
-if ( window.localStorage.getItem("loggedIn") !== false ){
-    window.location.href = "/admin/users.html";
-}

@@ -14,7 +14,7 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="/admin/js/core.js"></script>
-    <script src="/admin/js/orders.js"></script>
+    <script src="/admin/js/chargers.js"></script>
 </head>
 <body id="orders-page">
 <nav class="container-fluid navbar navbar-inverse">
@@ -47,43 +47,33 @@
     </div><!-- /.container-fluid -->
 </nav>
 <div class="container">
-    <div id="users-list">
+    <div id="chargers-list">
         <table class="table table-hover">
             <thead>
             <tr>
                 <th>ID</th>
-                <th>UUID</th>
+                <th>Charger ID</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Type</th>
                 <th>Status</th>
-                <th>Price</th>
-                <th>Confirmed</th>
-                <th>Confirm Date</th>
-                <th>User</th>
-                <th>Charger trId</th>
-                <th>Payments</th>
                 <th>Action</th>
             </tr>
             </thead>
-            <tbody data-bind="foreach: orders">
+            <tbody data-bind="foreach: chargers">
             <tr>
                 <td data-bind="text: id"></td>
-                <td data-bind="text: uuid"></td>
+                <td data-bind="text: chargerId"></td>
+                <td data-bind="text: latitude"></td>
+                <td data-bind="text: longitude"></td>
+                <td data-bind="text: description"></td>
+                <td ></td>
+                <td data-bind="text: type"></td>
                 <td data-bind="text: status"></td>
-                <td data-bind="text: price"></td>
-                <td data-bind="text: confirmed"></td>
-                <td data-bind="text: confirmDate"></td>
-                <td data-bind="text: user.username"></td>
                 <td>
-                    <a data-bind="attr: { href: '/admin/priceCounter.html?trid='+chargerTransactionId }">
-                     <span data-bind="text: chargerTransactionId"></span>
-                    </a>
-                </td>
-                <td>
-                    <a data-bind="attr: { href: '/admin/payments.html?order='+uuid }">
-                        Payments
-                    </a>
-                </td>
-                <td>
-                    <button data-bind="click: $parent.confirmPayment" class="btn btn-sm btn-warning">Confirm</button>
+                    <button data-bind="click: $parent.syncCharger" class="btn btn-sm btn-primary">Sync</button>
                 </td>
             </tr>
             </tbody>

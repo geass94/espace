@@ -58,3 +58,11 @@ function getURLParameters(paramName)
         return "No Parameters Found";
     }
 }
+
+function logout() {
+    window.localStorage.setItem("accessToken", "");
+    window.localStorage.setItem("refreshToken", "");
+    window.localStorage.setItem("active", "");
+    window.localStorage.setItem("loggedIn", false);
+    window.location.href = "/admin/index.html";
+}

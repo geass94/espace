@@ -40,27 +40,33 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Profile <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">My profile</a></li>
-                        <li role="separator" class="divider"></li>
-                        <li><a href="#">Logout</a></li>
-                    </ul>
+                <li>
+                    <a href="#" onclick="logout()">Logout</a>
                 </li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
 <div class="container">
+    <p>
+        ფასიის დასაანგარიშებელი ფორმულა: <i>calcualtedPrice += (current update time - previous update time) * pricing</i>.
+    </p>
+    <p>
+        სადაც <b>calcualtedPrice</b> არის ტრანზაქციის ყოველ შემოწმებაზე დაანგარიშებული ფასების ჯამი.
+    </p>
+    <p>
+        <b>current update time</b> არის ტრანზაქციის შემოწმების მიმდინარე დროის მაჩვენებელი, ანუ ეხლანდელი რეალური დრო,
+        <b>previous update time</b> არის ტრანზაქციის წინა შემოწმების დრო, ხოლო <b>pricing</b> არის <a href="/admin/pricing.html">ტარიფებიდან</a> აღებული კილოვატ საათის ფასი,
+        რომელიც გენერირდება ავტომობილის მიერ დასატენად მოხმარებული ძალის <u>(charge power)</u> მიხედვით.
+    </p>
     <div id="users-list">
         <table class="table table-hover">
             <thead>
             <tr>
                 <th>ID</th>
                 <th>Charger ID</th>
-                <th>Charge power</th>
-                <th>Charge time</th>
+                <th>Charge power (kw/h)</th>
+                <th>Charge time (minutes)</th>
                 <th>Charger trId</th>
                 <th>Last update</th>
                 <th>Pricing</th>

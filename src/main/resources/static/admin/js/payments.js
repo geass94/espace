@@ -1,14 +1,14 @@
-var countersVMModel = function () {
+var paymentsVMModel = function () {
     var self = this;
-    self.counters = ko.observableArray([]);
+    self.payments = ko.observableArray([]);
     self.getOrders = function () {
         request({
-            url: '/api/admin/counter/'+getURLParameters("trid"),
+            url: '/api/admin/payment/'+getURLParameters("order"),
             method: 'GET',
             preventDataConversion: true,
             onSuccess: function (data) {
-                self.counters.removeAll();
-                ko.utils.arrayPushAll(self.counters, data)
+                self.payments.removeAll();
+                ko.utils.arrayPushAll(self.payments, data)
             },
             onError: function (data) {
                 console.log(data)
@@ -22,9 +22,9 @@ $(document).ready(function () {
     if ( window.localStorage.getItem("loggedIn") === "false" && window.localStorage.getItem("loggedIn") != null && typeof window.localStorage.getItem("loggedIn") != "undefined"){
         window.location.href = "/admin/index.html";
     }
-    var countersVM = new countersVMModel();
-    countersVM.getOrders();
-    ko.applyBindings(countersVM, $('#counter-page')[0]);
+    var paymentsVM = new paymentsVMModel();
+    paymentsVM.getOrders();
+    ko.applyBindings(paymentsVM, $('#payment-page')[0]);
 
 });
 

@@ -1,11 +1,10 @@
 package ge.boxwood.espace.controllers.admin;
 
+import ge.boxwood.espace.models.Charger;
+import ge.boxwood.espace.models.Order;
 import ge.boxwood.espace.models.Pricing;
 import ge.boxwood.espace.models.User;
-import ge.boxwood.espace.services.CounterService;
-import ge.boxwood.espace.services.OrderService;
-import ge.boxwood.espace.services.PricingService;
-import ge.boxwood.espace.services.UserService;
+import ge.boxwood.espace.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +21,10 @@ public class RequestController {
     private OrderService orderService;
     @Autowired
     private CounterService counterService;
+    @Autowired
+    private PaymentService paymentService;
+    @Autowired
+    private ChargerService chargerService;
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUsers(){
@@ -80,5 +83,30 @@ public class RequestController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getCoutnersByTrId(@PathVariable("trid")String trid){
         return ResponseEntity.ok(counterService.getAllCounterByTrId(trid));
+    }
+
+    @GetMapping("/payment/{order}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getOrderPayments(@PathVariable("order")String order){
+        Order order1 = orderService.getOneByUUID(order);
+        return ResponseEntity.ok(paymentService.getAllByOrder(order1));
+    }
+
+    @GetMapping("/chargers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getChargers(){
+        return ResponseEntity.ok(chargerService.getAll());
+    }
+
+    @GetMapping("/chargers/info")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> chargerInfo(@RequestParam("chargerId") Long cid) throws Exception {
+        Charger chargerInfo = chargerService.info(cid);
+        if(chargerInfo != null){
+            return ResponseEntity.ok(chargerInfo);
+        }
+        else{
+            throw new RuntimeException("Something went wrong");
+        }
     }
 }

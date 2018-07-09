@@ -62,12 +62,12 @@ var pricingsVMModel = function () {
 }
 
 $(document).ready(function () {
-    console.log(window.localStorage.getItem("loggedIn"))
+    if ( window.localStorage.getItem("loggedIn") === "false" && window.localStorage.getItem("loggedIn") != null && typeof window.localStorage.getItem("loggedIn") != "undefined"){
+        window.location.href = "/admin/index.html";
+    }
     var pricingsVM = new pricingsVMModel();
     pricingsVM.getPricings();
     ko.applyBindings(pricingsVM, $('#pricings-page')[0]);
+
 });
 
-if ( window.localStorage.getItem("loggedIn") === false ){
-    window.location.href = "/admin/index.html";
-}

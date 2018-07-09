@@ -16,4 +16,9 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getAll() {
         return orderRepository.findAll();
     }
+
+    @Override
+    public Order getOneByUUID(String uuid) {
+        return orderRepository.findByUuid(uuid);
+    }
 }

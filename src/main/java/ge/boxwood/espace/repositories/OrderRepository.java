@@ -18,4 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Order findByChargerAndChargerTransactionIdAndConfirmed(Charger charger, Long chargerTransactionId, boolean confirmed);
 
     Order findByUserAndChargerTransactionIdAndConfirmed(User user, Long trid, boolean confirmed);
+
+    Order findByUuid(String uuid);
 }
