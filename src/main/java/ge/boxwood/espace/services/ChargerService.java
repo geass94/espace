@@ -16,7 +16,7 @@ public interface ChargerService {
     Charger getOneByCode(String code);
     List<Charger> getAll();
     List<Charger> getClosestChargers(Double latitude, Double longitude);
-
+    void refreshChargers();
     Long freeChargers();
 
     ChargerInfoDTO start(Long cID, Long conID, Long cardID, Float targetPrice);

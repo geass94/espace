@@ -117,4 +117,8 @@ public class Charger extends BaseEntity {
     public void setCode(String code) {
         this.code = code;
     }
+
+    public void setChargerId(Long chargerId) {
+        this.chargerId = chargerId;
+    }
 }

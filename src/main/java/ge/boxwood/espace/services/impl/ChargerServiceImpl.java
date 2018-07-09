@@ -132,10 +132,64 @@ public class ChargerServiceImpl implements ChargerService {
         return q.getResultList();
     }
 
+    @Override
+    public void refreshChargers() {
+        try {
+            JSONObject obj = chargerRequestUtils.all();
+            JSONObject data = obj.getJSONObject("data");
+            JSONArray chargers = data.getJSONArray("chargers");
+            for (int i = 0; i < chargers.length(); i++) {
+                JSONObject chrg1 = chargers.getJSONObject(i);
+                JSONArray conns = chrg1.getJSONArray("connectors");
+                Charger charger = chargerRepository.findByChargerId(Long.valueOf(chrg1.get("id").toString()));
+
+                if (charger == null){
+                    Charger charger1 = new Charger();
+                    charger1.setChargerId( Long.valueOf(chrg1.get("id").toString()) );
+                    charger1.setLatitude( Double.valueOf(chrg1.get("latitude").toString()) );
+                    charger1.setLongitude( Double.valueOf(chrg1.get("longitude").toString()) );
+                    charger1.setStatus( Integer.valueOf(chrg1.get("status").toString()) );
+                    charger1.setType( Integer.valueOf(chrg1.get("type").toString()) );
+                    charger1.setDescription( chrg1.get("description").toString() );
+                    charger1 = chargerRepository.save(charger1);
+                    List<Connector> connectorList = new ArrayList<>();
+                    for(int x = 0; x < conns.length(); x++){
+                        Connector connector = new Connector();
+                        connector.setCharger(charger1);
+                        connector.setConnectorId( Long.valueOf(conns.getJSONObject(x).get("id").toString() ));
+                        connector = connectorRepository.save(connector);
+                        connectorList.add(connector);
+                    }
+                    charger1.setConnectors(connectorList);
+                    chargerRepository.flush();
+                }else{
+                    Charger charger1 = chargerRepository.findByChargerId( Long.valueOf( chrg1.get("id").toString() ) );
+                    charger1.setChargerId( Long.valueOf(chrg1.get("id").toString()) );
+                    charger1.setLatitude( Double.valueOf(chrg1.get("latitude").toString()) );
+                    charger1.setLongitude( Double.valueOf(chrg1.get("longitude").toString()) );
+                    charger1.setStatus( Integer.valueOf(chrg1.get("status").toString()) );
+                    charger1.setType( Integer.valueOf(chrg1.get("type").toString()) );
+                    charger1.setDescription( chrg1.get("description").toString() );
+                    charger1 = chargerRepository.save(charger1);
+                    List<Connector> connectorList = new ArrayList<>();
+                    for(int x = 0; x < conns.length(); x++){
+                        Connector connector = new Connector();
+                        connector.setCharger(charger1);
+                        connector.setConnectorId( Long.valueOf(conns.getJSONObject(x).get("id").toString() ));
+                        connector = connectorRepository.save(connector);
+                        connectorList.add(connector);
+                    }
+                    charger1.setConnectors(connectorList);
+                    chargerRepository.flush();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
-
-// როდესაც ეშვება start მეთოდი პირველ რიგში მოწმდება არსებობს თუ არა დაუსრულებელი ორდერი ამ ჩარჯერეზე.
+    // როდესაც ეშვება start მეთოდი პირველ რიგში მოწმდება არსებობს თუ არა დაუსრულებელი ორდერი ამ ჩარჯერეზე.
 //    შემდეგ ეშვება info მეთოდი და ახლდება ჩარჯერის ინფორმაცია და ინახება ჩემთან ბაზაში.
 //    იქმნება ორდერი, ფეიმენტი და ინახება როგორც დაუსულებელი გადახდა.
     @Override

@@ -34,6 +34,17 @@ var chargersVMModel = function () {
             }
         })
     }
+
+    self.refreshChargers = function () {
+        request({
+            url: '/api/admin/chargers/refresh',
+            method: 'POST',
+            preventDataConversion: true,
+            onSuccess: function () {
+                self.getChargers();
+            }
+        })
+    }
 }
 
 $(document).ready(function () {

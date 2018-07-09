@@ -109,4 +109,11 @@ public class RequestController {
             throw new RuntimeException("Something went wrong");
         }
     }
+
+    @PostMapping("/chargers/refresh")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> refreshChargers(){
+        chargerService.refreshChargers();
+        return ResponseEntity.ok(true);
+    }
 }

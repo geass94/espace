@@ -17,7 +17,8 @@ function request(cfg) {
             cfg.onSuccess(r);
         },
         error: function (r) {
-            cfg.onError(r)
+            // cfg.onError(r)
+            console.log("ERROR: ", r)
         },
         headers: {
             'Authorization':'Bearer '+window.localStorage.getItem("accessToken"),
