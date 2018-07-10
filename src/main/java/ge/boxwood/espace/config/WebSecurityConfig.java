@@ -99,21 +99,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 HttpMethod.GET,
                 "/user-files/**",
                 "/recovery/**",
-                "/place/**",
                 "/charger/free",
-                "/static/images/**",
+                "/images/**",
                 "/payment/InitiatePayment",
                 "/slave/**",
                 "/checkoutComplete",
                 "/checkoutFailed",
-                "/partner",
-                "/orders/pricing"
+                "/partner"
         );
 
-        web.ignoring().antMatchers(
-                HttpMethod.GET,
-                "/images/**"
-        );
     }
 
     @Bean

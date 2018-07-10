@@ -3,6 +3,7 @@ package ge.boxwood.espace.controllers;
 
 import ge.boxwood.espace.repositories.CategoryRepository;
 import ge.boxwood.espace.security.TokenHelper;
+import ge.boxwood.espace.services.PricingService;
 import ge.boxwood.espace.services.smsservice.GeoSms.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,8 @@ import java.util.Random;
 public class SlaveController {
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private PricingService pricingService;
     @GetMapping("/charger/start/{chID}/{conID}")
     public ResponseEntity<?> start(@PathVariable("chID")Long cID, @PathVariable("conID")Long conID){
         HashMap start = new HashMap();
@@ -93,6 +96,11 @@ public class SlaveController {
     @GetMapping("/categories")
     public ResponseEntity<?> categories(){
         return ResponseEntity.ok(categoryRepository.findAll());
+    }
+
+    @GetMapping("/pricing")
+    public ResponseEntity<?> pricing(){
+        return ResponseEntity.ok(pricingService.getAll());
     }
 
 }

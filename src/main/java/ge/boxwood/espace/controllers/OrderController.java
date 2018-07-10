@@ -37,8 +37,7 @@ public class OrderController {
     private ChargerService chargerService;
     @Autowired
     private CreditCardService creditCardService;
-    @Autowired
-    private PricingService pricingService;
+
     @PostMapping("/giveOrder")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> giveOrder(HttpServletRequest request){
@@ -91,10 +90,5 @@ public class OrderController {
         paymentRepository.save(payment);
         orderRepository.flush();
         return ResponseEntity.ok(payment);
-    }
-
-    @GetMapping("/pricing")
-    public ResponseEntity<?> pricingList(){
-        return ResponseEntity.ok(pricingService.getAll());
     }
 }
