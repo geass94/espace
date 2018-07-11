@@ -36,7 +36,7 @@ public class Charger extends BaseEntity {
             mappedBy = "charger")
     private List<Connector> connectors;
 
-
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="category_id", nullable = true)
     private Category category;

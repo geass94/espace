@@ -8,9 +8,6 @@ import javax.persistence.*;
 
 @Table(name = "charger_connectors")
 @Entity
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
 public class Connector extends BaseEntity {
     @Column
     private Long connectorId;
