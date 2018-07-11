@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
             Notification notification = new Notification();
             notification.setUser(raw);
             notificationService.create(notification);
-            raw.setSmsActive(false);
+//            raw.setSmsActive(false);
         }
         if(user.getImage() != null && !user.getImage().isEmpty()){
             UserFile userFile = userFileService.create(user.getImage(), raw);
