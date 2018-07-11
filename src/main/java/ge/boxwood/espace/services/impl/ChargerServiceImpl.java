@@ -68,8 +68,8 @@ public class ChargerServiceImpl implements ChargerService {
                 }
                 chrg.setConnectors(connectorList);
             }
-            if (charger.getCategory() != null){
-                Category cat = categoryRepository.findOne(charger.getCategory().getId());
+            if (charger.getCategoryId() != null){
+                Category cat = categoryRepository.findOne(charger.getCategoryId());
                 chrg.setCategory(cat);
             }
             chargerRepository.flush();

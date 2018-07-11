@@ -26,6 +26,8 @@ public class Charger extends BaseEntity {
     private String description;
     @Column
     private String code;
+    @Transient
+    private Long categoryId;
 
     @JsonIgnore
     @OneToMany(mappedBy = "charger", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -119,5 +121,13 @@ public class Charger extends BaseEntity {
 
     public void setChargerId(Long chargerId) {
         this.chargerId = chargerId;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 }
