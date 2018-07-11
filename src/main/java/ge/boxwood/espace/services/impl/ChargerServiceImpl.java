@@ -362,13 +362,11 @@ public class ChargerServiceImpl implements ChargerService {
                 counter.setChargeTime(dto.getChargeTime());
                 counter.setPricing(pricingService.getPriceForChargingPower(dto.getChargePower()));
                 counter = counterRepository.save(counter);
-
                 List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trid.toString());
                 float price = this.calculatePrice(counters);
-
                 counter.setCurrentPrice(price);
-                counterRepository.save(counter);
-                System.out.println("new price: "+price);
+                counterRepository.flush();
+
                 dto.setCurrentPrice(counter.getCurrentPrice());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
@@ -387,6 +385,10 @@ public class ChargerServiceImpl implements ChargerService {
                 }
                 paymentRepository.save(payment);
                 this.finisher ++;
+
+                System.out.println("TRANSACTION");
+                System.out.println("calculatedPrice: "+counter.getCurrentPrice());
+                System.out.println("chargePower: "+counter.getChargePower());
                 return dto;
             }else
             {
