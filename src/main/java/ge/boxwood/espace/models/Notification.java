@@ -1,6 +1,8 @@
 package ge.boxwood.espace.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import ge.boxwood.espace.models.converters.NotificationTypeConverter;
 import ge.boxwood.espace.models.enums.NotificationType;
 
@@ -9,6 +11,9 @@ import java.util.Date;
 
 @Table(name = "notifications")
 @Entity
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Notification extends BaseStatusEntity {
     @JsonIgnore
     @ManyToOne

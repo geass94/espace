@@ -1,6 +1,8 @@
 package ge.boxwood.espace.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,6 +12,9 @@ import java.util.Set;
 @Table(name = "credit_cards", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "trx_id"})
 })
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class CreditCard extends BaseStatusAuditEntity {
 
     @NotNull
