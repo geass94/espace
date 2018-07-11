@@ -424,6 +424,10 @@ public class ChargerServiceImpl implements ChargerService {
             }
         }
 
+        if (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) <= 2){
+            price = 0f;
+        }
+
         String formattedPrice = df.format(price);
         float finalPrice = Float.valueOf(formattedPrice);
         return finalPrice;
