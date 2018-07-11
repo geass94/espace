@@ -9,9 +9,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "AUTHORITY")
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
 public class Authority implements GrantedAuthority {
 
     @Id
