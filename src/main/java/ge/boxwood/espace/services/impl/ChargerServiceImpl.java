@@ -119,6 +119,7 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public List<Charger> getClosestChargers(Double latitude, Double longitude) {
+        this.refreshChargers();
         Query q = em.createNativeQuery("SELECT ch.* , 111.045 * DEGREES(ACOS(COS(RADIANS(:lat))\n" +
                 " * COS(RADIANS(latitude))\n" +
                 " * COS(RADIANS(longitude) - RADIANS(:lng))\n" +
