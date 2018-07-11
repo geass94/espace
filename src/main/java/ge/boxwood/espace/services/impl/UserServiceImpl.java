@@ -112,10 +112,9 @@ public class UserServiceImpl implements UserService {
         }
         if(user.getPhoneNumber() != null && raw.getPhoneNumber() != user.getPhoneNumber()){
             raw.setPhoneNumber(user.getPhoneNumber());
-            Notification notification = new Notification();
-            notification.setUser(raw);
-            notificationService.create(notification);
-//            raw.setSmsActive(false);
+        }
+        if(user.getEmail() != null && raw.getEmail() != user.getEmail()){
+            raw.setEmail(user.getEmail());
         }
         if(user.getImage() != null && !user.getImage().isEmpty()){
             UserFile userFile = userFileService.create(user.getImage(), raw);
