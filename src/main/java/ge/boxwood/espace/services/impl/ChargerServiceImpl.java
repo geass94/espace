@@ -188,6 +188,11 @@ public class ChargerServiceImpl implements ChargerService {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
+        System.out.println("START");
+        System.out.println("cID: "+cID);
+        System.out.println("conID: "+conID);
+        System.out.println("cardID: "+cardID);
+        System.out.println("targetPrice: "+targetPrice);
         Order order = orderRepository.findByChargerAndUserAndConfirmed(chargerRepository.findByChargerId(cID), user, false);
         Charger charger = this.info(cID);
         this.finisher = 0;
