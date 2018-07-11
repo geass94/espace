@@ -196,7 +196,11 @@ public class ChargerServiceImpl implements ChargerService {
         Order order = orderRepository.findByChargerAndUserAndConfirmed(chargerRepository.findByChargerId(cID), user, false);
         Charger charger = this.info(cID);
         this.finisher = 0;
-        if(order == null && charger.getStatus() == 0){
+        float pendingPrice = 0f;
+        if(order != null){
+            pendingPrice = order.getPrice();
+        }
+        if(charger.getStatus() == 0){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
@@ -210,9 +214,10 @@ public class ChargerServiceImpl implements ChargerService {
                     newOrder.setCharger(chargerInfo.getCharger());
                     newOrder.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
                     newOrder.setTargetPrice(targetPrice);
+                    newOrder.setPrice(pendingPrice);
                     newOrder = orderRepository.save(newOrder);
                     chargerInfo.setOrder(newOrder);
-                    Payment payment = new Payment(0f, newOrder);
+                    Payment payment = new Payment(pendingPrice, newOrder);
                     if(cardID != null && cardID > 0){
                         CreditCard creditCard = creditCardRepository.findOne(cardID);
                         payment.setCreditCard(creditCard);
