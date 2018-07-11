@@ -71,7 +71,7 @@
                 <td data-bind="text: status"></td>
                 <td data-bind="text: price"></td>
                 <td data-bind="text: confirmed"></td>
-                <td data-bind="text: confirmDate"></td>
+                <td data-bind="text: moment(confirmDate).format('YYYY-MM-DD HH:mm:ss')"></td>
                 <td data-bind="text: user.username"></td>
                 <td>
                     <a data-bind="attr: { href: '/admin/priceCounter.html?trid='+chargerTransactionId }">
