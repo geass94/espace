@@ -9,4 +9,5 @@ import java.util.List;
 public interface ConnectorRepository extends JpaRepository<Connector, Long> {
     List<Connector> findAllByCharger(Charger charger);
     Connector findByChargerAndConnectorId(Charger charger, Long id);
+    Connector findByConnectorId(Long id);
 }

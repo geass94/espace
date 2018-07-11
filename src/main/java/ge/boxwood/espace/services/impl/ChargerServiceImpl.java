@@ -1,6 +1,5 @@
 package ge.boxwood.espace.services.impl;
 
-import ch.qos.logback.core.util.TimeUtil;
 import ge.boxwood.espace.config.utils.ChargerRequestUtils;
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.sql.Time;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -143,50 +141,39 @@ public class ChargerServiceImpl implements ChargerService {
             JSONObject data = obj.getJSONObject("data");
             JSONArray chargers = data.getJSONArray("chargers");
             for (int i = 0; i < chargers.length(); i++) {
-                JSONObject chrg1 = chargers.getJSONObject(i);
-                JSONArray conns = chrg1.getJSONArray("connectors");
-                Charger charger = chargerRepository.findByChargerId(Long.valueOf(chrg1.get("id").toString()));
-
-                if (charger == null){
-                    Charger charger1 = new Charger();
-                    charger1.setChargerId( Long.valueOf(chrg1.get("id").toString()) );
-                    charger1.setLatitude( Double.valueOf(chrg1.get("latitude").toString()) );
-                    charger1.setLongitude( Double.valueOf(chrg1.get("longitude").toString()) );
-                    charger1.setStatus( Integer.valueOf(chrg1.get("status").toString()) );
-                    charger1.setType( Integer.valueOf(chrg1.get("type").toString()) );
-                    charger1.setDescription( chrg1.get("description").toString() );
-                    charger1 = chargerRepository.save(charger1);
-                    List<Connector> connectorList = new ArrayList<>();
-                    for(int x = 0; x < conns.length(); x++){
-                        Connector connector = new Connector();
-                        connector.setCharger(charger1);
-                        connector.setConnectorId( Long.valueOf(conns.getJSONObject(x).get("id").toString() ));
-                        connector = connectorRepository.save(connector);
-                        connectorList.add(connector);
-                    }
-                    charger1.setConnectors(connectorList);
-                    chargerRepository.flush();
-                }else{
-                    Charger charger1 = chargerRepository.findByChargerId( Long.valueOf( chrg1.get("id").toString() ) );
-                    charger1.setChargerId( Long.valueOf(chrg1.get("id").toString()) );
-                    charger1.setLatitude( Double.valueOf(chrg1.get("latitude").toString()) );
-                    charger1.setLongitude( Double.valueOf(chrg1.get("longitude").toString()) );
-                    charger1.setStatus( Integer.valueOf(chrg1.get("status").toString()) );
-                    charger1.setType( Integer.valueOf(chrg1.get("type").toString()) );
-                    charger1.setDescription( chrg1.get("description").toString() );
-                    charger1 = chargerRepository.save(charger1);
-                    List<Connector> connectorList = new ArrayList<>();
-                    for(int x = 0; x < conns.length(); x++){
-                        Connector connector = new Connector();
-                        connector.setCharger(charger1);
-                        connector.setConnectorId( Long.valueOf(conns.getJSONObject(x).get("id").toString() ));
-                        connector = connectorRepository.save(connector);
-                        connectorList.add(connector);
-                    }
-                    charger1.setConnectors(connectorList);
-                    chargerRepository.flush();
+                JSONObject jsonCharger = chargers.getJSONObject(i);
+                JSONArray jsonChargerConnectors = jsonCharger.getJSONArray("connectors");
+                Charger charger = chargerRepository.findByChargerId(Long.valueOf(jsonCharger.get("id").toString()));
+                if(charger == null) {
+                    charger = new Charger();
                 }
-            }
+                    List<Connector> connectors = new ArrayList<>();
+                    charger.setChargerId( Long.valueOf( jsonCharger.get("id").toString() ) );
+                    charger.setLatitude( Double.valueOf( jsonCharger.get("latitude").toString() ) );
+                    charger.setLongitude( Double.valueOf( jsonCharger.get("longitude").toString() ) );
+                    charger.setStatus( Integer.valueOf( jsonCharger.get("status").toString() ) );
+                    charger.setType( Integer.valueOf( jsonCharger.get("type").toString() ) );
+                    charger.setCode( jsonCharger.get("code").toString() );
+                    charger.setDescription( jsonCharger.get("description").toString() );
+                    charger.setCategory( categoryRepository.findOne(Long.valueOf( jsonCharger.get("category").toString() ) ) );
+                    charger = chargerRepository.save(charger);
+                    for(int x = 0; x < jsonChargerConnectors.length(); x++){
+                        JSONObject connector =  jsonChargerConnectors.getJSONObject(x);
+                        Connector conn = connectorRepository.findByChargerAndConnectorId(charger, Long.valueOf( connector.get("id").toString() ) );
+                        if(conn == null){
+                            conn = new Connector();
+                        }
+                        conn.setConnectorId( Long.valueOf( connector.get("id").toString() ) );
+                        conn.setType( connector.get("type").toString() );
+                        conn.setCharger(charger);
+                        conn = connectorRepository.save(conn);
+                        connectors.add(conn);
+                    }
+                    charger.setConnectors(connectors);
+                    chargerRepository.flush();
+                    connectorRepository.flush();
+                }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
