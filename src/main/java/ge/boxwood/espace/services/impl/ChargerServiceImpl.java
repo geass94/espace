@@ -70,6 +70,7 @@ public class ChargerServiceImpl implements ChargerService {
             }
             if (charger.getCategory() != null){
                 Category cat = categoryRepository.findOne(charger.getCategory().getId());
+                chrg.setCategory(cat);
             }
             chargerRepository.flush();
         }
