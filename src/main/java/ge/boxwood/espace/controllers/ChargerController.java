@@ -2,6 +2,7 @@ package ge.boxwood.espace.controllers;
 
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.services.ChargerService;
+import ge.boxwood.espace.services.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class ChargerController {
     @Autowired
     private ChargerService chargerService;
+    @Autowired
+    private SettingsService settingsService;
 
     @GetMapping("/free")
     public ResponseEntity<?> getFreeChargers(){
@@ -51,7 +54,7 @@ public class ChargerController {
         Long chargerId = !data.get("chargerId").isEmpty() && data.get("chargerId") != null ? Long.valueOf(data.get("chargerId")) : 0L;
         Long connectorId = !data.get("connectorId").isEmpty() && data.get("connectorId") != null ? Long.valueOf(data.get("connectorId")) : 0L;
         Long cardId = !data.get("cardId").isEmpty() && data.get("cardId") != null ? Long.valueOf(data.get("cardId")) : 0L;
-        float targetPrice = !data.get("targetPrice").isEmpty() && data.get("targetPrice") != null ? Float.valueOf(data.get("targetPrice")) : 0f;
+        float targetPrice = !data.get("targetPrice").isEmpty() && data.get("targetPrice") != null ? Float.valueOf(data.get("targetPrice")) : Float.valueOf(settingsService.getByKey("defaultPriceForCharging").getValue());
 
         HashMap dt = chargerService.preStart(chargerId, connectorId, cardId, targetPrice);
         return ResponseEntity.ok(dt);

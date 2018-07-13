@@ -1,9 +1,6 @@
 package ge.boxwood.espace.controllers.admin;
 
-import ge.boxwood.espace.models.Charger;
-import ge.boxwood.espace.models.Order;
-import ge.boxwood.espace.models.Pricing;
-import ge.boxwood.espace.models.User;
+import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +22,9 @@ public class RequestController {
     private PaymentService paymentService;
     @Autowired
     private ChargerService chargerService;
+    @Autowired
+    private SettingsService settingsService;
+
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUsers(){
@@ -115,5 +115,17 @@ public class RequestController {
     public ResponseEntity<?> refreshChargers(){
         chargerService.refreshChargers();
         return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/settings")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> settings(){
+        return ResponseEntity.ok(settingsService.getAll());
+    }
+
+    @PutMapping("/settings/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateSettings(@PathVariable("id")Long id, @RequestBody Settings settings){
+        return ResponseEntity.ok(settingsService.update(id, settings));
     }
 }
