@@ -4,6 +4,7 @@ package ge.boxwood.espace.controllers;
 import ge.boxwood.espace.repositories.CategoryRepository;
 import ge.boxwood.espace.security.TokenHelper;
 import ge.boxwood.espace.services.PricingService;
+import ge.boxwood.espace.services.SettingsService;
 import ge.boxwood.espace.services.smsservice.GeoSms.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,6 +27,8 @@ public class SlaveController {
     private CategoryRepository categoryRepository;
     @Autowired
     private PricingService pricingService;
+    @Autowired
+    private SettingsService settingsService;
     @GetMapping("/charger/start/{chID}/{conID}")
     public ResponseEntity<?> start(@PathVariable("chID")Long cID, @PathVariable("conID")Long conID){
         HashMap start = new HashMap();
@@ -102,6 +105,17 @@ public class SlaveController {
     @GetMapping("/pricing")
     public ResponseEntity<?> pricing(){
         return ResponseEntity.ok(pricingService.getAll());
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> info(){
+        HashMap resp = new HashMap();
+        resp.put("addressLine1", settingsService.getByKey("addressLine1"));
+        resp.put("addressLine2", settingsService.getByKey("addressLine2"));
+        resp.put("phoneNumber", settingsService.getByKey("phoneNumber"));
+        resp.put("email", settingsService.getByKey("email"));
+        resp.put("website", settingsService.getByKey("website"));
+        return ResponseEntity.ok(resp);
     }
 
 }
