@@ -438,7 +438,7 @@ public class ChargerServiceImpl implements ChargerService {
 
         if ( !prevCounter.equals(null) && !lastCounter.equals(null) ){
             if(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) > 0){
-                price = prevCounter.getCurrentPrice() == null ? 0 : prevCounter.getCurrentPrice() + (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) * prevCounter.getPricing());
+                price += prevCounter.getCurrentPrice() == null ? 0 : prevCounter.getCurrentPrice() + (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) * prevCounter.getPricing());
             }
         }
 
