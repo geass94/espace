@@ -1,14 +1,18 @@
 package ge.boxwood.espace.models;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "settings")
 public class Settings extends BaseStatusEntity {
-    String name;
-    String key;
-    String value;
+    @Column(name = "setting_name")
+    private String name;
+    @Column(name = "setting_key")
+    private String key;
+    @Column(name = "setting_value")
+    private String value;
 
     public String getName() {
         return name;
