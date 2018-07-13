@@ -45,7 +45,7 @@ public class ChargerController {
         }
     }
 
-    @PostMapping("/start")
+    @PostMapping("/preStart")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> preStart(@RequestBody Map<String, String> data) throws Exception {
         Long chargerId = !data.get("chargerId").isEmpty() && data.get("chargerId") != null ? Long.valueOf(data.get("chargerId")) : 0L;
