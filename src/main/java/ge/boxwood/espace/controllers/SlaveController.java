@@ -110,11 +110,11 @@ public class SlaveController {
     @GetMapping("/info")
     public ResponseEntity<?> info(){
         HashMap resp = new HashMap();
-        resp.put("addressLine1", settingsService.getByKey("addressLine1"));
-        resp.put("addressLine2", settingsService.getByKey("addressLine2"));
-        resp.put("phoneNumber", settingsService.getByKey("phoneNumber"));
-        resp.put("email", settingsService.getByKey("email"));
-        resp.put("website", settingsService.getByKey("website"));
+        resp.put("addressLine1", settingsService.getByKey("addressLine1").getValue());
+        resp.put("addressLine2", settingsService.getByKey("addressLine2").getValue());
+        resp.put("phoneNumber", settingsService.getByKey("phoneNumber").getValue());
+        resp.put("email", settingsService.getByKey("email").getValue());
+        resp.put("website", settingsService.getByKey("website").getValue());
         return ResponseEntity.ok(resp);
     }
 
