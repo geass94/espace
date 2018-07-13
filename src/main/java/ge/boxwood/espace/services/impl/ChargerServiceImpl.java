@@ -232,7 +232,7 @@ public class ChargerServiceImpl implements ChargerService {
         Order order = orderRepository.findByUuid(orderUUID);
         Charger charger = this.info(cID);
         this.finisher = 0;
-        if(charger.getStatus() == 0 && order.isConfirmed() == false && order != null){
+        if(charger.getStatus() == 0 && order.isConfirmed() == true && order != null){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
