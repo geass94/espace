@@ -1,4 +1,4 @@
-package ge.boxwood.espace.services.payments.impl;
+package ge.boxwood.espace.services.gc.impl;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,7 @@ import ge.boxwood.espace.models.georgiancard.*;
 import ge.boxwood.espace.repositories.OrderRepository;
 import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.services.CreditCardService;
-import ge.boxwood.espace.services.payments.PaymentService;
+import ge.boxwood.espace.services.gc.GCPaymentService;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -39,7 +39,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class PaymentServiceImpl implements PaymentService {
+public class GCPaymentServiceImpl implements GCPaymentService {
     private static String primaryTrxId = "";
     private static String orderId = "1111122222";
     private static String merchId = "19446110895BF705B1BE0F83FC420564";

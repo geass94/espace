@@ -2,7 +2,7 @@ package ge.boxwood.espace.controllers;
 
 import ge.boxwood.espace.models.Payment;
 import ge.boxwood.espace.repositories.PaymentRepository;
-import ge.boxwood.espace.services.payments.PaymentService;
+import ge.boxwood.espace.services.gc.GCPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -21,23 +21,23 @@ public class PaymentController {
     private PaymentRepository paymentsRepo;
 
     @Autowired
-    private PaymentService paymentService;
+    private GCPaymentService GCPaymentService;
 
     @GetMapping(path = "/payment/initiatePayment")
     public void initiatePayment(@RequestParam String orderId, HttpServletResponse response) throws IOException {
-        response.sendRedirect(paymentService.initiatePayment(orderId, ""));
+        response.sendRedirect(GCPaymentService.initiatePayment(orderId, ""));
     }
 
     @GetMapping(path = "/payments/check", produces = MediaType.APPLICATION_XML_VALUE)
     @ResponseBody
     public String checkAvailable(@RequestParam Map<String, String> params) {
-        return paymentService.checkAvailable(params);
+        return GCPaymentService.checkAvailable(params);
     }
 
     @GetMapping(path = "/payments/register", produces = MediaType.APPLICATION_XML_VALUE)
     @ResponseBody
     public String registerPayment(@RequestParam Map<String, String> params, HttpServletRequest httpRequest) {
-        return paymentService.registerPayment(params, httpRequest);
+        return GCPaymentService.registerPayment(params, httpRequest);
     }
 
 
