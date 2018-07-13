@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PaymentService {
     List<Payment> getAllByOrder(Order order);
+    Payment create(Payment payment);
+    Payment update(Payment payment);
 }

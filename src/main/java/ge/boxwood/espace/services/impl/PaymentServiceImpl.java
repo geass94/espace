@@ -17,4 +17,14 @@ public class PaymentServiceImpl implements PaymentService {
     public List<Payment> getAllByOrder(Order order) {
         return paymentRepository.findAllByOrder(order);
     }
+
+    @Override
+    public Payment create(Payment payment) {
+        return paymentRepository.save(payment);
+    }
+
+    @Override
+    public Payment update(Payment payment) {
+        return paymentRepository.save(payment);
+    }
 }

@@ -311,7 +311,6 @@ public class ChargerServiceImpl implements ChargerService {
                         gcPaymentService.makeRefund(order.getTargetPrice(), dto.getCurrentPrice(), successfulPayment.getTrxId(), successfulPayment.getPrrn());
                         paymentRepository.flush();
                     }
-                    orderService.confirm(order.getUuid());
                     return dto;
                 }else
                 {
