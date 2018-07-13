@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,13 +47,23 @@ public class ChargerController {
 
     @PostMapping("/start")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> startChargingByCode(@RequestBody Map<String, String> data) throws Exception {
+    public ResponseEntity<?> preStart(@RequestBody Map<String, String> data) throws Exception {
         Long chargerId = !data.get("chargerId").isEmpty() && data.get("chargerId") != null ? Long.valueOf(data.get("chargerId")) : 0L;
         Long connectorId = !data.get("connectorId").isEmpty() && data.get("connectorId") != null ? Long.valueOf(data.get("connectorId")) : 0L;
         Long cardId = !data.get("cardId").isEmpty() && data.get("cardId") != null ? Long.valueOf(data.get("cardId")) : 0L;
         float targetPrice = !data.get("targetPrice").isEmpty() && data.get("targetPrice") != null ? Float.valueOf(data.get("targetPrice")) : 0f;
 
-        ChargerInfoDTO dto = chargerService.start(chargerId, connectorId, cardId, targetPrice);
+        HashMap dt = chargerService.preStart(chargerId, connectorId, cardId, targetPrice);
+        return ResponseEntity.ok(dt);
+    }
+
+    @PostMapping("/start")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<?> startChargingByCode(@RequestBody Map<String, String> data) throws Exception {
+        Long chargerId = !data.get("chargerId").isEmpty() && data.get("chargerId") != null ? Long.valueOf(data.get("chargerId")) : 0L;
+        Long connectorId = !data.get("connectorId").isEmpty() && data.get("connectorId") != null ? Long.valueOf(data.get("connectorId")) : 0L;
+        String orderUUID = !data.get("orderUUID").isEmpty() && data.get("orderUUID") != null ? data.get("orderUUID").toString() : "";
+        ChargerInfoDTO dto = chargerService.start(chargerId, connectorId, orderUUID);
         return ResponseEntity.ok(dto);
     }
 

@@ -3,7 +3,9 @@ package ge.boxwood.espace.services;
 import ge.boxwood.espace.models.Category;
 import ge.boxwood.espace.models.Charger;
 import ge.boxwood.espace.models.ChargerInfoDTO;
+import ge.boxwood.espace.models.Order;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface ChargerService {
@@ -18,8 +20,8 @@ public interface ChargerService {
     List<Charger> getClosestChargers(Double latitude, Double longitude);
     void refreshChargers();
     Long freeChargers();
-
-    ChargerInfoDTO start(Long cID, Long conID, Long cardID, Float targetPrice);
+    HashMap preStart(Long cID, Long conID, Long cardID, Float targetPrice);
+    ChargerInfoDTO start(Long cID, Long conID, String orderUUID);
     ChargerInfoDTO stop(Long cID);
     Charger info(Long cid);
     ChargerInfoDTO transaction(Long trid);

@@ -10,6 +10,7 @@ import ge.boxwood.espace.services.UserService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -180,12 +181,8 @@ public class ChargerServiceImpl implements ChargerService {
         }
     }
 
-
-    // როდესაც ეშვება start მეთოდი პირველ რიგში მოწმდება არსებობს თუ არა დაუსრულებელი ორდერი ამ ჩარჯერეზე.
-//    შემდეგ ეშვება info მეთოდი და ახლდება ჩარჯერის ინფორმაცია და ინახება ჩემთან ბაზაში.
-//    იქმნება ორდერი, ფეიმენტი და ინახება როგორც დაუსულებელი გადახდა.
     @Override
-    public ChargerInfoDTO start(Long cID, Long conID, Long cardID, Float targetPrice) {
+    public HashMap preStart(Long cID, Long conID, Long cardID, Float targetPrice) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
@@ -194,41 +191,53 @@ public class ChargerServiceImpl implements ChargerService {
         System.out.println("conID: "+conID);
         System.out.println("cardID: "+cardID);
         System.out.println("targetPrice: "+targetPrice);
-        Order order = orderRepository.findByChargerAndUserAndConfirmed(chargerRepository.findByChargerId(cID), user, false);
+        Charger charger = chargerRepository.findByChargerId(cID);
+        Order order = new Order(user);
+        order.setCharger(charger);
+        order.setTargetPrice(targetPrice);
+        order = orderRepository.save(order);
+        Payment payment = new Payment(order.getTargetPrice(), order);
+        if(cardID != null && cardID > 0){
+            CreditCard creditCard = creditCardRepository.findOne(cardID);
+            payment.setCreditCard(creditCard);
+        }
+        payment = paymentRepository.save(payment);
+        order.setPayments(Collections.singletonList(payment));
+        orderRepository.flush();
+        paymentRepository.flush();
+        HashMap ret = new HashMap();
+        ret.put("paymentUUID", payment.getUuid());
+        ret.put("orderUUID", order.getUuid());
+        ret.put("chargerId", order.getCharger().getChargerId());
+        ret.put("connectorId", conID);
+        return ret;
+    }
+
+    // როდესაც ეშვება start მეთოდი პირველ რიგში მოწმდება არსებობს თუ არა დაუსრულებელი ორდერი ამ ჩარჯერეზე.
+    //    შემდეგ ეშვება info მეთოდი და ახლდება ჩარჯერის ინფორმაცია და ინახება ჩემთან ბაზაში.
+    //    იქმნება ორდერი, ფეიმენტი და ინახება როგორც დაუსულებელი გადახდა.
+    @Override
+    public ChargerInfoDTO start(Long cID, Long conID, String orderUUID) {
+        System.out.println("START");
+        System.out.println("cID: "+cID);
+        System.out.println("conID: "+conID);
+        Order order = orderRepository.findByUuid(orderUUID);
         Charger charger = this.info(cID);
         this.finisher = 0;
-        float pendingPrice = 0f;
-        if(order != null){
-            pendingPrice = order.getPrice();
-        }
-        if(charger.getStatus() == 0){
+        if(charger.getStatus() == 0 && order.isConfirmed() == true && order != null){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
                 chargerInfo.setChargerTransactionId(chargerStart.get("data") != null && !chargerStart.get("data").equals(null) ? chargerStart.get("data").toString() : "0");
                 chargerInfo.setCharger(charger);
                 chargerInfo.setResponseCode((Integer) chargerStart.get("responseCode"));
-
+                chargerInfo.setOrder(order);
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
-                    Order newOrder = new Order(user);
-                    newOrder.setPaymentType(PaymentType.CREDITCARD);
-                    newOrder.setCharger(chargerInfo.getCharger());
-                    newOrder.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
-                    newOrder.setTargetPrice(targetPrice);
-                    newOrder.setPrice(pendingPrice);
-                    newOrder = orderRepository.save(newOrder);
-                    chargerInfo.setOrder(newOrder);
-                    Payment payment = new Payment(pendingPrice, newOrder);
-                    if(cardID != null && cardID > 0){
-                        CreditCard creditCard = creditCardRepository.findOne(cardID);
-                        payment.setCreditCard(creditCard);
-                    }
-                    payment = paymentRepository.save(payment);
-                    newOrder.setPayments(Collections.singletonList(payment));
-                    paymentRepository.flush();
+                    order.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
+                    order = orderRepository.save(order);
                     orderRepository.flush();
                     charger.setStatus(1);
-                    chargerRepository.save(charger);
+                    charger = chargerRepository.save(charger);
                     chargerRepository.flush();
                     Counter counter = new Counter();
                     counter.setChargerId(charger.getChargerId());
@@ -246,13 +255,13 @@ public class ChargerServiceImpl implements ChargerService {
                     return dto;
                 }else
                 {
-                    throw new RuntimeException("Something wrong with charger");
+                    throw new RuntimeException("Network error");
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }else{
-            throw new RuntimeException("Some order is pending confirmation or charger is offline/busy");
+            throw new RuntimeException("Charger is offline/busy");
         }
     }
 
@@ -414,6 +423,7 @@ public class ChargerServiceImpl implements ChargerService {
     public Long freeChargers() {
         return chargerRepository.countAllByStatus(-1);
     }
+
 
     private Float calculatePrice(List<Counter> counterList){
         DecimalFormat df = new DecimalFormat("##.##");
