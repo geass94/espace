@@ -7,6 +7,7 @@ import ge.boxwood.espace.repositories.*;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.PricingService;
 import ge.boxwood.espace.services.UserService;
+import ge.boxwood.espace.services.gc.GCPaymentService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,8 @@ public class ChargerServiceImpl implements ChargerService {
     private CategoryRepository categoryRepository;
     @Autowired
     private CounterRepository counterRepository;
+    @Autowired
+    private GCPaymentService gcPaymentService;
     @Override
     public Charger create(Charger charger) {
 
@@ -274,7 +277,8 @@ public class ChargerServiceImpl implements ChargerService {
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
         Charger charger = this.info(cID);
-        Order order = orderRepository.findByChargerAndUserAndConfirmed(charger, user, false);
+        Order order = orderRepository.findByChargerAndUserAndConfirmed(charger, user, true);
+        Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
         if(order != null){
             try {
                 JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
@@ -285,6 +289,25 @@ public class ChargerServiceImpl implements ChargerService {
                     chargerInfo.setOrder(order);
                     orderRepository.save(order);
                     ChargerInfoDTO dto = this.transaction(order.getChargerTransactionId());
+                    if(dto.getCurrentPrice() > order.getTargetPrice()){
+                        System.out.println("PAY MORE BIATCH");
+                        Payment newPay = new Payment(dto.getCurrentPrice() - order.getTargetPrice(), order);
+                        newPay = paymentRepository.save(newPay);
+                        dto.setCurrentPrice(newPay.getPrice());
+                        dto.setPaymentUUID(newPay.getUuid());
+                        paymentRepository.flush();
+                    }
+                    if(dto.getCurrentPrice() < order.getTargetPrice()){
+                        System.out.println("REFUNDING");
+                        Payment newPay = new Payment(dto.getCurrentPrice(), order);
+                        newPay.setTrxId(successfulPayment.getTrxId());
+                        newPay.setPrrn(successfulPayment.getPrrn());
+                        newPay = paymentRepository.save(newPay);
+                        dto.setCurrentPrice(newPay.getPrice());
+                        dto.setPaymentUUID(newPay.getUuid());
+                        gcPaymentService.makeRefund(order.getTargetPrice(), dto.getCurrentPrice(), successfulPayment.getTrxId(), successfulPayment.getPrrn());
+                        paymentRepository.flush();
+                    }
                     return dto;
                 }else
                 {
@@ -433,6 +456,7 @@ public class ChargerServiceImpl implements ChargerService {
         Float price = 0f;
         int last = counterList.size() - 1 < 0 ? 0 : counterList.size() - 1;
         int prev = counterList.size() - 2 < 0 ? 0 : counterList.size() - 2;
+
         Counter lastCounter = counterList.get(last);
         Counter prevCounter = counterList.get(prev);
 
@@ -441,7 +465,7 @@ public class ChargerServiceImpl implements ChargerService {
             System.out.println(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()));
             if(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) > 0){
                 System.out.println("calculatePrice second IF");
-                price += prevCounter.getCurrentPrice() == null ? 0 : prevCounter.getCurrentPrice() + (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) * prevCounter.getPricing());
+                price = prevCounter.getCurrentPrice() == null ? 0 : prevCounter.getCurrentPrice() + (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) * prevCounter.getPricing());
             }
         }
 

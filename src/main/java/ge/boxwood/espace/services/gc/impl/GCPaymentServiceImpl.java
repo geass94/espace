@@ -212,9 +212,9 @@ public class GCPaymentServiceImpl implements GCPaymentService {
                         User user = order.getUser();
 
                         String acquireBankTrnId = request.pRrn; //transaction id in acquirer bank
-                        if ( order.getTargetPrice() - payment.getPrice() > 0  ){
-                            makeRefund(order.getTargetPrice(), payment.getPrice(), request.trxId, acquireBankTrnId);
-                        }
+//                        if ( order.getTargetPrice() - payment.getPrice() > 0  ){
+//                            makeRefund(order.getTargetPrice(), payment.getPrice(), request.trxId, acquireBankTrnId);
+//                        }
                         Date paymentDate = request.pTransmissionDateTime;
                         payment.setTrxId(request.trxId);
                         payment.setPrrn(acquireBankTrnId);
@@ -380,8 +380,8 @@ public class GCPaymentServiceImpl implements GCPaymentService {
 
         return request;
     }
-
-    private String makeRefund(Float targetPrice, Float currentPrice, String trxId, String prnn){
+    @Override
+    public String makeRefund(Float targetPrice, Float currentPrice, String trxId, String prnn){
         try{
             Float refundPrice = targetPrice - currentPrice;
             URIBuilder builder = new URIBuilder();
