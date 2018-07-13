@@ -5,6 +5,7 @@ import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
 import ge.boxwood.espace.repositories.*;
 import ge.boxwood.espace.services.ChargerService;
+import ge.boxwood.espace.services.OrderService;
 import ge.boxwood.espace.services.PricingService;
 import ge.boxwood.espace.services.UserService;
 import ge.boxwood.espace.services.gc.GCPaymentService;
@@ -49,6 +50,8 @@ public class ChargerServiceImpl implements ChargerService {
     private CounterRepository counterRepository;
     @Autowired
     private GCPaymentService gcPaymentService;
+    @Autowired
+    private OrderService orderService;
     @Override
     public Charger create(Charger charger) {
 
@@ -229,7 +232,7 @@ public class ChargerServiceImpl implements ChargerService {
         Order order = orderRepository.findByUuid(orderUUID);
         Charger charger = this.info(cID);
         this.finisher = 0;
-        if(charger.getStatus() == 0 && order.isConfirmed() == true && order != null){
+        if(charger.getStatus() == 0 && order.isConfirmed() == false && order != null){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
@@ -277,8 +280,8 @@ public class ChargerServiceImpl implements ChargerService {
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
         Charger charger = this.info(cID);
-        Order order = orderRepository.findByChargerAndUserAndConfirmed(charger, user, true);
-        Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
+        Order order = orderRepository.findByChargerAndUserAndConfirmed(charger, user, false);
+        Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, false);
         if(order != null){
             try {
                 JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
@@ -308,6 +311,7 @@ public class ChargerServiceImpl implements ChargerService {
                         gcPaymentService.makeRefund(order.getTargetPrice(), dto.getCurrentPrice(), successfulPayment.getTrxId(), successfulPayment.getPrrn());
                         paymentRepository.flush();
                     }
+                    orderService.confirm(order.getUuid());
                     return dto;
                 }else
                 {
@@ -368,8 +372,8 @@ public class ChargerServiceImpl implements ChargerService {
             chargerInfo.setResponseCode((Integer) transactionInfo.get("responseCode"));
             if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
                 JSONObject transaction = transactionInfo.getJSONObject("data");
-                Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, Long.valueOf(transaction.get("id").toString()), true);
-                Payment payment = paymentRepository.findByOrderAndConfirmed(order, true);
+                Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, Long.valueOf(transaction.get("id").toString()), false);
+                Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
                 Charger charger = order.getCharger();
                 chargerInfo.setCharger(charger != null ? charger : new Charger());
                 chargerInfo.setOrder(order != null ? order : new Order());

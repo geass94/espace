@@ -39,15 +39,4 @@ public class PaymentController {
     public String registerPayment(@RequestParam Map<String, String> params, HttpServletRequest httpRequest) {
         return GCPaymentService.registerPayment(params, httpRequest);
     }
-
-
-    @RequestMapping("/confirmpayment")
-    @ResponseBody
-    public boolean confirmPayment(@RequestParam(value = "token", required = true, defaultValue = "") String token,
-                                  @RequestParam(value = "id", required = true, defaultValue = "") String id) {
-        Payment payment = paymentsRepo.findByUuid(id);
-        payment.confirm();
-        paymentsRepo.save(payment);
-        return true;
-    }
 }
