@@ -20,7 +20,12 @@ public class Payment {
     private long id;
     @Column
     private String uuid;
-
+    @JsonIgnore
+    @Column
+    private String trxId;
+    @JsonIgnore
+    @Column
+    private String prrn;
     @Column
     private float price;
 
@@ -138,6 +143,22 @@ public class Payment {
         if ((this.price + this.order.getPayementsMade()) >= order.getPrice()) {
             this.order.confirm();
         }
+    }
+
+    public String getTrxId() {
+        return trxId;
+    }
+
+    public void setTrxId(String trxId) {
+        this.trxId = trxId;
+    }
+
+    public String getPrrn() {
+        return prrn;
+    }
+
+    public void setPrrn(String prrn) {
+        this.prrn = prrn;
     }
 
     public CreditCard getCreditCard() {

@@ -18,6 +18,8 @@ import ge.boxwood.espace.services.CreditCardService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
+import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
@@ -31,10 +33,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.KeyStore;
@@ -247,8 +253,40 @@ public class PaymentController {
                         User user = order.getUser();
 
                         String acquireBankTrnId = request.pRrn; //transaction id in acquirer bank
+                        if ( order.getTargetPrice() - payment.getPrice() > 0  ){
+                            Float refundPrice = order.getTargetPrice() - payment.getPrice();
+                            URIBuilder builder = new URIBuilder();
+                            builder.setScheme("https");
+                            builder.setHost("PCID-111111111111111111111111111:espace!08%^^?@3dacq.georgiancard.ge");
+                            builder.setPath("/merchantapi/refund");
+                            builder.addParameter("trx_id", request.trxId);
+                            builder.addParameter("p.rrn", acquireBankTrnId);
+                            builder.addParameter("amount", refundPrice.toString());
+                            URL url = builder.build().toURL();
+                            URL obj = new URL(url.toString());
 
+                            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+                            con.setRequestMethod("GET");
+                            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+                            con.setRequestProperty("Accept-Charset", "UTF-8");
+
+                            BufferedReader in = new BufferedReader(
+                                    new InputStreamReader(con.getInputStream()));
+                            String inputLine;
+                            StringBuffer xmlResp = new StringBuffer();
+                            while ((inputLine = in.readLine()) != null) {
+                                xmlResp.append(inputLine);
+                            }
+
+                            in.close();
+
+                            String xml = xmlResp.toString();
+                            JSONObject jsonObj = XML.toJSONObject(xml);
+                            jsonObj.put("responseCode", con.getResponseCode());
+                        }
                         Date paymentDate = request.pTransmissionDateTime;
+                        payment.setTrxId(request.trxId);
+                        payment.setPrrn(acquireBankTrnId);
                         payment.setConfirmDate(paymentDate);
                         payment.setConfirmed(true);
                         payment.confirm();
