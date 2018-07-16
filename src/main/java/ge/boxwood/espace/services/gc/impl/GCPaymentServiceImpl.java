@@ -380,6 +380,7 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             builder.addParameter("p.rrn", prnn);
             builder.addParameter("amount", refundPrice.toString());
             URL url = builder.build().toURL();
+            System.out.println("REFUND URL:"+url.toString());
             URL obj = new URL(url.toString());
 
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
