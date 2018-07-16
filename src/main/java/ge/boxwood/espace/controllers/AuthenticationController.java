@@ -88,6 +88,7 @@ public class AuthenticationController {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         String authToken = tokenHelper.getToken(request);
+        System.out.println(authentication.getPrincipal());
         User user = (User) authentication.getPrincipal();
 
         if (authToken != null) {
