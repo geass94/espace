@@ -374,7 +374,7 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             Float refundPrice = targetPrice - currentPrice;
             URIBuilder builder = new URIBuilder();
             builder.setScheme("https");
-            builder.setHost("PCID-"+trxId+":espace!08%^^?@3dacq.georgiancard.ge");
+            builder.setHost("PCID-"+trxId+":Pass123456@3dacq.georgiancard.ge");
             builder.setPath("/merchantapi/refund");
             builder.addParameter("trx_id", payment.getCreditCard().getTrxId());
             builder.addParameter("p.rrn", prnn);
