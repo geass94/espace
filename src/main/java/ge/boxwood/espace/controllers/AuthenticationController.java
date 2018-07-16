@@ -82,8 +82,7 @@ public class AuthenticationController {
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
     public ResponseEntity<?> refreshAuthenticationToken(
             HttpServletRequest request,
-            Device device,
-            Principal principal
+            Device device
     ) {
 
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -91,7 +90,7 @@ public class AuthenticationController {
         String authToken = tokenHelper.getToken(request);
         User user = (User) authentication.getPrincipal();
 
-        if (authToken != null && principal != null) {
+        if (authToken != null) {
 
             String jws = tokenHelper.generateToken(user, device);
             String jwsr = tokenHelper.generateRefreshToken(jws, device);
