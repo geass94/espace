@@ -3,6 +3,7 @@ package ge.boxwood.espace.services.impl;
 import ge.boxwood.espace.config.utils.ChargerRequestUtils;
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
+import ge.boxwood.espace.models.enums.Status;
 import ge.boxwood.espace.repositories.*;
 import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.OrderService;
@@ -192,25 +193,26 @@ public class ChargerServiceImpl implements ChargerService {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
-        System.out.println("START");
+        System.out.println("PRE START");
         System.out.println("cID: "+cID);
         System.out.println("conID: "+conID);
         System.out.println("cardID: "+cardID);
         System.out.println("targetPrice: "+targetPrice);
         Charger charger = chargerRepository.findByChargerId(cID);
+
         Order order = new Order(user);
         order.setCharger(charger);
         order.setTargetPrice(targetPrice);
         order.setPaymentType(PaymentType.CREDITCARD);
-        order.setCashPayment(false);
         order = orderRepository.save(order);
+
         Payment payment = new Payment(order.getTargetPrice(), order);
         if(cardID != null && cardID > 0){
             CreditCard creditCard = creditCardRepository.findOne(cardID);
             payment.setCreditCard(creditCard);
         }
+        payment.setOrder(order);
         payment = paymentRepository.save(payment);
-        order.setPayments(Collections.singletonList(payment));
         orderRepository.flush();
         paymentRepository.flush();
         HashMap ret = new HashMap();
@@ -225,14 +227,19 @@ public class ChargerServiceImpl implements ChargerService {
     //    შემდეგ ეშვება info მეთოდი და ახლდება ჩარჯერის ინფორმაცია და ინახება ჩემთან ბაზაში.
     //    იქმნება ორდერი, ფეიმენტი და ინახება როგორც დაუსულებელი გადახდა.
     @Override
-    public ChargerInfoDTO start(Long cID, Long conID, String orderUUID) {
+    public ChargerInfoDTO start(Long cID, Long conID, String paymentUUID) {
         System.out.println("START");
         System.out.println("cID: "+cID);
         System.out.println("conID: "+conID);
-        Order order = orderRepository.findByUuid(orderUUID);
+        Payment payment = paymentRepository.findByUuid(paymentUUID);
+        Order order = payment.getOrder();
         Charger charger = this.info(cID);
         this.finisher = 0;
-        if(charger.getStatus() == 0 && order.isActive() == true && order != null){
+//        თუ ჩარჯერი თავისუფალია,
+//        თუ შეკვეთა ძალაშია
+//        თუ წინასწარ გადასახდელი თანხა გადახდილია
+//        მაშინ დავიწყოთ დატენვა
+        if(charger.getStatus() == 0 && order.getStatus() == Status.ORDERED && payment.isConfirmed()){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
@@ -243,6 +250,8 @@ public class ChargerServiceImpl implements ChargerService {
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
                     order.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
                     order = orderRepository.save(order);
+                    Payment payment1 = new Payment(order.getTargetPrice(), order);
+                    paymentRepository.save(payment1);
                     orderRepository.flush();
                     charger.setStatus(1);
                     charger = chargerRepository.save(charger);
@@ -280,8 +289,11 @@ public class ChargerServiceImpl implements ChargerService {
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
         Charger charger = this.info(cID);
-        Order order = orderRepository.findByChargerAndUserAndConfirmed(charger, user, false);
-        Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, false);
+        Order order = orderRepository.findByUserAndChargerAndStatus(user, charger, Status.ORDERED);
+
+        Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
+        Payment pendingPayment = paymentRepository.findByOrderAndConfirmed(order, false);
+
         if(order != null){
             try {
                 JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
@@ -292,23 +304,24 @@ public class ChargerServiceImpl implements ChargerService {
                     chargerInfo.setOrder(order);
                     orderRepository.save(order);
                     ChargerInfoDTO dto = this.transaction(order.getChargerTransactionId());
-                    if(dto.getCurrentPrice() > order.getTargetPrice()){
+
+                    if(pendingPayment.getPrice() - successfulPayment.getPrice() > 0){
                         System.out.println("PAY MORE BIATCH");
-                        Payment newPay = new Payment(dto.getCurrentPrice() - order.getTargetPrice(), order);
-                        newPay = paymentRepository.save(newPay);
-                        dto.setCurrentPrice(newPay.getPrice());
-                        dto.setPaymentUUID(newPay.getUuid());
+                        pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
+                        paymentRepository.save(pendingPayment);
+                        dto.setCurrentPrice(pendingPayment.getPrice());
+                        dto.setPaymentUUID(pendingPayment.getUuid());
                         paymentRepository.flush();
                     }
-                    if(dto.getCurrentPrice() < order.getTargetPrice()){
+                    if(pendingPayment.getPrice() - successfulPayment.getPrice() <= 0){
                         System.out.println("REFUNDING");
-                        Payment newPay = new Payment(dto.getCurrentPrice(), order);
-                        newPay.setTrxId(successfulPayment.getTrxId());
-                        newPay.setPrrn(successfulPayment.getPrrn());
-                        newPay = paymentRepository.save(newPay);
-                        dto.setCurrentPrice(newPay.getPrice());
-                        dto.setPaymentUUID(newPay.getUuid());
-                        gcPaymentService.makeRefund(order.getTargetPrice(), dto.getCurrentPrice(), successfulPayment.getTrxId(), successfulPayment.getPrrn());
+                        pendingPayment.setPrice( successfulPayment.getPrice() - pendingPayment.getPrice() );
+                        pendingPayment.setTrxId(successfulPayment.getTrxId());
+                        pendingPayment.setPrrn(successfulPayment.getPrrn());
+                        paymentRepository.save(pendingPayment);
+                        dto.setCurrentPrice(pendingPayment.getPrice());
+                        dto.setPaymentUUID(pendingPayment.getUuid());
+                        gcPaymentService.makeRefund(order.getTargetPrice(), successfulPayment.getPrice() - pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
                         paymentRepository.flush();
                     }
                     return dto;
@@ -371,7 +384,7 @@ public class ChargerServiceImpl implements ChargerService {
             chargerInfo.setResponseCode((Integer) transactionInfo.get("responseCode"));
             if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
                 JSONObject transaction = transactionInfo.getJSONObject("data");
-                Order order = orderRepository.findByUserAndChargerTransactionIdAndConfirmed(user, Long.valueOf(transaction.get("id").toString()), false);
+                Order order = orderRepository.findByUserAndChargerTransactionIdAndStatus(user, Long.valueOf(transaction.get("id").toString()), Status.ORDERED);
                 Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
                 Charger charger = order.getCharger();
                 chargerInfo.setCharger(charger != null ? charger : new Charger());

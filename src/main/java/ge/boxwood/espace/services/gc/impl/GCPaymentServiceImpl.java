@@ -222,7 +222,6 @@ public class GCPaymentServiceImpl implements GCPaymentService {
                         payment.setConfirmed(true);
                         payment.confirm();
                         paymentRepository.save(payment);
-                        order.setActive(true);
                         orderRepository.save(order);
 
                         CreditCard creditCard = creditCardService.findByUserAndMaskedPan(user, request.pMaskedPan);
@@ -412,6 +411,8 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             String xml = xmlResp.toString();
             JSONObject jsonObj = XML.toJSONObject(xml);
             jsonObj.put("responseCode", con.getResponseCode());
+            System.out.println("REFUND METHOD");
+            System.out.println(getAttribute(jsonObj, "code"));
             return getAttribute(jsonObj, "code");
         }
         catch (Exception ex){

@@ -11,6 +11,5 @@ import java.util.List;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Payment findByUuid(String uuid);
     Payment findByOrderAndConfirmed(Order order, boolean confirmed);
-    List<Payment> findByTransaction(String trans_id);
     List<Payment> findAllByOrder(Order order);
 }

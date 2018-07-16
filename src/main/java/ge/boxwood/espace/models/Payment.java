@@ -13,11 +13,7 @@ import java.util.UUID;
         property = "id")
 @Entity
 @Table(name = "Payment")
-public class Payment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "paymentId")
-    private long id;
+public class Payment extends BaseEntity {
     @Column
     private String uuid;
     @JsonIgnore
@@ -28,26 +24,20 @@ public class Payment {
     private String prrn;
     @Column
     private float price;
-
     @Column
     private Date date;
     @Column
     private Date confirmDate;
     @Column
     private boolean confirmed;
-    @Column
-    private String transaction;
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "credit_card_id")
     private CreditCard creditCard;
-
     @ManyToOne
     @JoinColumn(name = "orderId")
     @JsonIgnore
     private Order order;
-
     @Column
     private boolean active;
 
@@ -63,14 +53,6 @@ public class Payment {
 
     public Payment() {
 
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getUuid() {
@@ -105,14 +87,6 @@ public class Payment {
         this.confirmed = confirmed;
     }
 
-    public String getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(String transaction) {
-        this.transaction = transaction;
-    }
-
     public Order getOrder() {
         return order;
     }
@@ -140,9 +114,6 @@ public class Payment {
     public void confirm() {
         this.confirmed = true;
         this.confirmDate = new Date();
-        if ((this.price + this.order.getPayementsMade()) >= order.getPrice()) {
-            this.order.confirm();
-        }
     }
 
     public String getTrxId() {

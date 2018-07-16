@@ -53,6 +53,8 @@ open class UserController (val userService: UserService,
         val rawPassowrd = user.password
 //        user.authIds = ArrayList(Arrays.asList(1L))
         user = userService!!.create(user)
+
+
         val authentication = authenticationManager!!.authenticate(
                 UsernamePasswordAuthenticationToken(
                         user.username,

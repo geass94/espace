@@ -4,6 +4,7 @@ package ge.boxwood.espace.models;
 import com.fasterxml.jackson.annotation.*;
 import ge.boxwood.espace.models.converters.PaymentTypeConverter;
 import ge.boxwood.espace.models.enums.PaymentType;
+import ge.boxwood.espace.models.enums.Status;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -16,18 +17,9 @@ import java.util.UUID;
         property = "id")
 @Entity
 @Table(name = "orders")
-public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orderId")
-    private long id;
+public class Order extends BaseStatusAuditEntity {
     @Column
     private String uuid;
-    @Column
-    private Date createDate;
-    @Column
-    @JsonIgnore
-    private Date lastModifyDate;
     @Column
     private Date confirmDate;
     @Column
@@ -35,18 +27,9 @@ public class Order {
     @Column
     @JsonIgnore
     private boolean refunded;
-    @Column
-    @JsonIgnore
-    private boolean active;
-    @Column
-    private String comment;
-    @Column
-    private int status;
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
-    @Column
-    private boolean cashPayment;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Payment> payments;
@@ -64,26 +47,14 @@ public class Order {
 
     public Order(User user) {
         this.user = user;
-        this.active = true;
+        this.status = Status.ORDERED;
         this.confirmed = false;
         this.refunded = false;
-        this.createDate = new Date();
-        this.lastModifyDate = new Date();
         this.uuid = UUID.randomUUID().toString();
         this.payments = new ArrayList<>();
-        this.comment = "";
-        this.cashPayment = true;
     }
 
     public Order() {}
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getUuid() {
         return uuid;
@@ -93,21 +64,6 @@ public class Order {
         this.uuid = uuid;
     }
 
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Date getLastModifyDate() {
-        return lastModifyDate;
-    }
-
-    public void setLastModifyDate(Date lastModifyDate) {
-        this.lastModifyDate = lastModifyDate;
-    }
     @JsonProperty
     public Date getConfirmDate() {
         return confirmDate;
@@ -133,13 +89,6 @@ public class Order {
         this.refunded = refunded;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
     @JsonProperty
     public User getUser() {
         return user;
@@ -158,15 +107,6 @@ public class Order {
         this.payments = payments;
     }
 
-
-    @JsonIgnore
-    public float getPayementsMade() {
-        return (float) this.payments.stream()
-                .filter(payment -> payment.isActive() && payment
-                        .isConfirmed()).mapToDouble(value ->
-                        (double) value.getPrice()).sum();
-    }
-
     public void confirm() {
         this.confirmDate = new Date();
         this.confirmed = true;
@@ -176,41 +116,8 @@ public class Order {
         return user.getId();
     }
 
-    public boolean isCanBePaid() {
-        Date date = new Date();
-        long nowLong = date.getTime();
-        Date createDate = new Date(new DateTime(this.createDate).getMillis());
-        long cLong = createDate.getTime();
-        long dif = nowLong - cLong;
-        return (dif < 1000 * 60 * 60) && !this.confirmed;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public boolean isCashPayment() {
-        return cashPayment;
-    }
-
-    public void setCashPayment(boolean cashPayment) {
-        this.cashPayment = cashPayment;
-    }
-
     public String getPhone() {
         return this.user.getPhoneNumber();
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
     }
 
     public PaymentType getPaymentType() {

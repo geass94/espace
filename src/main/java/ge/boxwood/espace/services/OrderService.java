@@ -10,4 +10,5 @@ public interface OrderService {
     List<Order> getAll();
     List<Order> getAllByUser();
     Order getOneByUUID(String uuid);
+
 }
