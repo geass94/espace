@@ -110,7 +110,6 @@ public class Order extends BaseStatusAuditEntity {
     public void confirm() {
         this.confirmDate = new Date();
         this.confirmed = true;
-        this.status = Status.PAID;
     }
 
     public long getUserId() {

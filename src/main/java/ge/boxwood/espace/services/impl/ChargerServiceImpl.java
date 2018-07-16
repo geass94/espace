@@ -299,6 +299,7 @@ public class ChargerServiceImpl implements ChargerService {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 chargerInfo.setResponseCode((Integer) stopInfo.get("responseCode"));
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
+                    order.setStatus(Status.PAID);
                     order.confirm();
                     chargerInfo.setOrder(order);
                     orderRepository.save(order);
@@ -320,7 +321,7 @@ public class ChargerServiceImpl implements ChargerService {
                         paymentRepository.save(pendingPayment);
                         dto.setCurrentPrice(pendingPayment.getPrice());
                         dto.setPaymentUUID(pendingPayment.getUuid());
-                        gcPaymentService.makeRefund(order.getTargetPrice(), successfulPayment.getPrice() - pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
+                        gcPaymentService.makeRefund(pendingPayment.getUuid(), order.getTargetPrice(), successfulPayment.getPrice() - pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
                         paymentRepository.flush();
                     }
                     return dto;
