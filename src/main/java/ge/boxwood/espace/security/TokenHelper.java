@@ -88,20 +88,23 @@ public class TokenHelper {
         return refreshedToken;
     }
 
-    public String generateRefreshToken(String newToken, Device device) {
-        if (StringUtils.isBlank(getUsernameFromToken(newToken))) {
+    public String generateRefreshToken(User userContext, Device device) {
+        if (StringUtils.isBlank(userContext.getUsername()))
             throw new IllegalArgumentException("Cannot create JWT Token without username");
-        }
+
+        if (userContext.getAuthorities() == null || userContext.getAuthorities().isEmpty())
+            throw new IllegalArgumentException("User doesn't have any privileges");
+
+        Claims claims = Jwts.claims().setSubject(userContext.getUsername());
+        claims.put("scopes", userContext.getAuthorities());
 
         DateTime currentTime = new DateTime();
 
         String token = Jwts.builder()
-                .setSubject(getUsernameFromToken(newToken))
-                .setClaims(getAllClaimsFromToken(newToken))
+                .setClaims(claims)
                 .setIssuer(APP_NAME)
-                .setId(UUID.randomUUID().toString())
                 .setIssuedAt(currentTime.toDate())
-                .setExpiration(new Date(timeProvider.now().getTime() + 604800)) // One week for refresh token
+                .setExpiration(new Date(timeProvider.now().getTime() + 604800))
                 .signWith(SIGNATURE_ALGORITHM, SECRET)
                 .compact();
 

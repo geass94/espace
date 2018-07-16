@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,11 +67,11 @@ public class AuthenticationController {
 
         // Inject into security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         // token creation
         User user = (User) authentication.getPrincipal();
         String jws = tokenHelper.generateToken(user, device);
-        String jwsr = tokenHelper.generateRefreshToken(jws, device);
+        String jwsr = tokenHelper.generateRefreshToken(user, device);
 
         int expiresIn = tokenHelper.getExpiredIn(device);
         // Return the token
@@ -84,18 +85,15 @@ public class AuthenticationController {
             HttpServletRequest request,
             Device device
     ) {
-
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         String authToken = tokenHelper.getToken(request);
-        System.out.println(authentication.getCredentials());
-        System.out.println(authentication.getPrincipal());
-        User user = (User) authentication.getPrincipal();
-
-        if (authToken != null) {
-
+        String username = tokenHelper.getUsernameFromToken(authToken);
+        User user = (User) userDetailsService.loadUserByUsername(username);
+        if (authToken != null && user != null) {
+            Authentication authentication = new UsernamePasswordAuthenticationToken(user, null,
+                    user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             String jws = tokenHelper.generateToken(user, device);
-            String jwsr = tokenHelper.generateRefreshToken(jws, device);
+            String jwsr = tokenHelper.generateRefreshToken(user, device);
             return ResponseEntity.ok(new UserTokenState(jws, jwsr, tokenHelper.getExpiredIn(device), user.getSmsActive() || user.getEmailActive()));
         } else {
             UserTokenState userTokenState = new UserTokenState();

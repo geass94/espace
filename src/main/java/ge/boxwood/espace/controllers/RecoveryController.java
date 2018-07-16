@@ -80,7 +80,7 @@ public class RecoveryController {
             // token creation
             User user1 = (User)authentication.getPrincipal();
             String jws = tokenHelper.generateToken(user1, device);
-            String jwsr = tokenHelper.generateRefreshToken(jws, device);
+            String jwsr = tokenHelper.generateRefreshToken(user1, device);
 
             int expiresIn = tokenHelper.getExpiredIn(device);
             // Return the token

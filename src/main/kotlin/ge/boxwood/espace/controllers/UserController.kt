@@ -67,7 +67,7 @@ open class UserController (val userService: UserService,
         // token creation
         val autoUser = authentication.principal as User
         val jws = tokenHelper!!.generateToken(autoUser, device)
-        val jwsr = tokenHelper.generateRefreshToken(jws, device)
+        val jwsr = tokenHelper.generateRefreshToken(autoUser, device)
         val expiresIn = tokenHelper.getExpiredIn(device)
         // Return the token
         return ResponseEntity.ok(UserTokenState(jws, jwsr, expiresIn.toLong(), false))
