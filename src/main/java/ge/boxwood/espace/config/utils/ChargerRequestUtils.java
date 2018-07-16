@@ -13,7 +13,7 @@ public class ChargerRequestUtils {
 //    private final String SERVICE_URL = "http://devel.ge:9090/es-services/mobile/ws";
 //        private final String SERVICE_URL = "http://localhost:8443/slave";
 //    private final String SERVICE_URL = "https://api.e-space.ge/slave";
-    private final String SERVICE_URL = "https://chargers.e- space.ge:8443";
+    private final String SERVICE_URL = "https://chargers.e-space.ge:8443";
     public JSONObject start(Long cid, Long conid) throws Exception {
         URL obj = new URL(SERVICE_URL+"/charger/start/"+cid+"/"+conid);
 
