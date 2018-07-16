@@ -217,7 +217,6 @@ public class ChargerServiceImpl implements ChargerService {
         paymentRepository.flush();
         HashMap ret = new HashMap();
         ret.put("paymentUUID", payment.getUuid());
-        ret.put("orderUUID", order.getUuid());
         ret.put("chargerId", order.getCharger().getChargerId());
         ret.put("connectorId", conID);
         return ret;
