@@ -21,7 +21,7 @@ public interface ChargerService {
     void refreshChargers();
     Long freeChargers();
     HashMap preStart(Long cID, Long conID, Long cardID, Float targetPrice);
-    ChargerInfoDTO start(Long cID, Long conID, String orderUUID);
+    ChargerInfoDTO start(Long cID, Long conID, String paymentUUID);
     ChargerInfoDTO stop(Long cID);
     Charger info(Long cid);
     ChargerInfoDTO transaction(Long trid);

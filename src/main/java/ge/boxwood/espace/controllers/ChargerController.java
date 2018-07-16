@@ -65,8 +65,8 @@ public class ChargerController {
     public ResponseEntity<?> startChargingByCode(@RequestBody Map<String, String> data) throws Exception {
         Long chargerId = !data.get("chargerId").isEmpty() && data.get("chargerId") != null ? Long.valueOf(data.get("chargerId")) : 0L;
         Long connectorId = !data.get("connectorId").isEmpty() && data.get("connectorId") != null ? Long.valueOf(data.get("connectorId")) : 0L;
-        String orderUUID = !data.get("orderUUID").isEmpty() && data.get("orderUUID") != null ? data.get("orderUUID").toString() : "";
-        ChargerInfoDTO dto = chargerService.start(chargerId, connectorId, orderUUID);
+        String paymentUUID = !data.get("paymentUUID").isEmpty() && data.get("orderUUID") != null ? data.get("paymentUUID").toString() : "";
+        ChargerInfoDTO dto = chargerService.start(chargerId, connectorId, paymentUUID);
         return ResponseEntity.ok(dto);
     }
 
