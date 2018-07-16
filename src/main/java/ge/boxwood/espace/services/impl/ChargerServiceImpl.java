@@ -293,7 +293,7 @@ public class ChargerServiceImpl implements ChargerService {
 
         Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
         Payment pendingPayment = paymentRepository.findByOrderAndConfirmed(order, false);
-
+        System.out.println("PENDING UUID: "+pendingPayment.getUuid());
         if(order != null){
             try {
                 JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
