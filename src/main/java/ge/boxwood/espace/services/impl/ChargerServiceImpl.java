@@ -250,6 +250,7 @@ public class ChargerServiceImpl implements ChargerService {
                     order.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
                     order = orderRepository.save(order);
                     Payment payment1 = new Payment(order.getTargetPrice(), order);
+                    payment1.setCreditCard(payment.getCreditCard());
                     paymentRepository.save(payment1);
                     orderRepository.flush();
                     charger.setStatus(1);
