@@ -83,7 +83,6 @@ public class OrderController {
         User user = userService.getByUsername(username);
         Order order = new Order(user);
         order.setPaymentType(PaymentType.CREDITCARD);
-        order.setCashPayment(false);
         order.setPrice(1f);
         orderRepository.save(order);
         Payment payment = new Payment(1f, order);
