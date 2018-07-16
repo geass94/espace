@@ -5,6 +5,7 @@ import ge.boxwood.espace.models.User;
 import ge.boxwood.espace.models.UserTokenState;
 import ge.boxwood.espace.security.TokenHelper;
 import ge.boxwood.espace.security.auth.JwtAuthenticationRequest;
+import ge.boxwood.espace.security.auth.TokenBasedAuthentication;
 import ge.boxwood.espace.services.UserService;
 import ge.boxwood.espace.services.impl.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,13 +90,19 @@ public class AuthenticationController {
         Device device = deviceProvider.getCurrentDevice(request);
         String username = tokenHelper.getUsernameFromToken(authToken);
         User user = userService.getByUsername(username);
+
+
+        TokenBasedAuthentication authentication = new TokenBasedAuthentication(user);
+
+
         if (authToken != null) {
 
             // TODO check user password last update
             String refreshedToken = tokenHelper.refreshToken(authToken, device);
             String refreshToken = tokenHelper.generateRefreshToken(refreshedToken, device);
             int expiresIn = tokenHelper.getExpiredIn(device);
-
+            authentication.setToken(authToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             return ResponseEntity.ok(new UserTokenState(refreshedToken, refreshToken, expiresIn, user.getSmsActive() || user.getEmailActive()));
         } else {
             UserTokenState userTokenState = new UserTokenState();
