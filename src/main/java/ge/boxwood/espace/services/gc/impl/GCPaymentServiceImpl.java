@@ -277,21 +277,6 @@ public class GCPaymentServiceImpl implements GCPaymentService {
         return responseXml;
     }
 
-
-    private String removeQueryParameter(String url, String parameterName) throws URISyntaxException {
-        URIBuilder uriBuilder = new URIBuilder(url);
-        List<NameValuePair> queryParameters = uriBuilder.getQueryParams();
-        for (Iterator<NameValuePair> queryParameterItr = queryParameters.iterator(); queryParameterItr.hasNext(); ) {
-            NameValuePair queryParameter = queryParameterItr.next();
-            if (queryParameter.getName().equals(parameterName)) {
-                queryParameterItr.remove();
-            }
-        }
-        uriBuilder.setParameters(queryParameters);
-        return uriBuilder.build().toString();
-    }
-
-
     private RegisterPaymentRequest mapRegisterPaymentRequest(Map<String, String> params) {
         DateFormat df = new SimpleDateFormat("MMddHHmmss");
         DateFormat expDF = new SimpleDateFormat("YYMM");
@@ -380,8 +365,12 @@ public class GCPaymentServiceImpl implements GCPaymentService {
         return request;
     }
     @Override
-    public String makeRefund(Float targetPrice, Float currentPrice, String trxId, String prnn){
+    public String makeRefund(String paymentUUID, Float targetPrice, Float currentPrice, String trxId, String prnn){
         try{
+            Payment payment = paymentRepository.findByUuid(paymentUUID);
+            Order order = payment.getOrder();
+            order.setRefunded(true);
+
             Float refundPrice = targetPrice - currentPrice;
             URIBuilder builder = new URIBuilder();
             builder.setScheme("https");
@@ -413,6 +402,9 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             jsonObj.put("responseCode", con.getResponseCode());
             System.out.println("REFUND METHOD");
             System.out.println(getAttribute(jsonObj, "code"));
+            payment.confirm();
+            paymentRepository.save(payment);
+            orderRepository.save(order);
             return getAttribute(jsonObj, "code");
         }
         catch (Exception ex){

@@ -4,6 +4,7 @@ package ge.boxwood.espace.models;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import ge.boxwood.espace.models.enums.Status;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -114,6 +115,7 @@ public class Payment extends BaseEntity {
     public void confirm() {
         this.confirmed = true;
         this.confirmDate = new Date();
+        this.order.confirm();
     }
 
     public String getTrxId() {
