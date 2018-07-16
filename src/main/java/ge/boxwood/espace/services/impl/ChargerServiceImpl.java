@@ -299,10 +299,10 @@ public class ChargerServiceImpl implements ChargerService {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 chargerInfo.setResponseCode((Integer) stopInfo.get("responseCode"));
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
-                    order.setStatus(Status.PAID);
-                    order.confirm();
-                    chargerInfo.setOrder(order);
-                    orderRepository.save(order);
+//                    order.setStatus(Status.PAID);
+//                    order.confirm();
+//                    chargerInfo.setOrder(order);
+//                    orderRepository.save(order);
                     ChargerInfoDTO dto = this.transaction(order.getChargerTransactionId());
 
                     if(pendingPayment.getPrice() - successfulPayment.getPrice() > 0){
