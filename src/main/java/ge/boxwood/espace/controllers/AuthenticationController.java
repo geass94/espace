@@ -81,22 +81,21 @@ public class AuthenticationController {
 
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
     public ResponseEntity<?> refreshAuthenticationToken(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Principal principal
+            HttpServletRequest request
     ) {
 
         String authToken = tokenHelper.getToken(request);
 
         Device device = deviceProvider.getCurrentDevice(request);
-
-        if (authToken != null && principal != null) {
+        String username = tokenHelper.getUsernameFromToken(authToken);
+        User user = userService.getByUsername(username);
+        if (authToken != null) {
 
             // TODO check user password last update
             String refreshedToken = tokenHelper.refreshToken(authToken, device);
             String refreshToken = tokenHelper.generateRefreshToken(refreshedToken, device);
             int expiresIn = tokenHelper.getExpiredIn(device);
-            User user = userService.getByUsername(principal.getName());
+
             return ResponseEntity.ok(new UserTokenState(refreshedToken, refreshToken, expiresIn, user.getSmsActive() || user.getEmailActive()));
         } else {
             UserTokenState userTokenState = new UserTokenState();
