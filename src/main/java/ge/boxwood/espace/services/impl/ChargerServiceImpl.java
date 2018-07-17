@@ -504,6 +504,8 @@ public class ChargerServiceImpl implements ChargerService {
             prev = last - 1;
         }
         System.out.println("counters count: "+counterList.size());
+        System.out.println("last index: "+last);
+        System.out.println("prev index: "+prev);
         Counter lastCounter = counterList.get(last);
         Counter prevCounter = counterList.get(prev);
         System.out.println(prevCounter.getId());
