@@ -118,8 +118,13 @@ public class ChargerServiceImpl implements ChargerService {
     @Override
     public Charger getOneByCode(String code) {
         Charger charger = chargerRepository.findByCode(code);
-        charger = this.info(charger.getChargerId());
-        return charger;
+        if(charger != null){
+            charger = this.info(charger.getChargerId());
+            return charger;
+        }
+        else{
+            throw new RuntimeException("Charger not found");
+        }
     }
 
     @Override
