@@ -200,12 +200,15 @@ public class ChargerServiceImpl implements ChargerService {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
+
         System.out.println("PRE START");
         System.out.println("cID: "+cID);
         System.out.println("conID: "+conID);
         System.out.println("cardID: "+cardID);
         System.out.println("targetPrice: "+targetPrice);
+
         Charger charger = this.info(cID);
+
         if(charger.getStatus() != 0 && charger != null){
             throw new RuntimeException("CHARGER_OFFLINE_BUSY");
         }
@@ -217,6 +220,7 @@ public class ChargerServiceImpl implements ChargerService {
             order = orderRepository.save(order);
 
             Payment payment = new Payment(order.getTargetPrice(), order);
+
             if(cardID != null && cardID > 0){
                 CreditCard creditCard = creditCardRepository.findOne(cardID);
                 payment.setCreditCard(creditCard);
@@ -520,6 +524,7 @@ public class ChargerServiceImpl implements ChargerService {
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         Float hours = minutes / 60;
         String formatted = df.format(hours);
+        System.out.println("ms to hours: "+formatted);
         return Math.abs(Float.valueOf(formatted));
     }
 
