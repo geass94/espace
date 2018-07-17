@@ -491,7 +491,6 @@ public class ChargerServiceImpl implements ChargerService {
 
     private Float calculatePrice(List<Counter> counterList){
         DecimalFormat df = new DecimalFormat("##.##");
-//        counterList.sort(Comparator.comparing(Counter::getChargePower));
         Float price = 0f;
         int last;
         int prev;
@@ -503,24 +502,19 @@ public class ChargerServiceImpl implements ChargerService {
             last = counterList.size() - 1;
             prev = last - 1;
         }
-        System.out.println("counters count: "+counterList.size());
-        System.out.println("last index: "+last);
-        System.out.println("prev index: "+prev);
+
         Counter lastCounter = counterList.get(last);
         Counter prevCounter = counterList.get(prev);
         System.out.println(prevCounter.getId());
         System.out.println(lastCounter.getId());
         if ( !prevCounter.equals(null) && !lastCounter.equals(null) ){
-            System.out.println("calculatePrice first IF");
-            System.out.println(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()));
             if(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) > 0){
-                System.out.println("calculatePrice second IF");
                 price = prevCounter.getCurrentPrice() + (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) * lastCounter.getPricing());
             }
         }
 
-        if (msToMinutes( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) <= 2){
-//            price = 0f;
+        if (msToMinutes( counterList.get( counterList.size() - 1 ).getLastUpdate() - counterList.get( 0 ).getLastUpdate()) <= 2){
+            price = 0f;
         }
 
         String formattedPrice = df.format(price);
@@ -534,7 +528,7 @@ public class ChargerServiceImpl implements ChargerService {
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         Float hours = minutes / 60;
         String formatted = df.format(Math.abs(hours));
-        System.out.println("ms to hours: "+formatted);
+        System.out.println("MS to HOURS: "+formatted);
         return Float.valueOf(formatted);
     }
 
@@ -543,6 +537,7 @@ public class ChargerServiceImpl implements ChargerService {
         Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         String formatted = df.format(Math.abs(minutes));
+        System.out.println("MS to MIN: "+formatted);
         return Float.valueOf(formatted);
     }
 }
