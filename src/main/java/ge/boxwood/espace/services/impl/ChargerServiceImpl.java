@@ -494,8 +494,16 @@ public class ChargerServiceImpl implements ChargerService {
         DecimalFormat df = new DecimalFormat("##.##");
         counterList.sort(Comparator.comparing(Counter::getChargePower));
         Float price = 0f;
-        int last = counterList.size() - 1 < 0 ? 0 : counterList.size() - 1;
-        int prev = counterList.size() - 2 < 0 ? 0 : counterList.size() - 2;
+        int last;
+        int prev;
+
+        if (counterList.size() - 1 < 0){
+            last = 0;
+            prev = 0;
+        }else{
+            last = counterList.size() - 1;
+            prev = last - 1;
+        }
 
         Counter lastCounter = counterList.get(last);
         Counter prevCounter = counterList.get(prev);
