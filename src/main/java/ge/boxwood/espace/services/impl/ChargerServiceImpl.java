@@ -346,7 +346,7 @@ public class ChargerServiceImpl implements ChargerService {
                     throw new RuntimeException("CHARGER_CONNECTION_ERROR");
                 }
             } catch (Exception e) {
-                throw new RuntimeException("UNKNOWN_ERROR");
+                throw new RuntimeException(e);
             }
         }else{
             throw new RuntimeException("PAYMENT_ERROR");
