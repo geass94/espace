@@ -322,7 +322,7 @@ public class ChargerServiceImpl implements ChargerService {
                         paymentRepository.save(pendingPayment);
                         dto.setCurrentPrice(pendingPayment.getPrice());
                         dto.setPaymentUUID(pendingPayment.getUuid());
-                        gcPaymentService.makeRefund(pendingPayment.getUuid(), order.getTargetPrice(), successfulPayment.getPrice() - pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
+                        gcPaymentService.makeRefund(pendingPayment.getUuid(),successfulPayment.getPrice() - pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
                         paymentRepository.flush();
                     }
                     return dto;

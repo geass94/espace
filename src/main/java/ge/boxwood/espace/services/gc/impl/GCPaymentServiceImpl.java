@@ -365,20 +365,19 @@ public class GCPaymentServiceImpl implements GCPaymentService {
         return request;
     }
     @Override
-    public String makeRefund(String paymentUUID, Float targetPrice, Float currentPrice, String trxId, String prnn){
+    public String makeRefund(String paymentUUID, Float refundPrice, String trxId, String prnn){
         try{
             Payment payment = paymentRepository.findByUuid(paymentUUID);
             Order order = payment.getOrder();
             order.setRefunded(true);
 
-            Float refundPrice = targetPrice - currentPrice;
             URIBuilder builder = new URIBuilder();
             builder.setScheme("https");
             builder.setHost("PCID-"+merchId+":Hep84Fvm83@3dacq.georgiancard.ge");
             builder.setPath("/merchantapi/refund");
             builder.addParameter("trx_id", trxId);
             builder.addParameter("p.rrn", prnn);
-            builder.addParameter("amount", String.valueOf(800));
+            builder.addParameter("amount", String.valueOf(refundPrice));
             URL url = builder.build().toURL();
             System.out.println("REFUND URL:"+url.toString());
             URL obj = new URL(url.toString());
