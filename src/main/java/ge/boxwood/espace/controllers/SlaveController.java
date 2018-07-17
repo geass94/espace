@@ -53,7 +53,7 @@ public class SlaveController {
         info.put("status", 0);
         info.put("description", "");
         HashMap data = new HashMap();
-        data.put("id", 60);
+        data.put("id", 1);
         data.put("latitude", 43.12312);
         data.put("longitude", 43.53211);
         data.put("status", 0);
