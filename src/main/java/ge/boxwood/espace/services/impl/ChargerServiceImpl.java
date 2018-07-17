@@ -117,7 +117,9 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public Charger getOneByCode(String code) {
-        return chargerRepository.findByCode(code);
+        Charger charger = chargerRepository.findByCode(code);
+        charger = this.info(charger.getChargerId());
+        return charger;
     }
 
     @Override
