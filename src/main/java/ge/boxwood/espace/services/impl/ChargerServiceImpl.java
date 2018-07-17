@@ -461,7 +461,7 @@ public class ChargerServiceImpl implements ChargerService {
                 this.finisher ++;
 
                 System.out.println("TRANSACTION");
-                System.out.println("calculatedPrice: "+counter.getCurrentPrice());
+                System.out.println("calculatedPrice: "+payment.getPrice());
                 System.out.println("chargePower: "+counter.getChargePower());
                 return dto;
             }else
@@ -518,7 +518,7 @@ public class ChargerServiceImpl implements ChargerService {
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         Float hours = minutes / 60;
         String formatted = df.format(hours);
-        return Float.valueOf(formatted);
+        return Math.abs(Float.valueOf(formatted));
     }
 
     private Float msToMinutes(Long ms){
