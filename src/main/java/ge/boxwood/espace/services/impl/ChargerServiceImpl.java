@@ -432,7 +432,8 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
-
+                List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trid.toString());
+                float price = this.calculatePrice(counters);
                 Counter counter = new Counter();
                 counter.setConsumedPower(dto.getConsumedPower());
                 counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
@@ -441,10 +442,8 @@ public class ChargerServiceImpl implements ChargerService {
                 counter.setChargerId(dto.getChargerId());
                 counter.setChargeTime(dto.getChargeTime());
                 counter.setPricing(pricingService.getPriceForChargingPower(dto.getChargePower()));
-                counter = counterRepository.save(counter);
-                List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trid.toString());
-                float price = this.calculatePrice(counters);
                 counter.setCurrentPrice(price);
+                counterRepository.save(counter);
                 counterRepository.flush();
 
                 dto.setCurrentPrice(counter.getCurrentPrice());
@@ -518,8 +517,8 @@ public class ChargerServiceImpl implements ChargerService {
             }
         }
 
-        if (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) <= 2){
-            price = 0f;
+        if (msToMinutes( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) <= 2){
+//            price = 0f;
         }
 
         String formattedPrice = df.format(price);
@@ -541,7 +540,7 @@ public class ChargerServiceImpl implements ChargerService {
         DecimalFormat df = new DecimalFormat("##.#####");
         Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
         Float minutes = Float.valueOf(seconds.toString()) / 60;
-        String formatted = df.format(minutes);
+        String formatted = df.format(Math.abs(minutes));
         return Float.valueOf(formatted);
     }
 }
