@@ -491,7 +491,7 @@ public class ChargerServiceImpl implements ChargerService {
 
     private Float calculatePrice(List<Counter> counterList){
         DecimalFormat df = new DecimalFormat("##.##");
-        counterList.sort(Comparator.comparing(Counter::getChargePower));
+//        counterList.sort(Comparator.comparing(Counter::getChargePower));
         Float price = 0f;
         int last;
         int prev;
@@ -515,7 +515,7 @@ public class ChargerServiceImpl implements ChargerService {
             System.out.println(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()));
             if(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) > 0){
                 System.out.println("calculatePrice second IF");
-                price = prevCounter.getCurrentPrice() + (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) * prevCounter.getPricing());
+                price = prevCounter.getCurrentPrice() + (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) * lastCounter.getPricing());
             }
         }
 
