@@ -334,12 +334,12 @@ public class ChargerServiceImpl implements ChargerService {
                         pendingPayment.setPrice( successfulPayment.getPrice() - pendingPayment.getPrice() );
                         pendingPayment.setTrxId(successfulPayment.getTrxId());
                         pendingPayment.setPrrn(successfulPayment.getPrrn());
-                        paymentRepository.save(pendingPayment);
+                        pendingPayment = paymentRepository.save(pendingPayment);
                         dto.setCurrentPrice(pendingPayment.getPrice());
                         dto.setPaymentUUID(pendingPayment.getUuid());
                         System.out.println("succeesPayment: "+successfulPayment.getPrice());
                         System.out.println("pendingPayemtn: "+pendingPayment.getPrice());
-                        gcPaymentService.makeRefund(pendingPayment.getUuid(),pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
+                        gcPaymentService.makeRefund(pendingPayment.getUuid(), pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
                         paymentRepository.flush();
                     }
                     return dto;
