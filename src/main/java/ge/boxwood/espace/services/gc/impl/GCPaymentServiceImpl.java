@@ -24,14 +24,13 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -380,32 +379,66 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             builder.addParameter("amount", String.valueOf(BigDecimal.valueOf(Long.parseLong(df.format( refundPrice * 100 )))));
             URL url = builder.build().toURL();
             System.out.println("REFUND URL:"+url.toString());
-            URL obj = new URL(url.toString());
+//            URL obj = new URL(url.toString());
 
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-            con.setRequestProperty("Accept-Charset", "UTF-8");
+            try {
 
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer xmlResp = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                xmlResp.append(inputLine);
+                url = new URL(url.toString());
+                HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+
+                if(con!=null){
+
+                    try {
+
+                        System.out.println("****** Content of the URL ********");
+                        BufferedReader br =
+                                new BufferedReader(
+                                        new InputStreamReader(con.getInputStream()));
+
+                        String input;
+
+                        while ((input = br.readLine()) != null){
+                            System.out.println(input);
+                        }
+                        br.close();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            in.close();
-
-            String xml = xmlResp.toString();
-            JSONObject jsonObj = XML.toJSONObject(xml);
-            jsonObj.put("responseCode", con.getResponseCode());
-            System.out.println("REFUND METHOD");
-            System.out.println(getAttribute(jsonObj, "code"));
-            payment.confirm();
-            paymentRepository.save(payment);
-            orderRepository.save(order);
-            return getAttribute(jsonObj, "code");
+//            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+//            con.setRequestMethod("GET");
+//            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+//            con.setRequestProperty("Accept-Charset", "UTF-8");
+//
+//            BufferedReader in = new BufferedReader(
+//                    new InputStreamReader(con.getInputStream()));
+//            String inputLine;
+//            StringBuffer xmlResp = new StringBuffer();
+//            while ((inputLine = in.readLine()) != null) {
+//                xmlResp.append(inputLine);
+//            }
+//
+//            in.close();
+//
+//            String xml = xmlResp.toString();
+//            JSONObject jsonObj = XML.toJSONObject(xml);
+//            jsonObj.put("responseCode", con.getResponseCode());
+//            System.out.println("REFUND METHOD");
+//            System.out.println(getAttribute(jsonObj, "code"));
+//            payment.confirm();
+//            paymentRepository.save(payment);
+//            orderRepository.save(order);
+//            return getAttribute(jsonObj, "code");
+            return null;
         }
         catch (Exception ex){
             throw new RuntimeException(ex);
