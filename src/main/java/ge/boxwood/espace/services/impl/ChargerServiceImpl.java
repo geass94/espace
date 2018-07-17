@@ -532,9 +532,9 @@ public class ChargerServiceImpl implements ChargerService {
         Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         Float hours = minutes / 60;
-        String formatted = df.format(hours);
+        String formatted = df.format(Math.abs(hours));
         System.out.println("ms to hours: "+formatted);
-        return Math.abs(Float.valueOf(formatted));
+        return Float.valueOf(formatted);
     }
 
     private Float msToMinutes(Long ms){
