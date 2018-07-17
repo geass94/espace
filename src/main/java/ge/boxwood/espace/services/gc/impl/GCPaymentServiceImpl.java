@@ -377,7 +377,7 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             builder.setPath("/merchantapi/refund");
             builder.addParameter("trx_id", trxId);
             builder.addParameter("p.rrn", prnn);
-            builder.addParameter("amount", String.valueOf(refundPrice));
+            builder.addParameter("amount", String.valueOf(refundPrice * 100));
             URL url = builder.build().toURL();
             System.out.println("REFUND URL:"+url.toString());
             URL obj = new URL(url.toString());
