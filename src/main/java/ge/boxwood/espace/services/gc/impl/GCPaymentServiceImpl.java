@@ -370,14 +370,14 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             Payment payment = paymentRepository.findByUuid(paymentUUID);
             Order order = payment.getOrder();
             order.setRefunded(true);
-
+            refundPrice = refundPrice * 100;
             URIBuilder builder = new URIBuilder();
             builder.setScheme("https");
             builder.setHost(merchId+":Hep84Fvm83@3dacq.georgiancard.ge");
             builder.setPath("/merchantapi/refund");
             builder.addParameter("trx_id", trxId);
             builder.addParameter("p.rrn", prnn);
-            builder.addParameter("amount", String.valueOf(refundPrice * 100));
+            builder.addParameter("amount", refundPrice.toString());
             URL url = builder.build().toURL();
             System.out.println("REFUND URL:"+url.toString());
             URL obj = new URL(url.toString());
