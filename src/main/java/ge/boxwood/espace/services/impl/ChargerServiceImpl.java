@@ -499,7 +499,8 @@ public class ChargerServiceImpl implements ChargerService {
 
         Counter lastCounter = counterList.get(last);
         Counter prevCounter = counterList.get(prev);
-
+        System.out.println(prevCounter.getId());
+        System.out.println(lastCounter.getId());
         if ( !prevCounter.equals(null) && !lastCounter.equals(null) ){
             System.out.println("calculatePrice first IF");
             System.out.println(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()));
