@@ -9,6 +9,7 @@ import ge.boxwood.espace.models.CreditCard;
 import ge.boxwood.espace.models.Order;
 import ge.boxwood.espace.models.Payment;
 import ge.boxwood.espace.models.User;
+import ge.boxwood.espace.models.enums.Status;
 import ge.boxwood.espace.models.georgiancard.*;
 import ge.boxwood.espace.repositories.OrderRepository;
 import ge.boxwood.espace.repositories.PaymentRepository;
@@ -221,6 +222,10 @@ public class GCPaymentServiceImpl implements GCPaymentService {
                         payment.setConfirmed(true);
                         payment.confirm();
                         paymentRepository.save(payment);
+                        List<Payment> confirmedPayment = paymentRepository.findAllByOrderAndConfirmed(order, false);
+                        if(confirmedPayment.size() == 0 || confirmedPayment == null){
+                            order.setStatus(Status.PAID);
+                        }
                         orderRepository.save(order);
 
                         CreditCard creditCard = creditCardService.findByUserAndMaskedPan(user, request.pMaskedPan);

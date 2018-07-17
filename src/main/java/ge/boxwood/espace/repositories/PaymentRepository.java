@@ -12,4 +12,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Payment findByUuid(String uuid);
     Payment findByOrderAndConfirmed(Order order, boolean confirmed);
     List<Payment> findAllByOrder(Order order);
+    List<Payment> findAllByOrderAndConfirmed(Order order, Boolean cnfirmed);
 }
