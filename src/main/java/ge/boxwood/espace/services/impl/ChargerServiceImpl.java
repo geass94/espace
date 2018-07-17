@@ -123,7 +123,7 @@ public class ChargerServiceImpl implements ChargerService {
             return charger;
         }
         else{
-            throw new RuntimeException("Charger not found");
+            throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
 
@@ -205,28 +205,32 @@ public class ChargerServiceImpl implements ChargerService {
         System.out.println("conID: "+conID);
         System.out.println("cardID: "+cardID);
         System.out.println("targetPrice: "+targetPrice);
-        Charger charger = chargerRepository.findByChargerId(cID);
-
-        Order order = new Order(user);
-        order.setCharger(charger);
-        order.setTargetPrice(targetPrice);
-        order.setPaymentType(PaymentType.CREDITCARD);
-        order = orderRepository.save(order);
-
-        Payment payment = new Payment(order.getTargetPrice(), order);
-        if(cardID != null && cardID > 0){
-            CreditCard creditCard = creditCardRepository.findOne(cardID);
-            payment.setCreditCard(creditCard);
+        Charger charger = this.info(cID);
+        if(charger.getStatus() != 0 && charger != null){
+            throw new RuntimeException("CHARGER_OFFLINE_BUSY");
         }
-        payment.setOrder(order);
-        payment = paymentRepository.save(payment);
-        orderRepository.flush();
-        paymentRepository.flush();
-        HashMap ret = new HashMap();
-        ret.put("paymentUUID", payment.getUuid());
-        ret.put("chargerId", order.getCharger().getChargerId());
-        ret.put("connectorId", conID);
-        return ret;
+        else{
+            Order order = new Order(user);
+            order.setCharger(charger);
+            order.setTargetPrice(targetPrice);
+            order.setPaymentType(PaymentType.CREDITCARD);
+            order = orderRepository.save(order);
+
+            Payment payment = new Payment(order.getTargetPrice(), order);
+            if(cardID != null && cardID > 0){
+                CreditCard creditCard = creditCardRepository.findOne(cardID);
+                payment.setCreditCard(creditCard);
+            }
+            payment.setOrder(order);
+            payment = paymentRepository.save(payment);
+            orderRepository.flush();
+            paymentRepository.flush();
+            HashMap ret = new HashMap();
+            ret.put("paymentUUID", payment.getUuid());
+            ret.put("chargerId", order.getCharger().getChargerId());
+            ret.put("connectorId", conID);
+            return ret;
+        }
     }
 
     // როდესაც ეშვება start მეთოდი პირველ რიგში მოწმდება არსებობს თუ არა დაუსრულებელი ორდერი ამ ჩარჯერეზე.
@@ -245,7 +249,11 @@ public class ChargerServiceImpl implements ChargerService {
 //        თუ შეკვეთა ძალაშია
 //        თუ წინასწარ გადასახდელი თანხა გადახდილია
 //        მაშინ დავიწყოთ დატენვა
-        if(charger.getStatus() == 0 && order.getStatus() == Status.ORDERED && payment.isConfirmed()){
+        if(charger.getStatus() != 0){
+            throw new RuntimeException("CHARGER_OFFLINE_BUSY");
+        }
+
+        if(order.getStatus() == Status.ORDERED && payment.isConfirmed()){
             try {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
@@ -279,13 +287,13 @@ public class ChargerServiceImpl implements ChargerService {
                     return dto;
                 }else
                 {
-                    throw new RuntimeException("Network error");
+                    throw new RuntimeException("CHARGER_CONNECTION_ERROR");
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }else{
-            throw new RuntimeException("Charger is offline/busy");
+            throw new RuntimeException("PAYMENT_ERROR");
         }
     }
 
@@ -335,13 +343,13 @@ public class ChargerServiceImpl implements ChargerService {
                     return dto;
                 }else
                 {
-                    throw new RuntimeException("Something wrong with charger");
+                    throw new RuntimeException("CHARGER_CONNECTION_ERROR");
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("UNKNOWN_ERROR");
             }
         }else{
-            throw new RuntimeException("Some order is pending confirmation");
+            throw new RuntimeException("PAYMENT_ERROR");
         }
     }
 
@@ -368,12 +376,12 @@ public class ChargerServiceImpl implements ChargerService {
                 }
 
             } catch (Exception e) {
-                // TODO: handle exception
+                throw new RuntimeException("UNKNOWN_ERROR");
             }
             chargerRepository.flush();
             return charger;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("CHARGER_CONNECTION_ERROR");
         }
     }
 
@@ -458,7 +466,7 @@ public class ChargerServiceImpl implements ChargerService {
                 return dto;
             }else
             {
-                throw new RuntimeException("Something wrong with charger");
+                throw new RuntimeException("CHARGER_CONNECTION_ERROR");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
