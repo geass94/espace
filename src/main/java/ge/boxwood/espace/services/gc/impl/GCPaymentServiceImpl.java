@@ -16,6 +16,7 @@ import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.services.CreditCardService;
 import ge.boxwood.espace.services.gc.GCPaymentService;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
 import org.json.XML;
@@ -384,66 +385,33 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             builder.addParameter("amount", String.valueOf(BigDecimal.valueOf(Long.parseLong(df.format( refundPrice * 100 )))));
             URL url = builder.build().toURL();
             System.out.println("REFUND URL:"+url.toString());
-//            URL obj = new URL(url.toString());
+            URL obj = new URL(url.toString());
 
-            try {
 
-                url = new URL(url.toString());
-                HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+            con.setRequestProperty("Accept-Charset", "UTF-8");
 
-                if(con!=null){
-
-                    try {
-
-                        System.out.println("****** Content of the URL ********");
-                        BufferedReader br =
-                                new BufferedReader(
-                                        new InputStreamReader(con.getInputStream()));
-
-                        String input;
-
-                        while ((input = br.readLine()) != null){
-                            System.out.println(input);
-                        }
-                        br.close();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer xmlResp = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                xmlResp.append(inputLine);
             }
 
-//            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-//            con.setRequestMethod("GET");
-//            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-//            con.setRequestProperty("Accept-Charset", "UTF-8");
-//
-//            BufferedReader in = new BufferedReader(
-//                    new InputStreamReader(con.getInputStream()));
-//            String inputLine;
-//            StringBuffer xmlResp = new StringBuffer();
-//            while ((inputLine = in.readLine()) != null) {
-//                xmlResp.append(inputLine);
-//            }
-//
-//            in.close();
-//
-//            String xml = xmlResp.toString();
-//            JSONObject jsonObj = XML.toJSONObject(xml);
-//            jsonObj.put("responseCode", con.getResponseCode());
-//            System.out.println("REFUND METHOD");
-//            System.out.println(getAttribute(jsonObj, "code"));
-//            payment.confirm();
-//            paymentRepository.save(payment);
-//            orderRepository.save(order);
-//            return getAttribute(jsonObj, "code");
-            return null;
+            in.close();
+
+            String xml = xmlResp.toString();
+            JSONObject jsonObj = XML.toJSONObject(xml);
+            jsonObj.put("responseCode", con.getResponseCode());
+            System.out.println("REFUND METHOD");
+            System.out.println(getAttribute(jsonObj, "code"));
+            payment.confirm();
+            paymentRepository.save(payment);
+            orderRepository.save(order);
+            return getAttribute(jsonObj, "code");
         }
         catch (Exception ex){
             throw new RuntimeException(ex);

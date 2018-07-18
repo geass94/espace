@@ -463,7 +463,7 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
                 payment.setPrice(price);
-                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) || this.finisher >= 15){
+                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) || this.finisher >= 5){
                     if(order.getTargetPrice() > 0){
                         payment.setPrice(order.getTargetPrice());
                     }
@@ -508,7 +508,7 @@ public class ChargerServiceImpl implements ChargerService {
         int last;
         int prev;
 
-        if (counterList.size() - 1 < 0){
+        if (counterList.size() - 1 <= 0){
             last = 0;
             prev = 0;
         }else{
