@@ -387,12 +387,10 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             System.out.println("REFUND URL:"+url.toString());
             URL obj = new URL(url.toString());
 
-
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Mozilla/5.0");
             con.setRequestProperty("Accept-Charset", "UTF-8");
-
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
             String inputLine;

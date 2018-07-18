@@ -14,6 +14,7 @@ import ge.boxwood.espace.services.ChargerService;
 import ge.boxwood.espace.services.CreditCardService;
 import ge.boxwood.espace.services.PricingService;
 import ge.boxwood.espace.services.UserService;
+import ge.boxwood.espace.services.gc.GCPaymentService;
 import ge.boxwood.espace.services.smsservice.GeoSms.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,8 @@ public class OrderController {
     private ChargerService chargerService;
     @Autowired
     private CreditCardService creditCardService;
+    @Autowired
+    private GCPaymentService gcPaymentService;
 
     @PostMapping("/giveOrder")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -89,5 +92,11 @@ public class OrderController {
         paymentRepository.save(payment);
         orderRepository.flush();
         return ResponseEntity.ok(payment);
+    }
+
+    @GetMapping("/makerefund/{uuid}")
+    public ResponseEntity<?> makeRefund(@PathVariable("uuid")String uuid){
+        Payment payment = paymentRepository.findByUuid(uuid);
+        return ResponseEntity.ok(gcPaymentService.makeRefund(uuid, 0.5f, payment.getTrxId(), payment.getPrrn()));
     }
 }
