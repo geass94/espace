@@ -72,9 +72,8 @@ public class ChargerController {
 
     @GetMapping("/stop")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> stopCharging(@RequestParam("chargerId") Long cid) throws Exception {
-        ChargerInfoDTO chargerInfo = chargerService.stop(cid);
-        return ResponseEntity.ok(chargerInfo);
+    void stopCharging(@RequestParam("chargerId") Long cid) throws Exception {
+        chargerService.stop(cid);
     }
 
     @GetMapping("/info")
