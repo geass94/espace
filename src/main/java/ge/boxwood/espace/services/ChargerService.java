@@ -22,7 +22,7 @@ public interface ChargerService {
     Long freeChargers();
     HashMap preStart(Long cID, Long conID, Long cardID, Float targetPrice);
     ChargerInfoDTO start(Long cID, Long conID, String paymentUUID);
-    ChargerInfoDTO stop(Long cID);
+    void stop(Long cID);
     Charger info(Long cid);
     ChargerInfoDTO transaction(Long trid);
     List<Category> categories();

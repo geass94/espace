@@ -303,13 +303,12 @@ public class ChargerServiceImpl implements ChargerService {
 
 
     @Override
-    public ChargerInfoDTO stop(Long cID) {
+    public void stop(Long cID) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
         Charger charger = this.info(cID);
         Order order = orderRepository.findByUserAndChargerAndStatus(user, charger, Status.ORDERED);
-
         Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
         Payment pendingPayment = paymentRepository.findByOrderAndConfirmed(order, false);
         System.out.println("PENDING UUID: "+pendingPayment.getUuid());
@@ -319,45 +318,34 @@ public class ChargerServiceImpl implements ChargerService {
                 ChargerInfo chargerInfo = new ChargerInfo();
                 chargerInfo.setResponseCode((Integer) stopInfo.get("responseCode"));
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
-//                    order.setStatus(Status.PAID);
-//                    order.confirm();
-//                    chargerInfo.setOrder(order);
-//                    orderRepository.save(order);
-                    ChargerInfoDTO dto = this.transaction(order.getChargerTransactionId());
-
+                    System.out.println("succeesPayment: "+successfulPayment.getPrice());
+                    System.out.println("pendingPayemtn: "+pendingPayment.getPrice());
                     if(pendingPayment.getPrice() - successfulPayment.getPrice() > 0){
                         System.out.println("PAY MORE BIATCH");
                         pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
                         paymentRepository.save(pendingPayment);
-                        dto.setCurrentPrice(pendingPayment.getPrice());
-                        dto.setPaymentUUID(pendingPayment.getUuid());
-                        paymentRepository.flush();
                     }
-                    if (pendingPayment.getPrice() - successfulPayment.getPrice() == 0){
+                    else if ( pendingPayment.getPrice() - successfulPayment.getPrice() == 0 ){
                         System.out.println("ALL GOOD");
                         pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
                         paymentRepository.save(pendingPayment);
-                        dto.setCurrentPrice(pendingPayment.getPrice());
-                        dto.setPaymentUUID(pendingPayment.getUuid());
+
                         paymentRepository.flush();
                         order.setStatus(Status.PAID);
                         order.setPrice(successfulPayment.getPrice());
                         orderRepository.save(order);
                     }
-                    if(pendingPayment.getPrice() - successfulPayment.getPrice() < 0){
+                    else if( pendingPayment.getPrice() - successfulPayment.getPrice() < 0){
                         System.out.println("REFUNDING");
                         pendingPayment.setPrice( successfulPayment.getPrice() - pendingPayment.getPrice() );
                         pendingPayment.setTrxId(successfulPayment.getTrxId());
                         pendingPayment.setPrrn(successfulPayment.getPrrn());
                         pendingPayment = paymentRepository.save(pendingPayment);
-                        dto.setCurrentPrice(pendingPayment.getPrice());
-                        dto.setPaymentUUID(pendingPayment.getUuid());
-                        System.out.println("succeesPayment: "+successfulPayment.getPrice());
-                        System.out.println("pendingPayemtn: "+pendingPayment.getPrice());
                         gcPaymentService.makeRefund(pendingPayment.getUuid(), pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
-                        paymentRepository.flush();
                     }
-                    return dto;
+                    else{
+//                      TODO
+                    }
                 }else
                 {
                     throw new RuntimeException("CHARGER_CONNECTION_ERROR");
@@ -424,16 +412,10 @@ public class ChargerServiceImpl implements ChargerService {
                 Charger charger = order.getCharger();
                 chargerInfo.setCharger(charger != null ? charger : new Charger());
                 chargerInfo.setOrder(order != null ? order : new Order());
-                chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
-                chargerInfo.setTransStop(transaction.get("transStop") != null && !transaction.get("transStop").equals(null) ? (long)transaction.get("transStop") : 0L);
-                chargerInfo.setMeterStart(transaction.get("meterStart") != null && !transaction.get("meterStart").equals(null) ? (long)(int)transaction.get("meterStart") : 0L);
-                chargerInfo.setMeterStop(transaction.get("meterStop") != null && !transaction.get("meterStop").equals(null) ? (long)(int)transaction.get("meterStop") : 0L);
-                chargerInfo.setChargingPower(transaction.get("kiloWattHour") != null && !transaction.get("kiloWattHour").equals(null) ? Double.valueOf(transaction.get("kiloWattHour").toString()) : 0d);
-                chargerInfo.setChargeTime(transaction.get("chargingTime") != null && !transaction.get("chargingTime").equals(null) ? (long)(int)transaction.get("chargingTime") : 0L);
                 chargerInfo.setChargerTransactionId(String.valueOf(trid));
-                chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
-                chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
-                chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("consumed").toString()) : 0L);
+
+                parseChargerInfo(transaction, chargerInfo);
+
                 dto.setChargerId(chargerInfo.getCharger().getChargerId());
                 dto.setChargePower(chargerInfo.getChargingPower());
                 dto.setChargeTime(chargerInfo.getChargeTime());
@@ -443,6 +425,7 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
+
                 List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trid.toString());
                 float price = this.calculatePrice(counters);
                 Counter counter = new Counter();
@@ -465,9 +448,9 @@ public class ChargerServiceImpl implements ChargerService {
                     if(order.getTargetPrice() > 0){
                         payment.setPrice(order.getTargetPrice());
                     }
-
                     dto.setChargingFinished(true);
-                    chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
+                    chargerRequestUtils.stop(charger.getChargerId(), trid);
+                    this.stop(charger.getChargerId());
                     this.finisher = 6;
                 }
                 else{
@@ -554,5 +537,18 @@ public class ChargerServiceImpl implements ChargerService {
         String formatted = df.format(Math.abs(minutes));
         System.out.println("MS to MIN: "+formatted);
         return Float.valueOf(formatted);
+    }
+
+    private ChargerInfo parseChargerInfo(JSONObject transaction, ChargerInfo chargerInfo){
+        chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
+        chargerInfo.setTransStop(transaction.get("transStop") != null && !transaction.get("transStop").equals(null) ? (long)transaction.get("transStop") : 0L);
+        chargerInfo.setMeterStart(transaction.get("meterStart") != null && !transaction.get("meterStart").equals(null) ? (long)(int)transaction.get("meterStart") : 0L);
+        chargerInfo.setMeterStop(transaction.get("meterStop") != null && !transaction.get("meterStop").equals(null) ? (long)(int)transaction.get("meterStop") : 0L);
+        chargerInfo.setChargingPower(transaction.get("kiloWattHour") != null && !transaction.get("kiloWattHour").equals(null) ? Double.valueOf(transaction.get("kiloWattHour").toString()) : 0d);
+        chargerInfo.setChargeTime(transaction.get("chargingTime") != null && !transaction.get("chargingTime").equals(null) ? (long)(int)transaction.get("chargingTime") : 0L);
+        chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
+        chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
+        chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("consumed").toString()) : 0L);
+        return chargerInfo;
     }
 }
