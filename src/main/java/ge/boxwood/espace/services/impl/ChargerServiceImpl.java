@@ -309,17 +309,23 @@ public class ChargerServiceImpl implements ChargerService {
         User user = userService.getByUsername(username);
         Charger charger = this.info(cID);
         Order order = orderRepository.findByUserAndChargerAndStatus(user, charger, Status.ORDERED);
-        Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
-        Payment pendingPayment = paymentRepository.findByOrderAndConfirmed(order, false);
-        System.out.println("PENDING UUID: "+pendingPayment.getUuid());
+
         if(order != null){
             try {
                 JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
                 ChargerInfo chargerInfo = new ChargerInfo();
                 chargerInfo.setResponseCode((Integer) stopInfo.get("responseCode"));
+
+                Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
+                Payment pendingPayment = paymentRepository.findByOrderAndConfirmed(order, false);
+
+                System.out.println("PENDING UUID: "+pendingPayment.getUuid());
+
                 if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
+
                     System.out.println("succeesPayment: "+successfulPayment.getPrice());
                     System.out.println("pendingPayemtn: "+pendingPayment.getPrice());
+
                     if(pendingPayment.getPrice() - successfulPayment.getPrice() > 0){
                         System.out.println("PAY MORE BIATCH");
                         pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
@@ -328,9 +334,9 @@ public class ChargerServiceImpl implements ChargerService {
                     else if ( pendingPayment.getPrice() - successfulPayment.getPrice() == 0 ){
                         System.out.println("ALL GOOD");
                         pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
+                        pendingPayment.confirm();
                         paymentRepository.save(pendingPayment);
-
-                        paymentRepository.flush();
+                        order.confirm();
                         order.setStatus(Status.PAID);
                         order.setPrice(successfulPayment.getPrice());
                         orderRepository.save(order);
@@ -421,8 +427,6 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setChargeTime(chargerInfo.getChargeTime());
                 dto.setChargerStatus(chargerInfo.getCharger().getStatus());
                 dto.setChargerType(chargerInfo.getCharger().getType());
-                dto.setOrderUUID(chargerInfo.getOrder().getUuid());
-                dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
 
@@ -442,21 +446,21 @@ public class ChargerServiceImpl implements ChargerService {
                 price = this.calculatePrice(counters);
                 dto.setCurrentPrice(counter.getCurrentPrice());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
+                dto.setChargingFinished(false);
                 order.setPrice(price);
                 payment.setPrice(price);
+                if(order.getTargetPrice() > 0){
+                    payment.setPrice(order.getTargetPrice());
+                }
+                payment = paymentRepository.save(payment);
+                dto.setPaymentUUID(payment.getUuid());
                 if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) || this.finisher >= 5){
-                    if(order.getTargetPrice() > 0){
-                        payment.setPrice(order.getTargetPrice());
-                    }
-                    dto.setChargingFinished(true);
-                    chargerRequestUtils.stop(charger.getChargerId(), trid);
+//                    CHARGING FINISHED
                     this.stop(charger.getChargerId());
+                    dto.setChargingFinished(true);
                     this.finisher = 6;
                 }
-                else{
-                    dto.setChargingFinished(false);
-                }
-                paymentRepository.save(payment);
+
                 this.finisher ++;
 
                 System.out.println("TRANSACTION");

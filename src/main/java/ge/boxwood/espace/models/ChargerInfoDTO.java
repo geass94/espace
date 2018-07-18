@@ -5,7 +5,6 @@ public class ChargerInfoDTO {
     private Double chargePower;
     private Long chargeTime;
     private String chargerTrId;
-    private String orderUUID;
     private String paymentUUID;
     private Float currentPrice;
     private Integer chargerStatus;
@@ -43,14 +42,6 @@ public class ChargerInfoDTO {
 
     public void setChargerTrId(String chargerTrId) {
         this.chargerTrId = chargerTrId;
-    }
-
-    public String getOrderUUID() {
-        return orderUUID;
-    }
-
-    public void setOrderUUID(String orderUUID) {
-        this.orderUUID = orderUUID;
     }
 
     public String getPaymentUUID() {
