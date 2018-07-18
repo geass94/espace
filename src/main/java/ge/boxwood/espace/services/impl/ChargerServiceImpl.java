@@ -333,7 +333,18 @@ public class ChargerServiceImpl implements ChargerService {
                         dto.setPaymentUUID(pendingPayment.getUuid());
                         paymentRepository.flush();
                     }
-                    if(pendingPayment.getPrice() - successfulPayment.getPrice() <= 0){
+                    if (pendingPayment.getPrice() - successfulPayment.getPrice() == 0){
+                        System.out.println("ALL GOOD");
+                        pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
+                        paymentRepository.save(pendingPayment);
+                        dto.setCurrentPrice(pendingPayment.getPrice());
+                        dto.setPaymentUUID(pendingPayment.getUuid());
+                        paymentRepository.flush();
+                        order.setStatus(Status.PAID);
+                        order.setPrice(successfulPayment.getPrice());
+                        orderRepository.save(order);
+                    }
+                    if(pendingPayment.getPrice() - successfulPayment.getPrice() < 0){
                         System.out.println("REFUNDING");
                         pendingPayment.setPrice( successfulPayment.getPrice() - pendingPayment.getPrice() );
                         pendingPayment.setTrxId(successfulPayment.getTrxId());

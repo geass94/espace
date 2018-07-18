@@ -223,10 +223,10 @@ public class GCPaymentServiceImpl implements GCPaymentService {
                         payment.confirm();
                         paymentRepository.save(payment);
                         List<Payment> confirmedPayment = paymentRepository.findAllByOrderAndConfirmed(order, false);
-                        if(confirmedPayment.size() == 0 || confirmedPayment == null){
-                            order.setStatus(Status.PAID);
-                        }
-                        orderRepository.save(order);
+//                        if(confirmedPayment.size() > 1 && confirmedPayment == null){
+//                            order.setStatus(Status.PAID);
+//                        }
+//                        orderRepository.save(order);
 
                         CreditCard creditCard = creditCardService.findByUserAndMaskedPan(user, request.pMaskedPan);
                         if (creditCard == null) {
