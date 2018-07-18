@@ -443,7 +443,8 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setPaymentUUID(chargerInfo.getOrder().getPayments().get(0).getUuid());
                 dto.setChargerTrId(chargerInfo.getChargerTransactionId());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
-
+                List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trid.toString());
+                float price = this.calculatePrice(counters);
                 Counter counter = new Counter();
                 counter.setConsumedPower(dto.getConsumedPower());
                 counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
@@ -452,13 +453,10 @@ public class ChargerServiceImpl implements ChargerService {
                 counter.setChargerId(dto.getChargerId());
                 counter.setChargeTime(dto.getChargeTime());
                 counter.setPricing(pricingService.getPriceForChargingPower(dto.getChargePower()));
-                counter = counterRepository.save(counter);
-                List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trid.toString());
-                counters.add(counter);
-                float price = this.calculatePrice(counters);
                 counter.setCurrentPrice(price);
-                counterRepository.flush();
-
+                counter = counterRepository.save(counter);
+                counters.add(counter);
+                price = this.calculatePrice(counters);
                 dto.setCurrentPrice(counter.getCurrentPrice());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 order.setPrice(price);
@@ -470,7 +468,7 @@ public class ChargerServiceImpl implements ChargerService {
 
                     dto.setChargingFinished(true);
                     chargerRequestUtils.stop(dto.getChargerId(), Long.valueOf(dto.getChargerTrId()));
-                    this.finisher = 16;
+                    this.finisher = 6;
                 }
                 else{
                     dto.setChargingFinished(false);
