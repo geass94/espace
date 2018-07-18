@@ -454,7 +454,7 @@ public class ChargerServiceImpl implements ChargerService {
                 }
                 payment = paymentRepository.save(payment);
                 dto.setPaymentUUID(payment.getUuid());
-                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) || this.finisher >= 5){
+                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) ){
 //                    CHARGING FINISHED
                     this.stop(charger.getChargerId());
                     dto.setChargingFinished(true);
