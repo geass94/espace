@@ -507,15 +507,19 @@ public class ChargerServiceImpl implements ChargerService {
         Float price = 0f;
         int last;
         int prev;
-
+        System.out.println("counterList size: "+counterList.size());
         if (counterList.size() - 1 <= 0){
+            System.out.println("counterList IF");
             last = 0;
             prev = 0;
         }else{
+            System.out.println("counterList ELSE");
             last = counterList.size() - 1;
             prev = last - 1;
         }
 
+        System.out.println("last: "+last);
+        System.out.println("prev: "+prev);
         Counter lastCounter = counterList.get(last);
         Counter prevCounter = counterList.get(prev);
         System.out.println(prevCounter.getId());
