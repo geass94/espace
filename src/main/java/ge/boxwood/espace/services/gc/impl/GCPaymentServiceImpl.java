@@ -427,6 +427,6 @@ public class GCPaymentServiceImpl implements GCPaymentService {
     }
 
     private String getAttribute(JSONObject json, String path) {
-        return JsonPath.read(json.toString(), path);
+        return JsonPath.read(json.toString(), path).toString();
     }
 }
