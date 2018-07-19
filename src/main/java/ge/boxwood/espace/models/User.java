@@ -86,7 +86,7 @@ public class User extends BaseStatusAuditEntity implements UserDetails {
     @Transient
     private String newPassword;
 
-    @OneToMany( cascade = { CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE }, fetch = FetchType.LAZY, orphanRemoval = true )
+    @OneToMany( cascade = { CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE }, fetch = FetchType.LAZY )
     private List<Car> cars;
 
     @JsonProperty
