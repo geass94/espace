@@ -10,6 +10,6 @@ class AppController {
     @GetMapping("")
     fun checkAvailability(): ResponseEntity<Any>{
 
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok("OK")
     }
 }
