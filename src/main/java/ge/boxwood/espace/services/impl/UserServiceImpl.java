@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if(user.getCars() != null && user.getCars().size() > 0){
-            ArrayList cars = (ArrayList) user.getCars();
+            List<Car> cars = user.getCars();
             for (Car car:user.getCars()) {
                 if (!raw.getCars().contains(car)){
                     car.setStatus(Status.ACTIVE);
