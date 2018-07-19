@@ -378,7 +378,7 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             DecimalFormat df = new DecimalFormat("#.#");
             URIBuilder builder = new URIBuilder();
             builder.setScheme("https");
-            builder.setHost(merchId+":Hep84Fvm83@3dacq.georgiancard.ge");
+            builder.setHost(merchId+":Gr5d95r3ut@3dacq.georgiancard.ge");
             builder.setPath("/merchantapi/refund");
             builder.addParameter("trx_id", trxId);
             builder.addParameter("p.rrn", prnn);
