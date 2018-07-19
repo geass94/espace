@@ -416,10 +416,11 @@ public class GCPaymentServiceImpl implements GCPaymentService {
                 paymentRepository.save(payment);
                 order.setStatus(Status.PAID);
                 order.setRefunded(true);
+                order.setPrice(payment.getPrice());
                 order.confirm();
                 orderRepository.save(order);
             }
-            return getAttribute(jsonObj, "$.MerchantAPI.Message.RefundResponse.Result.desc");
+            return getAttribute(jsonObj, "$.MerchantAPI.Message.RefundResponse.Result.code");
         }
         catch (Exception ex){
             throw new RuntimeException(ex);

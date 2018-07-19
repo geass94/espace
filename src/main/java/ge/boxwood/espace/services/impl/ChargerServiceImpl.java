@@ -302,13 +302,13 @@ public class ChargerServiceImpl implements ChargerService {
 
 
     @Override
-    public void stop(Long cID) {
+    public HashMap stop(Long cID) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
         Charger charger = this.info(cID);
         Order order = orderRepository.findByUserAndChargerAndStatus(user, charger, Status.ORDERED);
-
+        HashMap ret = new HashMap();
         if(order != null){
             try {
                 JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
@@ -329,6 +329,10 @@ public class ChargerServiceImpl implements ChargerService {
                         System.out.println("PAY MORE BIATCH");
                         pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
                         paymentRepository.save(pendingPayment);
+                        ret.put("CODE", 2);
+                        ret.put("DESC", "OVERDOSE");
+                        ret.put("MESSAGE", "You spent more thanyou specified at the begining. Please pay!");
+                        ret.put("paymentUUID", pendingPayment.getUuid());
                     }
                     else if ( pendingPayment.getPrice() - successfulPayment.getPrice() == 0 ){
                         System.out.println("ALL GOOD");
@@ -339,6 +343,9 @@ public class ChargerServiceImpl implements ChargerService {
                         order.setStatus(Status.PAID);
                         order.setPrice(successfulPayment.getPrice());
                         orderRepository.save(order);
+                        ret.put("CODE", 1);
+                        ret.put("DESC", "SUCCESSFUL_PAYMENT");
+                        ret.put("MESSAGE", "All payments went through successfully. You are good to go!");
                     }
                     else if( pendingPayment.getPrice() - successfulPayment.getPrice() < 0){
                         System.out.println("REFUNDING");
@@ -346,11 +353,23 @@ public class ChargerServiceImpl implements ChargerService {
                         pendingPayment.setTrxId(successfulPayment.getTrxId());
                         pendingPayment.setPrrn(successfulPayment.getPrrn());
                         pendingPayment = paymentRepository.save(pendingPayment);
-                        gcPaymentService.makeRefund(pendingPayment.getUuid(), pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
+                        String code = gcPaymentService.makeRefund(pendingPayment.getUuid(), pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
+                        if(code.equals("1")){
+                            ret.put("CODE", 1);
+                            ret.put("DESC", "SUCCESSFULLY_REFUNDED");
+                            ret.put("MESSAGE", "Refund was successful. You are goodto go!");
+                        }else{
+                            ret.put("CODE", 0);
+                            ret.put("DESC", "REFUND_FAILED");
+                            ret.put("MESSAGE", "Something went wrong while refuning. Saving to pending refunds!");
+                        }
                     }
                     else{
-//                      TODO
+                        ret.put("CODE", -1);
+                        ret.put("DESC", "UNKNOWN_STATEMEN");
+                        ret.put("MESSAGE", "UNKNOWN_ERROR");
                     }
+                    return ret;
                 }else
                 {
                     throw new RuntimeException("CHARGER_CONNECTION_ERROR");
