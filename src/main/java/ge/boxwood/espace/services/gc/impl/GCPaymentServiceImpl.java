@@ -15,9 +15,12 @@ import ge.boxwood.espace.repositories.OrderRepository;
 import ge.boxwood.espace.repositories.PaymentRepository;
 import ge.boxwood.espace.services.CreditCardService;
 import ge.boxwood.espace.services.gc.GCPaymentService;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -387,29 +390,53 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             System.out.println("REFUND URL:"+url.toString());
             URL obj = new URL(url.toString());
 
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-            con.setRequestProperty("Accept-Charset", "UTF-8");
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer xmlResp = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                xmlResp.append(inputLine);
+
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpGet request = new HttpGet(url.toString());
+
+            // add request header
+            request.addHeader("User-Agent", "Mozilla/5.0");
+            HttpResponse response = client.execute(request);
+
+            System.out.println("Response Code : "
+                    + response.getStatusLine().getStatusCode());
+
+            BufferedReader rd = new BufferedReader(
+                    new InputStreamReader(response.getEntity().getContent()));
+
+            StringBuffer result = new StringBuffer();
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
             }
 
-            in.close();
+            System.out.println(result.toString());
 
-            String xml = xmlResp.toString();
-            JSONObject jsonObj = XML.toJSONObject(xml);
-            jsonObj.put("responseCode", con.getResponseCode());
-            System.out.println("REFUND METHOD");
-            System.out.println(getAttribute(jsonObj, "code"));
-            payment.confirm();
-            paymentRepository.save(payment);
-            orderRepository.save(order);
-            return getAttribute(jsonObj, "code");
+//            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+//            con.setRequestMethod("GET");
+//            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+//            con.setRequestProperty("Accept-Charset", "UTF-8");
+//            con.setRequestProperty();
+//            BufferedReader in = new BufferedReader(
+//                    new InputStreamReader(con.getInputStream()));
+//            String inputLine;
+//            StringBuffer xmlResp = new StringBuffer();
+//            while ((inputLine = in.readLine()) != null) {
+//                xmlResp.append(inputLine);
+//            }
+//
+//            in.close();
+//
+//            String xml = xmlResp.toString();
+//            JSONObject jsonObj = XML.toJSONObject(xml);
+//            jsonObj.put("responseCode", con.getResponseCode());
+//            System.out.println("REFUND METHOD");
+//            System.out.println(getAttribute(jsonObj, "code"));
+//            payment.confirm();
+//            paymentRepository.save(payment);
+//            orderRepository.save(order);
+//            return getAttribute(jsonObj, "code");
+            return null;
         }
         catch (Exception ex){
             throw new RuntimeException(ex);
