@@ -415,6 +415,8 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             if (getAttribute(jsonObj, "code") == "1"){
                 payment.confirm();
                 paymentRepository.save(payment);
+                order.setStatus(Status.PAID);
+                order.confirm();
                 orderRepository.save(order);
             }
             return getAttribute(jsonObj, "code");
