@@ -3,6 +3,7 @@ package ge.boxwood.espace.services.impl;
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.Status;
 import ge.boxwood.espace.repositories.AuthorityRepository;
+import ge.boxwood.espace.repositories.CarRepository;
 import ge.boxwood.espace.repositories.UserRepository;
 import ge.boxwood.espace.services.NotificationService;
 import ge.boxwood.espace.services.UserFileService;
@@ -30,7 +31,8 @@ public class UserServiceImpl implements UserService {
     private UserFileService userFileService;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
-
+    @Autowired
+    private CarRepository carRepository;
     @Override
     public User create(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -129,7 +131,11 @@ public class UserServiceImpl implements UserService {
             for (Car car:user.getCars()) {
                 if (!raw.getCars().contains(car)){
                     car.setStatus(Status.ACTIVE);
+
+                    car = carRepository.save(car);
                     cars.add(car);
+                }else{
+
                 }
             }
             raw.setCars(cars);
