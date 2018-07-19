@@ -410,33 +410,14 @@ public class GCPaymentServiceImpl implements GCPaymentService {
                 result.append(line);
             }
 
-            System.out.println(result.toString());
-
-//            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-//            con.setRequestMethod("GET");
-//            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-//            con.setRequestProperty("Accept-Charset", "UTF-8");
-//            con.setRequestProperty();
-//            BufferedReader in = new BufferedReader(
-//                    new InputStreamReader(con.getInputStream()));
-//            String inputLine;
-//            StringBuffer xmlResp = new StringBuffer();
-//            while ((inputLine = in.readLine()) != null) {
-//                xmlResp.append(inputLine);
-//            }
-//
-//            in.close();
-//
-//            String xml = xmlResp.toString();
-//            JSONObject jsonObj = XML.toJSONObject(xml);
-//            jsonObj.put("responseCode", con.getResponseCode());
-//            System.out.println("REFUND METHOD");
-//            System.out.println(getAttribute(jsonObj, "code"));
-//            payment.confirm();
-//            paymentRepository.save(payment);
-//            orderRepository.save(order);
-//            return getAttribute(jsonObj, "code");
-            return null;
+            JSONObject jsonObj = XML.toJSONObject(result.toString());
+            System.out.println("Result code: "+getAttribute(jsonObj, "code"));
+            if (getAttribute(jsonObj, "code") == "1"){
+                payment.confirm();
+                paymentRepository.save(payment);
+                orderRepository.save(order);
+            }
+            return getAttribute(jsonObj, "code");
         }
         catch (Exception ex){
             throw new RuntimeException(ex);
