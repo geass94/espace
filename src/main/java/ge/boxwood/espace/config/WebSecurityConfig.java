@@ -92,7 +92,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/users/signup",
                 "/users/check-username",
                 "/users/check-email",
-                "/recovery/**"
+                "/recovery/**",
+                "/orders/charger/gettransaction"
         );
 
         web.ignoring().antMatchers(

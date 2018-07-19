@@ -76,6 +76,12 @@ public class ChargerController {
         chargerService.stop(cid);
     }
 
+    @GetMapping("/finish")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity finish(@RequestParam("trId")Long trId){
+        return ResponseEntity.ok(chargerService.finish(trId));
+    }
+
     @GetMapping("/info")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> chargerInfo(@RequestParam("chargerId") Long cid) throws Exception {

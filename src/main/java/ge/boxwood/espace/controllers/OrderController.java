@@ -1,11 +1,9 @@
 package ge.boxwood.espace.controllers;
 
-import ge.boxwood.espace.models.CreditCard;
-import ge.boxwood.espace.models.Order;
-import ge.boxwood.espace.models.Payment;
-import ge.boxwood.espace.models.User;
+import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
 import ge.boxwood.espace.models.enums.Status;
+import ge.boxwood.espace.repositories.CounterRepository;
 import ge.boxwood.espace.repositories.CreditCardRepository;
 import ge.boxwood.espace.repositories.OrderRepository;
 import ge.boxwood.espace.repositories.PaymentRepository;
@@ -22,6 +20,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/orders")
@@ -40,6 +42,8 @@ public class OrderController {
     private CreditCardService creditCardService;
     @Autowired
     private GCPaymentService gcPaymentService;
+    @Autowired
+    private CounterRepository counterRepository;
 
     @PostMapping("/giveOrder")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -98,5 +102,26 @@ public class OrderController {
     public ResponseEntity<?> makeRefund(@PathVariable("uuid")String uuid){
         Payment payment = paymentRepository.findByUuid(uuid);
         return ResponseEntity.ok(gcPaymentService.makeRefund(uuid, 0.5f, payment.getTrxId(), payment.getPrrn()));
+    }
+
+    @PostMapping("/charger/gettransaction")
+    void getTransaction(@RequestBody Map<String, String> data){
+        String trId = data.getOrDefault("transactionId", "0");
+        String chargeTime = data.getOrDefault("chargeTime", "0");
+        String chargePower = data.getOrDefault("chargePower", "0");
+        String consumedPower = data.getOrDefault("consumedPower", "0");
+        Order order = orderRepository.findByChargerTransactionId(Long.valueOf(trId));
+        Charger charger = order.getCharger();
+        List<Counter> counterList = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trId);
+        Counter counter = new Counter();
+        counter.setChargerId(charger.getChargerId());
+        counter.setChargerTrId(trId);
+        counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
+        counter.setStartTime(Calendar.getInstance().getTimeInMillis());
+        counter.setChargeTime(Long.valueOf(chargeTime));
+        counter.setChargePower(Double.valueOf(chargePower));
+        counter.setConsumedPower(Long.valueOf(consumedPower));
+        counter.setPricing(counterList.get( counterList.size() - 1 ).getCurrentPrice());
+        counterRepository.save(counter);
     }
 }

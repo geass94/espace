@@ -18,5 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Order findByUuid(String uuid);
 
+    Order findByChargerTransactionId(Long trid);
+
     List<Order> findAllByUser(User user);
 }

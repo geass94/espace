@@ -26,4 +26,5 @@ public interface ChargerService {
     Charger info(Long cid);
     ChargerInfoDTO transaction(Long trid);
     List<Category> categories();
+    ChargerInfoDTO finish(Long trId);
 }

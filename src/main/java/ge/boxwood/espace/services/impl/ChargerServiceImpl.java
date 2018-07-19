@@ -5,10 +5,7 @@ import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
 import ge.boxwood.espace.models.enums.Status;
 import ge.boxwood.espace.repositories.*;
-import ge.boxwood.espace.services.ChargerService;
-import ge.boxwood.espace.services.OrderService;
-import ge.boxwood.espace.services.PricingService;
-import ge.boxwood.espace.services.UserService;
+import ge.boxwood.espace.services.*;
 import ge.boxwood.espace.services.gc.GCPaymentService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,6 +50,8 @@ public class ChargerServiceImpl implements ChargerService {
     private GCPaymentService gcPaymentService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private SettingsService settingsService;
     @Override
     public Charger create(Charger charger) {
 
@@ -449,9 +448,9 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setChargingFinished(false);
                 order.setPrice(price);
                 payment.setPrice(price);
-                if(order.getTargetPrice() > 0){
-                    payment.setPrice(order.getTargetPrice());
-                }
+//                if(order.getTargetPrice() <= Float.valueOf(settingsService.getByKey("defaultPriceForCharging").getValue())){
+//                    payment.setPrice(order.getTargetPrice());
+//                }
                 payment = paymentRepository.save(payment);
                 dto.setPaymentUUID(payment.getUuid());
                 if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) ){
@@ -479,6 +478,25 @@ public class ChargerServiceImpl implements ChargerService {
     @Override
     public List<Category> categories() {
         return categoryRepository.findAll();
+    }
+
+    @Override
+    public ChargerInfoDTO finish(Long trId) {
+        Order order = orderRepository.findByChargerTransactionId(trId);
+        Charger charger = order.getCharger();
+        List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trId.toString());
+        double chargePower = 0;
+        for (Counter counter:counters) {
+            chargePower+=counter.getChargePower();
+        }
+        Counter last = counters.get( counters.size() - 1 );
+        chargePower = chargePower / counters.size();
+        ChargerInfoDTO dto = new ChargerInfoDTO();
+        dto.setChargePower(chargePower);
+        dto.setChargeTime( Long.valueOf(msToMinutes( Long.valueOf( last.getChargeTime().toString() ) ).toString() ) );
+        dto.setConsumedPower(last.getConsumedPower());
+        dto.setChargerStatus(charger.getStatus());
+        return dto;
     }
 
     @Override
