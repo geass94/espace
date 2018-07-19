@@ -411,15 +411,15 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             }
 
             JSONObject jsonObj = XML.toJSONObject(result.toString());
-            System.out.println("Result code: "+getAttribute(jsonObj, "code"));
-            if (getAttribute(jsonObj, "code") == "1"){
+            System.out.println("Result code: "+getAttribute(jsonObj, "$.MerchantAPI.Message.RefundResponse.Result.code"));
+            if (getAttribute(jsonObj, "$.MerchantAPI.Message.RefundResponse.Result.code") == "1"){
                 payment.confirm();
                 paymentRepository.save(payment);
                 order.setStatus(Status.PAID);
                 order.confirm();
                 orderRepository.save(order);
             }
-            return getAttribute(jsonObj, "code");
+            return getAttribute(jsonObj, "$.MerchantAPI.Message.RefundResponse.Result.desc");
         }
         catch (Exception ex){
             throw new RuntimeException(ex);
