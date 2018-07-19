@@ -377,7 +377,7 @@ public class GCPaymentServiceImpl implements GCPaymentService {
         try{
             Payment payment = paymentRepository.findByUuid(paymentUUID);
             Order order = payment.getOrder();
-            order.setRefunded(true);
+
             DecimalFormat df = new DecimalFormat("#.#");
             URIBuilder builder = new URIBuilder();
             builder.setScheme("https");
@@ -388,8 +388,6 @@ public class GCPaymentServiceImpl implements GCPaymentService {
             builder.addParameter("amount", String.valueOf(BigDecimal.valueOf(Long.parseLong(df.format( refundPrice * 100 )))));
             URL url = builder.build().toURL();
             System.out.println("REFUND URL:"+url.toString());
-            URL obj = new URL(url.toString());
-
 
             HttpClient client = HttpClientBuilder.create().build();
             HttpGet request = new HttpGet(url.toString());
@@ -412,10 +410,12 @@ public class GCPaymentServiceImpl implements GCPaymentService {
 
             JSONObject jsonObj = XML.toJSONObject(result.toString());
             System.out.println("Result code: "+getAttribute(jsonObj, "$.MerchantAPI.Message.RefundResponse.Result.code"));
-            if (getAttribute(jsonObj, "$.MerchantAPI.Message.RefundResponse.Result.code") == "1"){
+            if (getAttribute(jsonObj, "$.MerchantAPI.Message.RefundResponse.Result.code").equals("1")){
+                System.out.println("STATUS OK, PROCESSING PAYMENT");
                 payment.confirm();
                 paymentRepository.save(payment);
                 order.setStatus(Status.PAID);
+                order.setRefunded(true);
                 order.confirm();
                 orderRepository.save(order);
             }
