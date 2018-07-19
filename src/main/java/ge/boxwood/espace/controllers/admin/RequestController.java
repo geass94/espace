@@ -34,7 +34,7 @@ public class RequestController {
     @DeleteMapping("/user/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable("id")Long id){
-        userService.delete(id);
+        userService.destroy(id);
         return ResponseEntity.ok(true);
     }
 

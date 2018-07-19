@@ -1,9 +1,6 @@
 package ge.boxwood.espace.services.impl;
 
-import ge.boxwood.espace.models.Authority;
-import ge.boxwood.espace.models.Notification;
-import ge.boxwood.espace.models.User;
-import ge.boxwood.espace.models.UserFile;
+import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.Status;
 import ge.boxwood.espace.repositories.AuthorityRepository;
 import ge.boxwood.espace.repositories.UserRepository;
@@ -16,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -59,6 +57,11 @@ public class UserServiceImpl implements UserService {
         user.setStatus(Status.DELETED);
         user.setUpdatedBy(1L);
         userRepository.save(user);
+    }
+
+    @Override
+    public void destroy(Long id) {
+        userRepository.delete(id);
     }
 
     @Override
@@ -120,6 +123,19 @@ public class UserServiceImpl implements UserService {
             UserFile userFile = userFileService.create(user.getImage(), raw);
             raw.setProfilePicture(userFile.getId());
         }
+
+        if(user.getCars() != null && user.getCars().size() > 0){
+            ArrayList cars = (ArrayList) user.getCars();
+            for (Car car:user.getCars()) {
+                if (!raw.getCars().contains(car)){
+                    car.setStatus(Status.ACTIVE);
+                    cars.add(car);
+                }
+            }
+            raw.setCars(cars);
+        }
+
+
         return userRepository.save(raw);
     }
 
