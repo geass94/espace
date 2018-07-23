@@ -1,5 +1,6 @@
 package ge.boxwood.espace.controllers;
 
+import ge.boxwood.espace.ErrorStalker.StepLoggerService;
 import ge.boxwood.espace.config.providers.DeviceProvider;
 import ge.boxwood.espace.models.User;
 import ge.boxwood.espace.models.UserTokenState;
@@ -44,10 +45,8 @@ public class AuthenticationController {
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    private DeviceProvider deviceProvider;
+    private StepLoggerService stepLoggerService;
 
-    @Autowired
-    private UserService userService;
 
     //    "/login" this goes after /auth and redirects to login method
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -76,7 +75,12 @@ public class AuthenticationController {
         int expiresIn = tokenHelper.getExpiredIn(device);
         // Return the token
         UserTokenState userTokenState = new UserTokenState(jws, jwsr, expiresIn, user.getSmsActive() || user.getEmailActive());
-        System.out.println(jws);
+        HashMap params = new HashMap();
+        params.put("token", userTokenState.getAccess_token());
+        params.put("refresh_token", userTokenState.getRefresh_token());
+        params.put("isUserActive", userTokenState.isUserActivated());
+        params.put("token_expires_in", userTokenState.getExpires_in());
+        stepLoggerService.logStep("AuthenticationController /login", params);
         return ResponseEntity.ok(userTokenState);
     }
 
@@ -94,9 +98,22 @@ public class AuthenticationController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jws = tokenHelper.generateToken(user, device);
             String jwsr = tokenHelper.generateRefreshToken(user, device);
-            return ResponseEntity.ok(new UserTokenState(jws, jwsr, tokenHelper.getExpiredIn(device), user.getSmsActive() || user.getEmailActive()));
+            UserTokenState userTokenState = new UserTokenState(jws, jwsr, tokenHelper.getExpiredIn(device), user.getSmsActive() || user.getEmailActive());
+            HashMap params = new HashMap();
+            params.put("token", userTokenState.getAccess_token());
+            params.put("refresh_token", userTokenState.getRefresh_token());
+            params.put("isUserActive", userTokenState.isUserActivated());
+            params.put("token_expires_in", userTokenState.getExpires_in());
+            stepLoggerService.logStep("AuthenticationController /refresh IF", params);
+            return ResponseEntity.ok(userTokenState);
         } else {
             UserTokenState userTokenState = new UserTokenState();
+            HashMap params = new HashMap();
+            params.put("token", userTokenState.getAccess_token());
+            params.put("refresh_token", userTokenState.getRefresh_token());
+            params.put("isUserActive", userTokenState.isUserActivated());
+            params.put("token_expires_in", userTokenState.getExpires_in());
+            stepLoggerService.logStep("AuthenticationController /refresh ELSE", params);
             return ResponseEntity.accepted().body(userTokenState);
         }
     }

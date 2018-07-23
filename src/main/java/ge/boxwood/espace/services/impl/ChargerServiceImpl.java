@@ -1,5 +1,6 @@
 package ge.boxwood.espace.services.impl;
 
+import ge.boxwood.espace.ErrorStalker.StepLoggerService;
 import ge.boxwood.espace.config.utils.ChargerRequestUtils;
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.models.enums.PaymentType;
@@ -49,14 +50,11 @@ public class ChargerServiceImpl implements ChargerService {
     @Autowired
     private GCPaymentService gcPaymentService;
     @Autowired
-    private OrderService orderService;
-    @Autowired
-    private SettingsService settingsService;
+    private StepLoggerService stepLoggerService;
+
     @Override
     public Charger create(Charger charger) {
-
         Charger charger1 = chargerRepository.save(charger);
-
         return charger1;
     }
 
@@ -106,16 +104,25 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public Charger getOne(Long id) {
+        HashMap params = new HashMap();
+        params.put("chargerId", id);
+        stepLoggerService.logStep("ChargerService /getOne", params);
         return chargerRepository.findOne(id);
     }
 
     @Override
     public Charger getOneByCID(Long id) {
+        HashMap params = new HashMap();
+        params.put("chargerId", id);
+        stepLoggerService.logStep("ChargerService /getOneByCID", params);
         return chargerRepository.findByChargerId(id);
     }
 
     @Override
     public Charger getOneByCode(String code) {
+        HashMap params = new HashMap();
+        params.put("code", code);
+        stepLoggerService.logStep("ChargerService /getOneByCode", params);
         Charger charger = chargerRepository.findByCode(code);
         if(charger != null){
             charger = this.info(charger.getChargerId());
@@ -133,6 +140,10 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public List<Charger> getClosestChargers(Double latitude, Double longitude) {
+        HashMap params = new HashMap();
+        params.put("latitude", latitude);
+        params.put("longitude", longitude);
+        stepLoggerService.logStep("ChargerService /getClosestChargers", params);
         this.refreshChargers();
         Query q = em.createNativeQuery("SELECT ch.* , 111.045 * DEGREES(ACOS(COS(RADIANS(:lat))\n" +
                 " * COS(RADIANS(latitude))\n" +
@@ -196,16 +207,15 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public HashMap preStart(Long cID, Long conID, Long cardID, Float targetPrice) {
+        HashMap params = new HashMap();
+        params.put("chargerId", cID);
+        params.put("connectorID", conID);
+        params.put("cardID", cardID);
+        params.put("targetPrice", targetPrice);
+        stepLoggerService.logStep("ChargerService /preStart", params);
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
-
-        System.out.println("PRE START");
-        System.out.println("cID: "+cID);
-        System.out.println("conID: "+conID);
-        System.out.println("cardID: "+cardID);
-        System.out.println("targetPrice: "+targetPrice);
-
         Charger charger = this.info(cID);
 
         if(charger.getStatus() != 0 && charger != null){
@@ -241,9 +251,11 @@ public class ChargerServiceImpl implements ChargerService {
     //    იქმნება ორდერი, ფეიმენტი და ინახება როგორც დაუსულებელი გადახდა.
     @Override
     public ChargerInfoDTO start(Long cID, Long conID, String paymentUUID) {
-        System.out.println("START");
-        System.out.println("cID: "+cID);
-        System.out.println("conID: "+conID);
+        HashMap params = new HashMap();
+        params.put("chargerId", cID);
+        params.put("connectorId", conID);
+        params.put("paymentUUID", paymentUUID);
+        stepLoggerService.logStep("ChargerService /getOne", params);
         Payment payment = paymentRepository.findByUuid(paymentUUID);
         Order order = payment.getOrder();
         Charger charger = this.info(cID);
@@ -303,6 +315,9 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public HashMap stop(Long cID) {
+        HashMap params = new HashMap();
+        params.put("chargerId", cID);
+        stepLoggerService.logStep("ChargerService /stop", params);
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
@@ -385,6 +400,9 @@ public class ChargerServiceImpl implements ChargerService {
 // როდესაც ეშვება info მეთოდი, მოწმდება ჩარჯერთან მისი ახლანდელი ინფორმაცია და ჩემთან ბაზაში ახლდება ჩანაწერი იმ კონკრეტული ჩარჯერის ID-ზე.
     @Override
     public Charger info(Long cid) {
+        HashMap params = new HashMap();
+        params.put("chargerId", cid);
+        stepLoggerService.logStep("ChargerService /info", params);
         try {
             JSONObject info = chargerRequestUtils.info(cid);
             JSONObject chrgInfo = info.getJSONObject("data");
@@ -419,6 +437,9 @@ public class ChargerServiceImpl implements ChargerService {
 //    ამ შემთხვევაში ეშვება ჩემთამ stop მეთოდი და ბრუნდება ფეიმენტის ID რაზეც უკვე ხორციელდება გადახდა საბანკო ბარათით
     @Override
     public ChargerInfoDTO transaction(Long trid) {
+        HashMap params = new HashMap();
+        params.put("trId", trid);
+        stepLoggerService.logStep("ChargerService /transaction", params);
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
@@ -430,8 +451,6 @@ public class ChargerServiceImpl implements ChargerService {
             if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
                 JSONObject transaction = transactionInfo.getJSONObject("data");
                 Order order = orderRepository.findByUserAndChargerTransactionIdAndStatus(user, Long.valueOf(transaction.get("id").toString()), Status.ORDERED);
-                System.out.println("TRANSACTION TOP");
-                System.out.println(order.getChargerTransactionId());
                 Payment payment = paymentRepository.findByOrderAndConfirmed(order, false);
                 Charger charger = order.getCharger();
                 chargerInfo.setCharger(charger != null ? charger : new Charger());
@@ -480,10 +499,6 @@ public class ChargerServiceImpl implements ChargerService {
                 }
 
                 this.finisher ++;
-
-                System.out.println("TRANSACTION");
-                System.out.println("calculatedPrice: "+payment.getPrice());
-                System.out.println("chargePower: "+counter.getChargePower());
                 return dto;
             }else
             {
@@ -501,6 +516,9 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public ChargerInfoDTO finish(Long trId) {
+        HashMap params = new HashMap();
+        params.put("trId", trId);
+        stepLoggerService.logStep("ChargerService /finish", params);
         Order order = orderRepository.findByChargerTransactionId(trId);
         Charger charger = order.getCharger();
         List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trId.toString());
@@ -529,7 +547,6 @@ public class ChargerServiceImpl implements ChargerService {
         Float price = 0f;
         int last;
         int prev;
-        System.out.println("counterList size: "+counterList.size());
         if (counterList.size() - 1 <= 0){
             System.out.println("counterList IF");
             last = 0;
@@ -540,12 +557,8 @@ public class ChargerServiceImpl implements ChargerService {
             prev = last - 1;
         }
 
-        System.out.println("last: "+last);
-        System.out.println("prev: "+prev);
         Counter lastCounter = counterList.get(last);
         Counter prevCounter = counterList.get(prev);
-        System.out.println(prevCounter.getId());
-        System.out.println(lastCounter.getId());
         if ( !prevCounter.equals(null) && !lastCounter.equals(null) ){
             if(msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) > 0){
                 price = prevCounter.getCurrentPrice() + (msToHours( lastCounter.getLastUpdate() - prevCounter.getLastUpdate()) * lastCounter.getPricing());
@@ -558,6 +571,9 @@ public class ChargerServiceImpl implements ChargerService {
 
         String formattedPrice = df.format(price);
         float finalPrice = Float.valueOf(formattedPrice);
+        HashMap params = new HashMap();
+        params.put("calcualtedPrice", finalPrice);
+        stepLoggerService.logStep("ChargerService /calcualtePrice", params);
         return finalPrice;
     }
 
@@ -567,7 +583,9 @@ public class ChargerServiceImpl implements ChargerService {
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         Float hours = minutes / 60;
         String formatted = df.format(Math.abs(hours));
-        System.out.println("MS to HOURS: "+formatted);
+        HashMap params = new HashMap();
+        params.put("msToHours", formatted);
+        stepLoggerService.logStep("ChargerService /msToHours", params);
         return Float.valueOf(formatted);
     }
 
@@ -576,7 +594,9 @@ public class ChargerServiceImpl implements ChargerService {
         Long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
         Float minutes = Float.valueOf(seconds.toString()) / 60;
         String formatted = df.format(Math.abs(minutes));
-        System.out.println("MS to MIN: "+formatted);
+        HashMap params = new HashMap();
+        params.put("msToMinutes", formatted);
+        stepLoggerService.logStep("ChargerService /msToMinutes", params);
         return Float.valueOf(formatted);
     }
 
@@ -590,6 +610,17 @@ public class ChargerServiceImpl implements ChargerService {
         chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
         chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
         chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("consumed").toString()) : 0L);
+        HashMap params = new HashMap();
+        params.put("transStart", chargerInfo.getTransStart());
+        params.put("transStop", chargerInfo.getTransStop());
+        params.put("meterStart", chargerInfo.getMeterStart());
+        params.put("meterStop", chargerInfo.getMeterStop());
+        params.put("chargingPower", chargerInfo.getChargingPower());
+        params.put("chargingTime", chargerInfo.getChargeTime());
+        params.put("startUUID", chargerInfo.getStartUUID());
+        params.put("stopUUID", chargerInfo.getStopUUID());
+        params.put("consumedPower", chargerInfo.getConsumedPower());
+        stepLoggerService.logStep("ChargerService /parseChargerInfo", params);
         return chargerInfo;
     }
 }
