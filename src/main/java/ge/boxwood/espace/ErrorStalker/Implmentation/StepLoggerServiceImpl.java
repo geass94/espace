@@ -30,9 +30,12 @@ public class StepLoggerServiceImpl implements StepLoggerService {
         stepLogger.setUser(user);
         stepLogger.setTimestamp(new Date());
         stepLoggerRepo.save(stepLogger);
+        System.out.println("=====STEP LOGGER BEGIN=====");
         System.out.println("EntryPoint: "+entryPoint);
         params.forEach((k,v)->{
             System.out.println(k + " : " + v);
         });
+        System.out.println("=====STEP LOGGER END=====");
+        System.out.println("--------------------------------");
     }
 }
