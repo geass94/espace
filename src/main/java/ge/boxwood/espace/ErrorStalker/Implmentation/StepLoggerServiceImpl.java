@@ -6,6 +6,7 @@ import ge.boxwood.espace.ErrorStalker.StepLoggerService;
 import ge.boxwood.espace.models.User;
 import ge.boxwood.espace.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 @Service
+@DependsOn(value = { "customUserDetailsService" })
 public class StepLoggerServiceImpl implements StepLoggerService {
     @Autowired
     private StepLoggerRepo stepLoggerRepo;
