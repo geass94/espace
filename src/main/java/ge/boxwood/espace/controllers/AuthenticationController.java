@@ -80,7 +80,7 @@ public class AuthenticationController {
         params.put("refresh_token", userTokenState.getRefresh_token());
         params.put("isUserActive", userTokenState.isUserActivated());
         params.put("token_expires_in", userTokenState.getExpires_in());
-        stepLoggerService.logStep("AuthenticationController /login", params);
+        stepLoggerService.logStep("AuthenticationController", "login", params);
         return ResponseEntity.ok(userTokenState);
     }
 
@@ -104,7 +104,7 @@ public class AuthenticationController {
             params.put("refresh_token", userTokenState.getRefresh_token());
             params.put("isUserActive", userTokenState.isUserActivated());
             params.put("token_expires_in", userTokenState.getExpires_in());
-            stepLoggerService.logStep("AuthenticationController /refresh IF", params);
+            stepLoggerService.logStep("AuthenticationController", "refresh IF", params);
             return ResponseEntity.ok(userTokenState);
         } else {
             UserTokenState userTokenState = new UserTokenState();
@@ -113,7 +113,7 @@ public class AuthenticationController {
             params.put("refresh_token", userTokenState.getRefresh_token());
             params.put("isUserActive", userTokenState.isUserActivated());
             params.put("token_expires_in", userTokenState.getExpires_in());
-            stepLoggerService.logStep("AuthenticationController /refresh ELSE", params);
+            stepLoggerService.logStep("AuthenticationController", "refresh ELSE", params);
             return ResponseEntity.accepted().body(userTokenState);
         }
     }
