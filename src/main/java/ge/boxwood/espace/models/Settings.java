@@ -9,9 +9,9 @@ import javax.persistence.Table;
 public class Settings extends BaseStatusEntity {
     @Column(name = "setting_name")
     private String name;
-    @Column(name = "setting_key")
+    @Column(name = "setting_key", nullable = false)
     private String key;
-    @Column(name = "setting_value")
+    @Column(name = "setting_value", nullable = false)
     private String value;
 
     public String getName() {
