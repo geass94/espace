@@ -14,7 +14,6 @@ public class StepLogger extends BaseEntity {
     private String entryPoint;
     @Column
     private String method;
-    @Column
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
