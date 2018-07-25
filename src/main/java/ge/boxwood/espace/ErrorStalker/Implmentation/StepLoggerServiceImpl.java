@@ -27,10 +27,7 @@ public class StepLoggerServiceImpl implements StepLoggerService {
         if (currentUser != null){
             String username = currentUser.getName();
             User user = userService.getByUsername(username);
-            if (user == null){
-                user = new User();
-                user.setUsername("N/A");
-            }
+
             StepLogger stepLogger = new StepLogger();
             stepLogger.setEntryPoint(entryPoint);
             stepLogger.setMethod(method);
@@ -40,7 +37,11 @@ public class StepLoggerServiceImpl implements StepLoggerService {
             stepLoggerRepo.save(stepLogger);
             System.out.println("=====STEP LOGGER BEGIN=====");
             System.out.println("EntryPoint: "+entryPoint);
-            System.out.println("Issuer: "+ user.getUsername());
+            if (user == null){
+                System.out.println("Issuer: N/A");
+            }else{
+                System.out.println("Issuer: "+ user.getUsername());
+            }
             System.out.println("Issued at: "+ stepLogger.getTimestamp());
             System.out.println("Method called: "+entryPoint);
             params.forEach((k,v)->{

@@ -3,9 +3,7 @@ package ge.boxwood.espace.ErrorStalker.Model;
 import ge.boxwood.espace.models.BaseEntity;
 import ge.boxwood.espace.models.User;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -17,6 +15,8 @@ public class StepLogger extends BaseEntity {
     @Column
     private String method;
     @Column
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
     @Column
     private HashMap params;
