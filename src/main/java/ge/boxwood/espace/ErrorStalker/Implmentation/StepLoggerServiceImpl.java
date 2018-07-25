@@ -43,7 +43,7 @@ public class StepLoggerServiceImpl implements StepLoggerService {
                 System.out.println("Issuer: "+ user.getUsername());
             }
             System.out.println("Issued at: "+ stepLogger.getTimestamp());
-            System.out.println("Method called: "+entryPoint);
+            System.out.println("Method called: "+method);
             params.forEach((k,v)->{
                 System.out.println(k + " : " + v);
             });
