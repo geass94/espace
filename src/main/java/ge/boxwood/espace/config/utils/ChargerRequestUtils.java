@@ -151,7 +151,7 @@ public class ChargerRequestUtils {
         HashMap params = new HashMap();
         params.put("URL", obj.toString());
 
-        stepLoggerService.logStep("ChargerReqeustUtils", "start", params);
+        stepLoggerService.logStep("ChargerReqeustUtils", "all", params);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
