@@ -3,6 +3,7 @@ package ge.boxwood.espace.models;
 import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -129,5 +130,19 @@ public class Charger extends BaseEntity {
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public HashMap getHashMap(){
+        HashMap ret = new HashMap();
+        ret.put("id", this.id);
+        ret.put("chargerId", this.chargerId);
+        ret.put("latitide", this.latitude);
+        ret.put("longitude", this.longitude);
+        ret.put("status", this.status);
+        ret.put("type", this.type);
+        ret.put("latitide", this.latitude);
+        ret.put("category", this.category.getId());
+        ret.put("code", this.code);
+        return ret;
     }
 }

@@ -103,28 +103,33 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public Charger getOne(Long id) {
-        HashMap params = new HashMap();
-        params.put("chargerId", id);
-        stepLoggerService.logStep("ChargerService", "getOne", params);
-        return chargerRepository.findOne(id);
+
+        Charger charger = chargerRepository.findOne(id);
+        if(charger != null){
+            stepLoggerService.logStep("ChargerService", "getOne", charger.getHashMap());
+            return charger;
+        }else{
+            throw new RuntimeException("CHARGER_NOT_FOUND");
+        }
     }
 
     @Override
     public Charger getOneByCID(Long id) {
-        HashMap params = new HashMap();
-        params.put("chargerId", id);
-        stepLoggerService.logStep("ChargerService", "getOneByCID", params);
-        return chargerRepository.findByChargerId(id);
+        Charger charger = chargerRepository.findByChargerId(id);
+        if(charger != null){
+            stepLoggerService.logStep("ChargerService", "getOneByCID", charger.getHashMap());
+            return charger;
+        }else{
+            throw new RuntimeException("CHARGER_NOT_FOUND");
+        }
     }
 
     @Override
     public Charger getOneByCode(String code) {
-        HashMap params = new HashMap();
-        params.put("code", code);
-        stepLoggerService.logStep("ChargerService", "getOneByCode", params);
         Charger charger = chargerRepository.findByCode(code);
         if(charger != null){
             charger = this.info(charger.getChargerId());
+            stepLoggerService.logStep("ChargerService", "getOneByCode", charger.getHashMap());
             return charger;
         }
         else{
@@ -206,42 +211,45 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public HashMap preStart(Long cID, Long conID, Long cardID, Float targetPrice) {
-        HashMap params = new HashMap();
+        Charger charger = this.info(cID);
+        HashMap params = charger.getHashMap();
         params.put("chargerId", cID);
         params.put("connectorID", conID);
         params.put("cardID", cardID);
         params.put("targetPrice", targetPrice);
         stepLoggerService.logStep("ChargerService", "preStart", params);
-        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
-        String username = currentUser.getName();
-        User user = userService.getByUsername(username);
-        Charger charger = this.info(cID);
-
-        if(charger.getStatus() != 0 && charger != null){
-            throw new RuntimeException("CHARGER_OFFLINE_BUSY");
-        }
-        else{
-            Order order = new Order(user);
-            order.setCharger(charger);
-            order.setTargetPrice(targetPrice);
-            order.setPaymentType(PaymentType.CREDITCARD);
-            order = orderRepository.save(order);
-
-            Payment payment = new Payment(order.getTargetPrice(), order);
-
-            if(cardID != null && cardID > 0){
-                CreditCard creditCard = creditCardRepository.findOne(cardID);
-                payment.setCreditCard(creditCard);
+        if(charger != null){
+            Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+            String username = currentUser.getName();
+            User user = userService.getByUsername(username);
+            if(charger.getStatus() != 0 && charger != null){
+                throw new RuntimeException("CHARGER_OFFLINE_BUSY");
             }
-            payment.setOrder(order);
-            payment = paymentRepository.save(payment);
-            orderRepository.flush();
-            paymentRepository.flush();
-            HashMap ret = new HashMap();
-            ret.put("paymentUUID", payment.getUuid());
-            ret.put("chargerId", order.getCharger().getChargerId());
-            ret.put("connectorId", conID);
-            return ret;
+            else{
+                Order order = new Order(user);
+                order.setCharger(charger);
+                order.setTargetPrice(targetPrice);
+                order.setPaymentType(PaymentType.CREDITCARD);
+                order = orderRepository.save(order);
+
+                Payment payment = new Payment(order.getTargetPrice(), order);
+
+                if(cardID != null && cardID > 0){
+                    CreditCard creditCard = creditCardRepository.findOne(cardID);
+                    payment.setCreditCard(creditCard);
+                }
+                payment.setOrder(order);
+                payment = paymentRepository.save(payment);
+                orderRepository.flush();
+                paymentRepository.flush();
+                HashMap ret = new HashMap();
+                ret.put("paymentUUID", payment.getUuid());
+                ret.put("chargerId", order.getCharger().getChargerId());
+                ret.put("connectorId", conID);
+                return ret;
+            }
+        }else{
+            throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
 
@@ -250,148 +258,160 @@ public class ChargerServiceImpl implements ChargerService {
     //    იქმნება ორდერი, ფეიმენტი და ინახება როგორც დაუსულებელი გადახდა.
     @Override
     public ChargerInfoDTO start(Long cID, Long conID, String paymentUUID) {
-        HashMap params = new HashMap();
+        Charger charger = this.info(cID);
+        HashMap params = charger.getHashMap();
         params.put("chargerId", cID);
         params.put("connectorId", conID);
         params.put("paymentUUID", paymentUUID);
         stepLoggerService.logStep("ChargerService", "start", params);
-        Payment payment = paymentRepository.findByUuid(paymentUUID);
-        Order order = payment.getOrder();
-        Charger charger = this.info(cID);
-        this.finisher = 0;
+        if (charger != null){
+            Payment payment = paymentRepository.findByUuid(paymentUUID);
+            Order order = payment.getOrder();
+
+            this.finisher = 0;
 //        თუ ჩარჯერი თავისუფალია,
 //        თუ შეკვეთა ძალაშია
 //        თუ წინასწარ გადასახდელი თანხა გადახდილია
 //        მაშინ დავიწყოთ დატენვა
-        if(charger.getStatus() != 0){
-            throw new RuntimeException("CHARGER_OFFLINE_BUSY");
-        }
+            if(charger.getStatus() != 0){
+                throw new RuntimeException("CHARGER_OFFLINE_BUSY");
+            }
 
-        if(order.getStatus() == Status.ORDERED && payment.isConfirmed()){
-            try {
-                ChargerInfo chargerInfo = new ChargerInfo();
-                JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
-                chargerInfo.setChargerTransactionId(chargerStart.get("data") != null && !chargerStart.get("data").equals(null) ? chargerStart.get("data").toString() : "0");
-                chargerInfo.setCharger(charger);
-                chargerInfo.setResponseCode((Integer) chargerStart.get("responseCode"));
-                chargerInfo.setOrder(order);
-                if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
-                    order.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
-                    order = orderRepository.save(order);
-                    Payment payment1 = new Payment(order.getTargetPrice(), order);
-                    payment1.setCreditCard(payment.getCreditCard());
-                    paymentRepository.save(payment1);
-                    orderRepository.flush();
-                    charger.setStatus(1);
-                    charger = chargerRepository.save(charger);
-                    chargerRepository.flush();
-                    Counter counter = new Counter();
-                    counter.setChargerId(charger.getChargerId());
-                    counter.setChargePower(0d);
-                    counter.setChargerTrId(chargerInfo.getChargerTransactionId());
-                    counter.setCurrentPrice(0f);
-                    counter.setChargeTime(0L);
-                    counter.setConsumedPower(0L);
-                    counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
-                    counter.setStartTime(Calendar.getInstance().getTimeInMillis());
-                    counter.setPricing(0f);
-                    counterRepository.save(counter);
-                    ChargerInfoDTO dto = this.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
-                    dto.setChargerStatus(charger.getStatus());
-                    return dto;
-                }else
-                {
-                    throw new RuntimeException("CHARGER_CONNECTION_ERROR");
+            if(order.getStatus() == Status.ORDERED && payment.isConfirmed()){
+                try {
+                    ChargerInfo chargerInfo = new ChargerInfo();
+                    JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
+                    chargerInfo.setChargerTransactionId(chargerStart.get("data") != null && !chargerStart.get("data").equals(null) ? chargerStart.get("data").toString() : "0");
+                    chargerInfo.setCharger(charger);
+                    chargerInfo.setResponseCode((Integer) chargerStart.get("responseCode"));
+                    chargerInfo.setOrder(order);
+                    if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
+                        order.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
+                        order = orderRepository.save(order);
+                        Payment payment1 = new Payment(order.getTargetPrice(), order);
+                        payment1.setCreditCard(payment.getCreditCard());
+                        paymentRepository.save(payment1);
+                        orderRepository.flush();
+                        charger.setStatus(1);
+                        charger = chargerRepository.save(charger);
+                        chargerRepository.flush();
+                        Counter counter = new Counter();
+                        counter.setChargerId(charger.getChargerId());
+                        counter.setChargePower(0d);
+                        counter.setChargerTrId(chargerInfo.getChargerTransactionId());
+                        counter.setCurrentPrice(0f);
+                        counter.setChargeTime(0L);
+                        counter.setConsumedPower(0L);
+                        counter.setLastUpdate(Calendar.getInstance().getTimeInMillis());
+                        counter.setStartTime(Calendar.getInstance().getTimeInMillis());
+                        counter.setPricing(0f);
+                        counterRepository.save(counter);
+                        ChargerInfoDTO dto = this.transaction(Long.valueOf(chargerInfo.getChargerTransactionId()));
+                        dto.setChargerStatus(charger.getStatus());
+                        return dto;
+                    }else
+                    {
+                        throw new RuntimeException("CHARGER_CONNECTION_ERROR");
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            }else{
+                throw new RuntimeException("PAYMENT_ERROR");
             }
         }else{
-            throw new RuntimeException("PAYMENT_ERROR");
+            throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
 
 
     @Override
     public HashMap stop(Long cID) {
-        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
-        String username = currentUser.getName();
-        User user = userService.getByUsername(username);
         Charger charger = this.info(cID);
-        Order order = orderRepository.findByUserAndChargerAndStatus(user, charger, Status.ORDERED);
-        HashMap ret = new HashMap();
-        ret.put("chargerId", cID);
-        if(order != null){
-            try {
-                JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
-                ChargerInfo chargerInfo = new ChargerInfo();
-                chargerInfo.setResponseCode((Integer) stopInfo.get("responseCode"));
+        HashMap params = charger.getHashMap();
+        params.put("chargerId", cID);
+        stepLoggerService.logStep("ChargerService", "stop", params);
+        if (charger != null){
+            Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+            String username = currentUser.getName();
+            User user = userService.getByUsername(username);
+            Order order = orderRepository.findByUserAndChargerAndStatus(user, charger, Status.ORDERED);
+            HashMap ret = new HashMap();
+            ret.put("chargerId", cID);
+            if(order != null){
+                try {
+                    JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
+                    ChargerInfo chargerInfo = new ChargerInfo();
+                    chargerInfo.setResponseCode((Integer) stopInfo.get("responseCode"));
 
-                Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
-                Payment pendingPayment = paymentRepository.findByOrderAndConfirmed(order, false);
+                    Payment successfulPayment = paymentRepository.findByOrderAndConfirmed(order, true);
+                    Payment pendingPayment = paymentRepository.findByOrderAndConfirmed(order, false);
 
-                System.out.println("PENDING UUID: "+pendingPayment.getUuid());
+                    System.out.println("PENDING UUID: "+pendingPayment.getUuid());
 
-                if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
+                    if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 300){
 
-                    System.out.println("succeesPayment: "+successfulPayment.getPrice());
-                    System.out.println("pendingPayemtn: "+pendingPayment.getPrice());
+                        System.out.println("succeesPayment: "+successfulPayment.getPrice());
+                        System.out.println("pendingPayemtn: "+pendingPayment.getPrice());
 
-                    if(pendingPayment.getPrice() - successfulPayment.getPrice() > 0){
-                        System.out.println("PAY MORE BIATCH");
-                        pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
-                        paymentRepository.save(pendingPayment);
-                        ret.put("CODE", 2);
-                        ret.put("DESC", "OVERDOSE");
-                        ret.put("MESSAGE", "You spent more thanyou specified at the begining. Please pay!");
-                        ret.put("paymentUUID", pendingPayment.getUuid());
-                    }
-                    else if ( pendingPayment.getPrice() - successfulPayment.getPrice() == 0 ){
-                        System.out.println("ALL GOOD");
-                        pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
-                        pendingPayment.confirm();
-                        paymentRepository.save(pendingPayment);
-                        order.confirm();
-                        order.setStatus(Status.PAID);
-                        order.setPrice(successfulPayment.getPrice());
-                        orderRepository.save(order);
-                        ret.put("CODE", 1);
-                        ret.put("DESC", "SUCCESSFUL_PAYMENT");
-                        ret.put("MESSAGE", "All payments went through successfully. You are good to go!");
-                    }
-                    else if( pendingPayment.getPrice() - successfulPayment.getPrice() < 0){
-                        System.out.println("REFUNDING");
-                        pendingPayment.setPrice( successfulPayment.getPrice() - pendingPayment.getPrice() );
-                        pendingPayment.setTrxId(successfulPayment.getTrxId());
-                        pendingPayment.setPrrn(successfulPayment.getPrrn());
-                        pendingPayment = paymentRepository.save(pendingPayment);
-                        String code = gcPaymentService.makeRefund(pendingPayment.getUuid(), pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
-                        if(code.equals("1")){
-                            ret.put("CODE", 1);
-                            ret.put("DESC", "SUCCESSFULLY_REFUNDED");
-                            ret.put("MESSAGE", "Refund was successful. You are goodto go!");
-                        }else{
-                            ret.put("CODE", 0);
-                            ret.put("DESC", "REFUND_FAILED");
-                            ret.put("MESSAGE", "Something went wrong while refuning. Saving to pending refunds!");
+                        if(pendingPayment.getPrice() - successfulPayment.getPrice() > 0){
+                            System.out.println("PAY MORE BIATCH");
+                            pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
+                            paymentRepository.save(pendingPayment);
+                            ret.put("CODE", 2);
+                            ret.put("DESC", "OVERDOSE");
+                            ret.put("MESSAGE", "You spent more thanyou specified at the begining. Please pay!");
+                            ret.put("paymentUUID", pendingPayment.getUuid());
                         }
+                        else if ( pendingPayment.getPrice() - successfulPayment.getPrice() == 0 ){
+                            System.out.println("ALL GOOD");
+                            pendingPayment.setPrice( pendingPayment.getPrice() - successfulPayment.getPrice() );
+                            pendingPayment.confirm();
+                            paymentRepository.save(pendingPayment);
+                            order.confirm();
+                            order.setStatus(Status.PAID);
+                            order.setPrice(successfulPayment.getPrice());
+                            orderRepository.save(order);
+                            ret.put("CODE", 1);
+                            ret.put("DESC", "SUCCESSFUL_PAYMENT");
+                            ret.put("MESSAGE", "All payments went through successfully. You are good to go!");
+                        }
+                        else if( pendingPayment.getPrice() - successfulPayment.getPrice() < 0){
+                            System.out.println("REFUNDING");
+                            pendingPayment.setPrice( successfulPayment.getPrice() - pendingPayment.getPrice() );
+                            pendingPayment.setTrxId(successfulPayment.getTrxId());
+                            pendingPayment.setPrrn(successfulPayment.getPrrn());
+                            pendingPayment = paymentRepository.save(pendingPayment);
+                            String code = gcPaymentService.makeRefund(pendingPayment.getUuid(), pendingPayment.getPrice(), pendingPayment.getTrxId(), pendingPayment.getPrrn());
+                            if(code.equals("1")){
+                                ret.put("CODE", 1);
+                                ret.put("DESC", "SUCCESSFULLY_REFUNDED");
+                                ret.put("MESSAGE", "Refund was successful. You are goodto go!");
+                            }else{
+                                ret.put("CODE", 0);
+                                ret.put("DESC", "REFUND_FAILED");
+                                ret.put("MESSAGE", "Something went wrong while refuning. Saving to pending refunds!");
+                            }
+                        }
+                        else{
+                            ret.put("CODE", -1);
+                            ret.put("DESC", "UNKNOWN_STATEMEN");
+                            ret.put("MESSAGE", "UNKNOWN_ERROR");
+                        }
+                        stepLoggerService.logStep("ChargerService", "stop", ret);
+                        return ret;
+                    }else
+                    {
+                        throw new RuntimeException("CHARGER_CONNECTION_ERROR");
                     }
-                    else{
-                        ret.put("CODE", -1);
-                        ret.put("DESC", "UNKNOWN_STATEMEN");
-                        ret.put("MESSAGE", "UNKNOWN_ERROR");
-                    }
-                    stepLoggerService.logStep("ChargerService", "stop", ret);
-                    return ret;
-                }else
-                {
-                    throw new RuntimeException("CHARGER_CONNECTION_ERROR");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            }else{
+                throw new RuntimeException("PAYMENT_ERROR");
             }
         }else{
-            throw new RuntimeException("PAYMENT_ERROR");
+            throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
 
@@ -404,7 +424,6 @@ public class ChargerServiceImpl implements ChargerService {
         try {
             JSONObject info = chargerRequestUtils.info(cid);
             JSONObject chrgInfo = info.getJSONObject("data");
-
             Long chargerId = Long.valueOf(chrgInfo.get("id").toString());
             Charger charger = chargerRepository.findByChargerId(chargerId);
             charger.setStatus( Integer.valueOf(chrgInfo.get("status").toString()) );
