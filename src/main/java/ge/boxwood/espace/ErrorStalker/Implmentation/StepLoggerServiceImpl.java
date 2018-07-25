@@ -24,20 +24,22 @@ public class StepLoggerServiceImpl implements StepLoggerService {
     @Override
     public void logStep(String entryPoint, HashMap params) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
-        String username = currentUser.getName();
-        User user = userService.getByUsername(username);
-        StepLogger stepLogger = new StepLogger();
-        stepLogger.setEntryPoint(entryPoint);
-        stepLogger.setParams(params);
-        stepLogger.setUser(user);
-        stepLogger.setTimestamp(new Date());
-        stepLoggerRepo.save(stepLogger);
-        System.out.println("=====STEP LOGGER BEGIN=====");
-        System.out.println("EntryPoint: "+entryPoint);
-        params.forEach((k,v)->{
-            System.out.println(k + " : " + v);
-        });
-        System.out.println("=====STEP LOGGER END=====");
-        System.out.println("--------------------------------");
+        if (currentUser != null){
+            String username = currentUser.getName();
+            User user = userService.getByUsername(username);
+            StepLogger stepLogger = new StepLogger();
+            stepLogger.setEntryPoint(entryPoint);
+            stepLogger.setParams(params);
+            stepLogger.setUser(user);
+            stepLogger.setTimestamp(new Date());
+            stepLoggerRepo.save(stepLogger);
+            System.out.println("=====STEP LOGGER BEGIN=====");
+            System.out.println("EntryPoint: "+entryPoint);
+            params.forEach((k,v)->{
+                System.out.println(k + " : " + v);
+            });
+            System.out.println("=====STEP LOGGER END=====");
+            System.out.println("--------------------------------");
+        }
     }
 }
