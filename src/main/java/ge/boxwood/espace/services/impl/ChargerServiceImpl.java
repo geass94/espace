@@ -103,12 +103,14 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public Charger getOne(Long id) {
-
         Charger charger = chargerRepository.findOne(id);
         if(charger != null){
-            stepLoggerService.logStep("ChargerService", "getOne", charger.getHashMap());
+
             return charger;
         }else{
+            HashMap params = new HashMap();
+            params.put("id", id);
+            stepLoggerService.logStep("ChargerService", "getOne[EXCEPTION]", params);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -120,6 +122,9 @@ public class ChargerServiceImpl implements ChargerService {
             stepLoggerService.logStep("ChargerService", "getOneByCID", charger.getHashMap());
             return charger;
         }else{
+            HashMap params = new HashMap();
+            params.put("chargerId", id);
+            stepLoggerService.logStep("ChargerService", "getOneByCID[EXCEPTION]", params);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -133,6 +138,9 @@ public class ChargerServiceImpl implements ChargerService {
             return charger;
         }
         else{
+            HashMap params = new HashMap();
+            params.put("code", code);
+            stepLoggerService.logStep("ChargerService", "getOneByCode[EXCEPTION]", params);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -249,6 +257,12 @@ public class ChargerServiceImpl implements ChargerService {
                 return ret;
             }
         }else{
+            HashMap params1 = new HashMap();
+            params.put("chargerId", cID);
+            params.put("connectorID", conID);
+            params.put("cardID", cardID);
+            params.put("targetPrice", targetPrice);
+            stepLoggerService.logStep("ChargerService", "preStart[EXCEPTION]", params1);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -320,6 +334,11 @@ public class ChargerServiceImpl implements ChargerService {
                 throw new RuntimeException("PAYMENT_ERROR");
             }
         }else{
+            HashMap params1 = new HashMap();
+            params.put("chargerId", cID);
+            params.put("connectorID", conID);
+            params.put("paymentUUID", paymentUUID);
+            stepLoggerService.logStep("ChargerService", "start[EXCEPTION]", params1);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -411,6 +430,9 @@ public class ChargerServiceImpl implements ChargerService {
                 throw new RuntimeException("PAYMENT_ERROR");
             }
         }else{
+            HashMap params1 = new HashMap();
+            params.put("chargerId", cID);
+            stepLoggerService.logStep("ChargerService", "stop[EXCEPTION]", params1);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
