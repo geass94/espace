@@ -60,7 +60,7 @@ public class SlaveController {
         data.put("status", 0);
         data.put("type", 0);
         data.put("description", "test device");
-        data.put("code", 4322);
+        data.put("code", 0026);
         HashMap conns = new HashMap();
         ArrayList arr = new ArrayList();
         conns.put("type", "ChadeMo");
