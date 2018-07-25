@@ -20,7 +20,7 @@ public class ChargerRequestUtils {
     private StepLoggerService stepLoggerService;
     private final String USER_AGENT = "Mozilla/5.0";
     private final String CHARSET = "UTF-8";
-    private final String SERVICE_URL = "https://chargers.e-space.ge:8443/es-services/mobile/ws";
+    private String SERVICE_URL = settingsService.getByKey("chargerServiceUrl").getValue();
 
     public JSONObject start(Long cid, Long conid) throws Exception {
         URL obj = new URL(SERVICE_URL+"/charger/start/"+cid+"/"+conid);
