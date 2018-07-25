@@ -22,24 +22,32 @@ public class StepLoggerServiceImpl implements StepLoggerService {
     @Autowired
     private UserService userService;
     @Override
-    public void logStep(String entryPoint, HashMap params) {
+    public void logStep(String entryPoint, String method, HashMap params) {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         if (currentUser != null){
             String username = currentUser.getName();
             User user = userService.getByUsername(username);
+            if (user == null){
+                user = new User();
+                user.setUsername("N/A");
+            }
             StepLogger stepLogger = new StepLogger();
             stepLogger.setEntryPoint(entryPoint);
+            stepLogger.setMethod(method);
             stepLogger.setParams(params);
             stepLogger.setUser(user);
             stepLogger.setTimestamp(new Date());
             stepLoggerRepo.save(stepLogger);
             System.out.println("=====STEP LOGGER BEGIN=====");
             System.out.println("EntryPoint: "+entryPoint);
+            System.out.println("Issuer: "+ user.getUsername());
+            System.out.println("Issued at: "+ stepLogger.getTimestamp());
+            System.out.println("Method called: "+entryPoint);
             params.forEach((k,v)->{
                 System.out.println(k + " : " + v);
             });
             System.out.println("=====STEP LOGGER END=====");
-            System.out.println("--------------------------------");
+            System.out.println("----------------------------------------------------------------");
         }
     }
 }

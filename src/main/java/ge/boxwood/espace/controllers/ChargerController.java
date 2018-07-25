@@ -26,7 +26,7 @@ public class ChargerController {
     @GetMapping("/free")
     public ResponseEntity<?> getFreeChargers(){
         HashMap params = new HashMap();
-        stepLoggerService.logStep("ChargerController /getFreeChargers", params);
+        stepLoggerService.logStep("ChargerController", "getFreeChargers", params);
         return ResponseEntity.ok(chargerService.freeChargers());
     }
 
@@ -35,7 +35,7 @@ public class ChargerController {
     public ResponseEntity<?> addCharger(@RequestBody Charger charger){
         HashMap params = new HashMap();
         params.put("charger", charger);
-        stepLoggerService.logStep("ChargerController /addCharger", params);
+        stepLoggerService.logStep("ChargerController","addCharger", params);
         return ResponseEntity.ok(chargerService.create(charger));
     }
 
@@ -43,16 +43,16 @@ public class ChargerController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> getChargersByCategories(){
         HashMap params = new HashMap();
-        stepLoggerService.logStep("ChargerController /getChargersByCategories", params);
+        stepLoggerService.logStep("ChargerController",  "getChargersByCategories", params);
         return ResponseEntity.ok(chargerService.categories());
     }
 
     @GetMapping("/getByCode")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> startCharging(@RequestParam(value = "code")String code) throws Exception {
+    public ResponseEntity<?> getChargerByCode(@RequestParam(value = "code")String code) throws Exception {
         HashMap params = new HashMap();
         params.put("code", code);
-        stepLoggerService.logStep("ChargerController /startCharging", params);
+        stepLoggerService.logStep("ChargerController", "getChargerByCode", params);
         if(!code.isEmpty()){
             Charger charger = chargerService.getOneByCode(code);
             return ResponseEntity.ok(charger);
@@ -73,14 +73,14 @@ public class ChargerController {
         params.put("connectorId", connectorId);
         params.put("cardId", cardId);
         params.put("targetPrice", targetPrice);
-        stepLoggerService.logStep("ChargerController /preStart", params);
+        stepLoggerService.logStep("ChargerController", "preStart", params);
         HashMap dt = chargerService.preStart(chargerId, connectorId, cardId, targetPrice);
         return ResponseEntity.ok(dt);
     }
 
     @PostMapping("/start")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> startChargingByCode(@RequestBody Map<String, String> data) throws Exception {
+    public ResponseEntity<?> startCharging(@RequestBody Map<String, String> data) throws Exception {
         Long chargerId = !data.get("chargerId").isEmpty() && data.get("chargerId") != null ? Long.valueOf(data.get("chargerId")) : 0L;
         Long connectorId = !data.get("connectorId").isEmpty() && data.get("connectorId") != null ? Long.valueOf(data.get("connectorId")) : 0L;
         String paymentUUID = !data.get("paymentUUID").isEmpty() && data.get("paymentUUID") != null ? data.get("paymentUUID").toString() : "";
@@ -88,7 +88,7 @@ public class ChargerController {
         params.put("chargerId", chargerId);
         params.put("connectorId", connectorId);
         params.put("paymentUUID", paymentUUID);
-        stepLoggerService.logStep("ChargerController /startChargingByCode", params);
+        stepLoggerService.logStep("ChargerController", "startCharging", params);
         ChargerInfoDTO dto = chargerService.start(chargerId, connectorId, paymentUUID);
         return ResponseEntity.ok(dto);
     }
@@ -98,16 +98,16 @@ public class ChargerController {
     public ResponseEntity<?> stopCharging(@RequestParam("chargerId") Long cid) throws Exception {
         HashMap params = new HashMap();
         params.put("chargerId", cid);
-        stepLoggerService.logStep("ChargerController /stopCharging", params);
+        stepLoggerService.logStep("ChargerController", "stopCharging", params);
         return ResponseEntity.ok(chargerService.stop(cid));
     }
 
     @GetMapping("/finish")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity finish(@RequestParam("trId")Long trId){
+    public ResponseEntity finishCharging(@RequestParam("trId")Long trId){
         HashMap params = new HashMap();
         params.put("trId", trId);
-        stepLoggerService.logStep("ChargerController /finish", params);
+        stepLoggerService.logStep("ChargerController", "finishCharging", params);
         return ResponseEntity.ok(chargerService.finish(trId));
     }
 
@@ -116,7 +116,7 @@ public class ChargerController {
     public ResponseEntity<?> chargerInfo(@RequestParam("chargerId") Long cid) throws Exception {
         HashMap params = new HashMap();
         params.put("chargerId", cid);
-        stepLoggerService.logStep("ChargerController /chargerInfo", params);
+        stepLoggerService.logStep("ChargerController", "chargerInfo", params);
         Charger chargerInfo = chargerService.info(cid);
         if(chargerInfo != null){
             return ResponseEntity.ok(chargerInfo);
@@ -131,7 +131,7 @@ public class ChargerController {
     public ResponseEntity<?> chargerTransactionInfo(@RequestParam("trId") Long trid) throws Exception {
         HashMap params = new HashMap();
         params.put("trId", trid);
-        stepLoggerService.logStep("ChargerController /chargerTransactionInfo", params);
+        stepLoggerService.logStep("ChargerController", "chargerTransactionInfo", params);
         ChargerInfoDTO chargerInfo = chargerService.transaction(trid);
         if(chargerInfo != null){
             return ResponseEntity.ok(chargerInfo);
@@ -145,7 +145,7 @@ public class ChargerController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> getAll(){
         HashMap params = new HashMap();
-        stepLoggerService.logStep("ChargerController /getAll", params);
+        stepLoggerService.logStep("ChargerController", "getAll", params);
         return ResponseEntity.ok(chargerService.getAll());
     }
 
@@ -160,7 +160,7 @@ public class ChargerController {
         HashMap params = new HashMap();
         params.put("latitude", lat);
         params.put("longitude", lng);
-        stepLoggerService.logStep("ChargerController /getClosestChargers", params);
+        stepLoggerService.logStep("ChargerController", "getClosestChargers", params);
         return ResponseEntity.ok( chargerService.getClosestChargers(lat, lng) );
     }
 
@@ -170,7 +170,7 @@ public class ChargerController {
         HashMap params = new HashMap();
         params.put("chargerId", cid);
         params.put("charger", charger);
-        stepLoggerService.logStep("ChargerController /updateCharger", params);
+        stepLoggerService.logStep("ChargerController", "updateCharger", params);
         Charger charger1 = chargerService.update(charger, cid);
         if (charger1 != null)
         {
@@ -187,7 +187,7 @@ public class ChargerController {
     public ResponseEntity<?> importChargers(@RequestBody List<Charger> chargers){
         HashMap params = new HashMap();
         params.put("chargers", chargers);
-        stepLoggerService.logStep("ChargerController /importCargers", params);
+        stepLoggerService.logStep("ChargerController", "importCargers", params);
         chargerService.importChargers(chargers);
         return ResponseEntity.ok("DONE");
     }

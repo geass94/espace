@@ -106,7 +106,7 @@ public class ChargerServiceImpl implements ChargerService {
     public Charger getOne(Long id) {
         HashMap params = new HashMap();
         params.put("chargerId", id);
-        stepLoggerService.logStep("ChargerService /getOne", params);
+        stepLoggerService.logStep("ChargerService", "getOne", params);
         return chargerRepository.findOne(id);
     }
 
@@ -114,7 +114,7 @@ public class ChargerServiceImpl implements ChargerService {
     public Charger getOneByCID(Long id) {
         HashMap params = new HashMap();
         params.put("chargerId", id);
-        stepLoggerService.logStep("ChargerService /getOneByCID", params);
+        stepLoggerService.logStep("ChargerService", "getOneByCID", params);
         return chargerRepository.findByChargerId(id);
     }
 
@@ -122,7 +122,7 @@ public class ChargerServiceImpl implements ChargerService {
     public Charger getOneByCode(String code) {
         HashMap params = new HashMap();
         params.put("code", code);
-        stepLoggerService.logStep("ChargerService /getOneByCode", params);
+        stepLoggerService.logStep("ChargerService", "getOneByCode", params);
         Charger charger = chargerRepository.findByCode(code);
         if(charger != null){
             charger = this.info(charger.getChargerId());
@@ -143,7 +143,7 @@ public class ChargerServiceImpl implements ChargerService {
         HashMap params = new HashMap();
         params.put("latitude", latitude);
         params.put("longitude", longitude);
-        stepLoggerService.logStep("ChargerService /getClosestChargers", params);
+        stepLoggerService.logStep("ChargerService", "getClosestChargers", params);
         this.refreshChargers();
         Query q = em.createNativeQuery("SELECT ch.* , 111.045 * DEGREES(ACOS(COS(RADIANS(:lat))\n" +
                 " * COS(RADIANS(latitude))\n" +
@@ -212,7 +212,7 @@ public class ChargerServiceImpl implements ChargerService {
         params.put("connectorID", conID);
         params.put("cardID", cardID);
         params.put("targetPrice", targetPrice);
-        stepLoggerService.logStep("ChargerService /preStart", params);
+        stepLoggerService.logStep("ChargerService", "preStart", params);
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
@@ -255,7 +255,7 @@ public class ChargerServiceImpl implements ChargerService {
         params.put("chargerId", cID);
         params.put("connectorId", conID);
         params.put("paymentUUID", paymentUUID);
-        stepLoggerService.logStep("ChargerService /getOne", params);
+        stepLoggerService.logStep("ChargerService", "start", params);
         Payment payment = paymentRepository.findByUuid(paymentUUID);
         Order order = payment.getOrder();
         Charger charger = this.info(cID);
@@ -315,15 +315,13 @@ public class ChargerServiceImpl implements ChargerService {
 
     @Override
     public HashMap stop(Long cID) {
-        HashMap params = new HashMap();
-        params.put("chargerId", cID);
-        stepLoggerService.logStep("ChargerService /stop", params);
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
         Charger charger = this.info(cID);
         Order order = orderRepository.findByUserAndChargerAndStatus(user, charger, Status.ORDERED);
         HashMap ret = new HashMap();
+        ret.put("chargerId", cID);
         if(order != null){
             try {
                 JSONObject stopInfo = chargerRequestUtils.stop(cID, order.getChargerTransactionId());
@@ -384,6 +382,7 @@ public class ChargerServiceImpl implements ChargerService {
                         ret.put("DESC", "UNKNOWN_STATEMEN");
                         ret.put("MESSAGE", "UNKNOWN_ERROR");
                     }
+                    stepLoggerService.logStep("ChargerService", "stop", ret);
                     return ret;
                 }else
                 {
@@ -402,7 +401,7 @@ public class ChargerServiceImpl implements ChargerService {
     public Charger info(Long cid) {
         HashMap params = new HashMap();
         params.put("chargerId", cid);
-        stepLoggerService.logStep("ChargerService /info", params);
+        stepLoggerService.logStep("ChargerService", "info", params);
         try {
             JSONObject info = chargerRequestUtils.info(cid);
             JSONObject chrgInfo = info.getJSONObject("data");
@@ -439,7 +438,7 @@ public class ChargerServiceImpl implements ChargerService {
     public ChargerInfoDTO transaction(Long trid) {
         HashMap params = new HashMap();
         params.put("trId", trid);
-        stepLoggerService.logStep("ChargerService /transaction", params);
+        stepLoggerService.logStep("ChargerService", "transaction", params);
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         String username = currentUser.getName();
         User user = userService.getByUsername(username);
@@ -518,7 +517,7 @@ public class ChargerServiceImpl implements ChargerService {
     public ChargerInfoDTO finish(Long trId) {
         HashMap params = new HashMap();
         params.put("trId", trId);
-        stepLoggerService.logStep("ChargerService /finish", params);
+        stepLoggerService.logStep("ChargerService", "finish", params);
         Order order = orderRepository.findByChargerTransactionId(trId);
         Charger charger = order.getCharger();
         List<Counter> counters = counterRepository.findAllByChargerIdAndChargerTrId(charger.getChargerId(), trId.toString());
@@ -573,7 +572,7 @@ public class ChargerServiceImpl implements ChargerService {
         float finalPrice = Float.valueOf(formattedPrice);
         HashMap params = new HashMap();
         params.put("calcualtedPrice", finalPrice);
-        stepLoggerService.logStep("ChargerService /calcualtePrice", params);
+        stepLoggerService.logStep("ChargerService", "calcualtePrice", params);
         return finalPrice;
     }
 
@@ -585,7 +584,7 @@ public class ChargerServiceImpl implements ChargerService {
         String formatted = df.format(Math.abs(hours));
         HashMap params = new HashMap();
         params.put("msToHours", formatted);
-        stepLoggerService.logStep("ChargerService /msToHours", params);
+        stepLoggerService.logStep("ChargerService", "msToHours", params);
         return Float.valueOf(formatted);
     }
 
@@ -596,7 +595,7 @@ public class ChargerServiceImpl implements ChargerService {
         String formatted = df.format(Math.abs(minutes));
         HashMap params = new HashMap();
         params.put("msToMinutes", formatted);
-        stepLoggerService.logStep("ChargerService /msToMinutes", params);
+        stepLoggerService.logStep("ChargerService", "msToMinutes", params);
         return Float.valueOf(formatted);
     }
 
@@ -620,7 +619,7 @@ public class ChargerServiceImpl implements ChargerService {
         params.put("startUUID", chargerInfo.getStartUUID());
         params.put("stopUUID", chargerInfo.getStopUUID());
         params.put("consumedPower", chargerInfo.getConsumedPower());
-        stepLoggerService.logStep("ChargerService /parseChargerInfo", params);
+        stepLoggerService.logStep("ChargerService", "parseChargerInfo", params);
         return chargerInfo;
     }
 }

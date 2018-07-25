@@ -15,6 +15,8 @@ public class StepLogger extends BaseEntity {
     @Column
     private String entryPoint;
     @Column
+    private String method;
+    @Column
     private User user;
     @Column
     private HashMap params;
@@ -51,5 +53,13 @@ public class StepLogger extends BaseEntity {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 }

@@ -65,7 +65,7 @@ public class OrderController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> getCards(HttpServletRequest request){
         HashMap params = new HashMap();
-        stepLoggerService.logStep("OrderController /getCards", params);
+        stepLoggerService.logStep("OrderController", "getCards", params);
         String authToken = tokenHelper.getToken( request );
         String username = tokenHelper.getUsernameFromToken(authToken);
         User user = userService.getByUsername(username);
@@ -78,7 +78,7 @@ public class OrderController {
         HashMap params = new HashMap();
         params.put("cardId", id);
         params.put("card", creditCard);
-        stepLoggerService.logStep("OrderController /arrangeCards", params);
+        stepLoggerService.logStep("OrderController", "arrangeCards", params);
         return ResponseEntity.ok(creditCardService.update(creditCard, id));
     }
 
@@ -87,7 +87,7 @@ public class OrderController {
     public ResponseEntity<?> deleteCard(@PathVariable("id")Long id){
         HashMap params = new HashMap();
         params.put("cardId", id);
-        stepLoggerService.logStep("OrderController /deleteCard", params);
+        stepLoggerService.logStep("OrderController", "deleteCard", params);
         creditCardService.delete(id);
         return ResponseEntity.ok(true);
     }
@@ -108,7 +108,7 @@ public class OrderController {
         HashMap params = new HashMap();
         params.put("paymentUUID", payment.getUuid());
         params.put("orderUUID", order.getUuid());
-        stepLoggerService.logStep("OrderController /confirmCreditCard", params);
+        stepLoggerService.logStep("OrderController", "confirmCreditCard", params);
         return ResponseEntity.ok(payment);
     }
 
@@ -116,7 +116,7 @@ public class OrderController {
     public ResponseEntity<?> makeRefund(@PathVariable("uuid")String uuid){
         HashMap params = new HashMap();
         params.put("paymentUUID", uuid);
-        stepLoggerService.logStep("OrderController /makeRefund", params);
+        stepLoggerService.logStep("OrderController", "makeRefund", params);
         Payment payment = paymentRepository.findByUuid(uuid);
         return ResponseEntity.ok(gcPaymentService.makeRefund(uuid, 0.5f, payment.getTrxId(), payment.getPrrn()));
     }

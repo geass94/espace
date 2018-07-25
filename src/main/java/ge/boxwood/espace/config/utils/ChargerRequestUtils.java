@@ -34,7 +34,7 @@ public class ChargerRequestUtils {
         params.put("chargerId", cid);
         params.put("connectorId", conid);
 
-        stepLoggerService.logStep("ChargerReqeustUtils /start", params);
+        stepLoggerService.logStep("ChargerReqeustUtils", "start", params);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -65,7 +65,7 @@ public class ChargerRequestUtils {
         params.put("chargerId", cid);
         params.put("trId", trid);
 
-        stepLoggerService.logStep("ChargerReqeustUtils /stop", params);
+        stepLoggerService.logStep("ChargerReqeustUtils", "stop", params);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -94,7 +94,7 @@ public class ChargerRequestUtils {
         params.put("URL", obj.toString());
         params.put("chargerId", cid);
 
-        stepLoggerService.logStep("ChargerReqeustUtils /info", params);
+        stepLoggerService.logStep("ChargerReqeustUtils", "info", params);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -124,7 +124,7 @@ public class ChargerRequestUtils {
         params.put("URL", obj.toString());
         params.put("trId", trid);
 
-        stepLoggerService.logStep("ChargerReqeustUtils /transaction", params);
+        stepLoggerService.logStep("ChargerReqeustUtils", "transaction", params);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -151,7 +151,7 @@ public class ChargerRequestUtils {
         HashMap params = new HashMap();
         params.put("URL", obj.toString());
 
-        stepLoggerService.logStep("ChargerReqeustUtils /start", params);
+        stepLoggerService.logStep("ChargerReqeustUtils", "start", params);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
