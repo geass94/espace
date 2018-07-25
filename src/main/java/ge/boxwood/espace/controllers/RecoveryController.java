@@ -1,5 +1,7 @@
 package ge.boxwood.espace.controllers;
 
+import ge.boxwood.espace.ErrorStalker.Model.StepLogger;
+import ge.boxwood.espace.ErrorStalker.StepLoggerService;
 import ge.boxwood.espace.models.Notification;
 import ge.boxwood.espace.models.User;
 import ge.boxwood.espace.models.UserTokenState;
@@ -34,6 +36,8 @@ public class RecoveryController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private TokenHelper tokenHelper;
+    @Autowired
+    private StepLoggerService stepLoggerService;
 
     @PostMapping("/start-recovery")
     public ResponseEntity<?> getUserByEmail(@RequestBody Map<String, String> phone){
@@ -41,7 +45,7 @@ public class RecoveryController {
         notificationService.setTempPassword(user);
         HashMap responseData = new HashMap();
         responseData.put("username", user.getUsername());
-
+        stepLoggerService.logStep("RecoveryController", "getUserByEmail", responseData);
         return ResponseEntity.ok(responseData);
     }
 
@@ -53,6 +57,7 @@ public class RecoveryController {
         int recoveryPreferedMethod = Integer.parseInt(requestData.get("recoveryPreferedMethod"));
         User user = userService.getByUsername(username);
         user.setRecoveryPreferedMethod(recoveryPreferedMethod);
+        stepLoggerService.logStep("RecoveryController", "sendRecoveryCode", requestData);
         if(user.getEmail().equals(email) && user.getPhoneNumber().equals(phoneNumber)){
             notificationService.recovery(user);
             return ResponseEntity.ok(true);
@@ -100,6 +105,7 @@ public class RecoveryController {
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setStatus(Status.ACTIVE);
         user = userService.update(user, user.getId());
+        stepLoggerService.logStep("RecoveryController", "changePassword", requestData);
         return ResponseEntity.accepted().body(user);
     }
 }

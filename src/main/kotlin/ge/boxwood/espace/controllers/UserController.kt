@@ -1,6 +1,7 @@
 package ge.boxwood.espace.controllers
 
 
+import ge.boxwood.espace.ErrorStalker.StepLoggerService
 import ge.boxwood.espace.models.User
 import ge.boxwood.espace.models.UserTokenState
 import ge.boxwood.espace.security.TokenHelper
@@ -21,11 +22,14 @@ import javax.validation.Valid
 @RequestMapping(UserController.ENTRY_POINT)
 open class UserController (val userService: UserService,
                            val tokenHelper: TokenHelper,
-                           val authenticationManager: AuthenticationManager) {
+                           val authenticationManager: AuthenticationManager,
+                           val stepLoggerService: StepLoggerService) {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     fun loadById(@PathVariable id: Long?): User {
+        var params = hashMapOf("userId" to id)
+        stepLoggerService.logStep("UserController", "loadById", params)
         return this.userService!!.getOne(id)
     }
 
@@ -40,6 +44,8 @@ open class UserController (val userService: UserService,
     open fun loadProfile(@RequestHeader(value = "Authorization") token: String): User {
         val accessToken = token.toString().substring(7)
         val username = tokenHelper!!.getUsernameFromToken(accessToken)
+        var params = hashMapOf("access_token" to accessToken, "username" to username)
+        stepLoggerService.logStep("UserController", "loadProfile", params)
         return userService!!.getByUsername(username)
     }
 
