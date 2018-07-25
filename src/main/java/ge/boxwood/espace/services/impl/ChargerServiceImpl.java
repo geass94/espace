@@ -50,6 +50,8 @@ public class ChargerServiceImpl implements ChargerService {
     private GCPaymentService gcPaymentService;
     @Autowired
     private StepLoggerService stepLoggerService;
+    @Autowired
+    private SettingsService settingsService;
 
     @Override
     public Charger create(Charger charger) {
@@ -237,10 +239,11 @@ public class ChargerServiceImpl implements ChargerService {
                 Order order = new Order(user);
                 order.setCharger(charger);
                 order.setTargetPrice(targetPrice);
+                order.setMustPay(Float.valueOf(settingsService.getByKey("defaultPriceForCharging").getValue().toString()));
                 order.setPaymentType(PaymentType.CREDITCARD);
                 order = orderRepository.save(order);
 
-                Payment payment = new Payment(order.getTargetPrice(), order);
+                Payment payment = new Payment(order.getMustPay(), order);
 
                 if(cardID != null && cardID > 0){
                     CreditCard creditCard = creditCardRepository.findOne(cardID);
@@ -302,7 +305,7 @@ public class ChargerServiceImpl implements ChargerService {
                     if(chargerInfo.getResponseCode() >= 200 && chargerInfo.getResponseCode() < 250){
                         order.setChargerTransactionId(Long.valueOf(chargerInfo.getChargerTransactionId()));
                         order = orderRepository.save(order);
-                        Payment payment1 = new Payment(order.getTargetPrice(), order);
+                        Payment payment1 = new Payment(order.getMustPay(), order);
                         payment1.setCreditCard(payment.getCreditCard());
                         paymentRepository.save(payment1);
                         orderRepository.flush();
@@ -523,16 +526,18 @@ public class ChargerServiceImpl implements ChargerService {
                 dto.setCurrentPrice(counter.getCurrentPrice());
                 dto.setConsumedPower(chargerInfo.getConsumedPower());
                 dto.setChargingFinished(false);
+                dto.setChargerPulledOut(false);
                 order.setPrice(price);
                 payment.setPrice(price);
-//                if(order.getTargetPrice() <= Float.valueOf(settingsService.getByKey("defaultPriceForCharging").getValue())){
-//                    payment.setPrice(order.getTargetPrice());
-//                }
+
                 payment = paymentRepository.save(payment);
                 dto.setPaymentUUID(payment.getUuid());
-                if(!chargerInfo.getStopUUID().isEmpty() || (order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0) ){
-//                    CHARGING FINISHED
-//                    this.stop(charger.getChargerId());
+                if(!chargerInfo.getStopUUID().isEmpty() && msToMinutes(chargerInfo.getTransStop()) > 0){
+                    dto.setChargerPulledOut(true);
+                    dto.setChargingFinished(true);
+                    this.finisher = 6;
+                }
+                if(order.getTargetPrice() - price <= 0 && order.getTargetPrice() > 0 && dto.getChargerPulledOut() == false){
                     dto.setChargingFinished(true);
                     this.finisher = 6;
                 }

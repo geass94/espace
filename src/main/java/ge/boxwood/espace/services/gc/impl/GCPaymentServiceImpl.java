@@ -216,8 +216,8 @@ public class GCPaymentServiceImpl implements GCPaymentService {
                         User user = order.getUser();
 
                         String acquireBankTrnId = request.pRrn; //transaction id in acquirer bank
-//                        if ( order.getTargetPrice() - payment.getPrice() > 0  ){
-//                            makeRefund(order.getTargetPrice(), payment.getPrice(), request.trxId, acquireBankTrnId);
+//                        if ( order.getMustPay() - payment.getPrice() > 0  ){
+//                            makeRefund(order.getMustPay(), payment.getPrice(), request.trxId, acquireBankTrnId);
 //                        }
                         Date paymentDate = request.pTransmissionDateTime;
                         payment.setTrxId(request.trxId);

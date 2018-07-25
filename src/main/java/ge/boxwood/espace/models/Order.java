@@ -43,7 +43,10 @@ public class Order extends BaseStatusAuditEntity {
     private PaymentType paymentType;
     @Column
     private float price;
+    @Column
     private float targetPrice;
+    @Column
+    private float mustPay;
 
     public Order(User user) {
         this.user = user;
@@ -62,6 +65,14 @@ public class Order extends BaseStatusAuditEntity {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public float getMustPay() {
+        return mustPay;
+    }
+
+    public void setMustPay(float mustPay) {
+        this.mustPay = mustPay;
     }
 
     @JsonProperty

@@ -6,11 +6,20 @@ public class ChargerInfoDTO {
     private Long chargeTime;
     private String chargerTrId;
     private String paymentUUID;
-    private Float currentPrice;
+    private Float currentPrice = 0f;
     private Integer chargerStatus;
     private Integer chargerType;
     private Boolean chargingFinished;
+    private Boolean chargerPulledOut;
     private Long consumedPower;
+
+    public Boolean getChargerPulledOut() {
+        return chargerPulledOut;
+    }
+
+    public void setChargerPulledOut(Boolean chargerPulledOut) {
+        this.chargerPulledOut = chargerPulledOut;
+    }
 
     public Long getChargerId() {
         return chargerId;
