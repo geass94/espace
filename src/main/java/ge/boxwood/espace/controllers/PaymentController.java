@@ -25,21 +25,21 @@ public class PaymentController {
         HashMap params = new HashMap();
         params.put("paymentUUID", orderId);
 
-        stepLoggerService.logStep("PaymentController /initiatePayment", params);
+        stepLoggerService.logStep("PaymentController", "initiatePayment", params);
         response.sendRedirect(GCPaymentService.initiatePayment(orderId, ""));
     }
 
     @GetMapping(path = "/payments/check", produces = MediaType.APPLICATION_XML_VALUE)
     @ResponseBody
     public String checkAvailable(@RequestParam Map<String, String> params) {
-        stepLoggerService.logStep("ChargerReqeustUtils /checkAvailable", (HashMap) params);
+        stepLoggerService.logStep("PaymentController", "checkAvailable", (HashMap) params);
         return GCPaymentService.checkAvailable(params);
     }
 
     @GetMapping(path = "/payments/register", produces = MediaType.APPLICATION_XML_VALUE)
     @ResponseBody
     public String registerPayment(@RequestParam Map<String, String> params, HttpServletRequest httpRequest) {
-        stepLoggerService.logStep("ChargerReqeustUtils /registerPayment", (HashMap) params);
+        stepLoggerService.logStep("PaymentController", "registerPayment", (HashMap) params);
         return GCPaymentService.registerPayment(params, httpRequest);
     }
 }
