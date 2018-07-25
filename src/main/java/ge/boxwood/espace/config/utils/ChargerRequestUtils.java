@@ -53,7 +53,7 @@ public class ChargerRequestUtils {
     }
 
     public JSONObject stop(Long cid, Long trid) throws Exception{
-        URL obj = new URL(SERVICE_URL+"/charger/stop/"+cid+"/"+trid);
+        URL obj = new URL(this.SERVICE_URL+"/charger/stop/"+cid+"/"+trid);
 
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
@@ -84,7 +84,7 @@ public class ChargerRequestUtils {
     }
 
     public JSONObject info(Long cid) throws Exception {
-        URL obj = new URL(SERVICE_URL+"/charger/info/"+cid);
+        URL obj = new URL(this.SERVICE_URL+"/charger/info/"+cid);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
@@ -113,7 +113,7 @@ public class ChargerRequestUtils {
     }
 
     public JSONObject transaction(Long trid) throws Exception {
-        URL obj = new URL(SERVICE_URL+"/transaction/info/"+trid);
+        URL obj = new URL(this.SERVICE_URL+"/transaction/info/"+trid);
 
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
@@ -142,7 +142,7 @@ public class ChargerRequestUtils {
     }
 
     public JSONObject all() throws Exception {
-        URL obj = new URL(SERVICE_URL+"/chargers");
+        URL obj = new URL(this.SERVICE_URL+"/chargers");
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
