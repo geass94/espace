@@ -110,7 +110,7 @@ public class ChargerServiceImpl implements ChargerService {
         }else{
             HashMap params = new HashMap();
             params.put("id", id);
-            stepLoggerService.logStep("ChargerService", "getOne[EXCEPTION]", params);
+            stepLoggerService.logStep("ChargerService", "[EXCEPTION]getOne", params);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -124,7 +124,7 @@ public class ChargerServiceImpl implements ChargerService {
         }else{
             HashMap params = new HashMap();
             params.put("chargerId", id);
-            stepLoggerService.logStep("ChargerService", "getOneByCID[EXCEPTION]", params);
+            stepLoggerService.logStep("ChargerService", "[EXCEPTION]getOneByCID", params);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -140,7 +140,7 @@ public class ChargerServiceImpl implements ChargerService {
         else{
             HashMap params = new HashMap();
             params.put("code", code);
-            stepLoggerService.logStep("ChargerService", "getOneByCode[EXCEPTION]", params);
+            stepLoggerService.logStep("ChargerService", "[EXCEPTION]getOneByCode", params);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -262,7 +262,7 @@ public class ChargerServiceImpl implements ChargerService {
             params.put("connectorID", conID);
             params.put("cardID", cardID);
             params.put("targetPrice", targetPrice);
-            stepLoggerService.logStep("ChargerService", "preStart[EXCEPTION]", params1);
+            stepLoggerService.logStep("ChargerService", "[EXCEPTION]preStart", params1);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -338,7 +338,7 @@ public class ChargerServiceImpl implements ChargerService {
             params.put("chargerId", cID);
             params.put("connectorID", conID);
             params.put("paymentUUID", paymentUUID);
-            stepLoggerService.logStep("ChargerService", "start[EXCEPTION]", params1);
+            stepLoggerService.logStep("ChargerService", "[EXCEPTION]start", params1);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
@@ -432,7 +432,7 @@ public class ChargerServiceImpl implements ChargerService {
         }else{
             HashMap params1 = new HashMap();
             params.put("chargerId", cID);
-            stepLoggerService.logStep("ChargerService", "stop[EXCEPTION]", params1);
+            stepLoggerService.logStep("ChargerService", "[EXCEPTION]stop", params1);
             throw new RuntimeException("CHARGER_NOT_FOUND");
         }
     }
