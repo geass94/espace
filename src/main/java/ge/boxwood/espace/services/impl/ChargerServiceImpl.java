@@ -298,7 +298,7 @@ public class ChargerServiceImpl implements ChargerService {
                 try {
                     ChargerInfo chargerInfo = new ChargerInfo();
                     JSONObject chargerStart = chargerRequestUtils.start(cID, conID);
-                    chargerInfo.setChargerTransactionId(chargerStart.get("data") != null && !chargerStart.get("data").equals(null) ? chargerStart.get("data").toString() : "0");
+                    chargerInfo.setChargerTransactionId(!chargerStart.get("data").equals(null) && !chargerStart.get("data").equals(null) ? chargerStart.get("data").toString() : "0");
                     chargerInfo.setCharger(charger);
                     chargerInfo.setResponseCode((Integer) chargerStart.get("responseCode"));
                     chargerInfo.setOrder(order);
@@ -645,15 +645,15 @@ public class ChargerServiceImpl implements ChargerService {
     }
 
     private ChargerInfo parseChargerInfo(JSONObject transaction, ChargerInfo chargerInfo){
-        chargerInfo.setTransStart(transaction.get("transStart") != null && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
-        chargerInfo.setTransStop(transaction.get("transStop") != null && !transaction.get("transStop").equals(null) ? (long)transaction.get("transStop") : 0L);
-        chargerInfo.setMeterStart(transaction.get("meterStart") != null && !transaction.get("meterStart").equals(null) ? (long)(int)transaction.get("meterStart") : 0L);
-        chargerInfo.setMeterStop(transaction.get("meterStop") != null && !transaction.get("meterStop").equals(null) ? (long)(int)transaction.get("meterStop") : 0L);
-        chargerInfo.setChargingPower(transaction.get("kiloWattHour") != null && !transaction.get("kiloWattHour").equals(null) ? Double.valueOf(transaction.get("kiloWattHour").toString()) : 0d);
-        chargerInfo.setChargeTime(transaction.get("chargingTime") != null && !transaction.get("chargingTime").equals(null) ? (long)(int)transaction.get("chargingTime") : 0L);
-        chargerInfo.setStartUUID(transaction.get("uuidStart") != null && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
-        chargerInfo.setStopUUID(transaction.get("uuidEnd") != null && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
-        chargerInfo.setConsumedPower(transaction.get("consumed") != null && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("consumed").toString()) : 0L);
+        chargerInfo.setTransStart(!transaction.get("transStart").equals(null) && !transaction.get("transStart").equals(null) ? (long) transaction.get("transStart") : 0L);
+        chargerInfo.setTransStop(!transaction.get("transStop").equals(null) && !transaction.get("transStop").equals(null) ? (long)transaction.get("transStop") : 0L);
+        chargerInfo.setMeterStart(!transaction.get("meterStart").equals(null) && !transaction.get("meterStart").equals(null) ? (long)(int)transaction.get("meterStart") : 0L);
+        chargerInfo.setMeterStop(!transaction.get("meterStop").equals(null) && !transaction.get("meterStop").equals(null) ? (long)(int)transaction.get("meterStop") : 0L);
+        chargerInfo.setChargingPower(!transaction.get("kiloWattHour").equals(null) && !transaction.get("kiloWattHour").equals(null) ? Double.valueOf(transaction.get("kiloWattHour").toString()) : 0d);
+        chargerInfo.setChargeTime(!transaction.get("chargingTime").equals(null) && !transaction.get("chargingTime").equals(null) ? (long)(int)transaction.get("chargingTime") : 0L);
+        chargerInfo.setStartUUID(!transaction.get("uuidStart").equals(null) && !transaction.get("uuidStart").equals(null) ? transaction.get("uuidStart").toString() : "");
+        chargerInfo.setStopUUID(!transaction.get("uuidEnd").equals(null) && !transaction.get("uuidEnd").equals(null) ? transaction.get("uuidEnd").toString() : "");
+        chargerInfo.setConsumedPower(!transaction.get("consumed").equals(null) && !transaction.get("consumed").equals(null) ? Long.valueOf(transaction.get("consumed").toString()) : 0L);
         HashMap params = new HashMap();
         params.put("transStart", chargerInfo.getTransStart());
         params.put("transStop", chargerInfo.getTransStop());

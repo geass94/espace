@@ -64,10 +64,10 @@ public class ChargerController {
     @PostMapping("/preStart")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> preStart(@RequestBody Map<String, String> data) throws Exception {
-        Long chargerId = !data.get("chargerId").isEmpty() && data.get("chargerId") != null ? Long.valueOf(data.get("chargerId")) : 0L;
-        Long connectorId = !data.get("connectorId").isEmpty() && data.get("connectorId") != null ? Long.valueOf(data.get("connectorId")) : 0L;
-        Long cardId = !data.get("cardId").isEmpty() && data.get("cardId") != null ? Long.valueOf(data.get("cardId")) : 0L;
-        float targetPrice = !data.get("targetPrice").isEmpty() && data.get("targetPrice") != null ? Float.valueOf(data.get("targetPrice")) : 0f;
+        Long chargerId = !data.get("chargerId").isEmpty() && !data.get("chargerId").equals(null) ? Long.valueOf(data.get("chargerId")) : 0L;
+        Long connectorId = !data.get("connectorId").isEmpty() && !data.get("connectorId").equals(null) ? Long.valueOf(data.get("connectorId")) : 0L;
+        Long cardId = !data.get("cardId").isEmpty() && !data.get("cardId").equals(null) ? Long.valueOf(data.get("cardId")) : 0L;
+        float targetPrice = !data.get("targetPrice").isEmpty() && !data.get("targetPrice").equals(null) ? Float.valueOf(data.get("targetPrice")) : 0f;
         HashMap params = new HashMap();
         params.put("chargerId", chargerId);
         params.put("connectorId", connectorId);
@@ -81,9 +81,9 @@ public class ChargerController {
     @PostMapping("/start")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> startCharging(@RequestBody Map<String, String> data) throws Exception {
-        Long chargerId = !data.get("chargerId").isEmpty() && data.get("chargerId") != null ? Long.valueOf(data.get("chargerId")) : 0L;
-        Long connectorId = !data.get("connectorId").isEmpty() && data.get("connectorId") != null ? Long.valueOf(data.get("connectorId")) : 0L;
-        String paymentUUID = !data.get("paymentUUID").isEmpty() && data.get("paymentUUID") != null ? data.get("paymentUUID").toString() : "";
+        Long chargerId = !data.get("chargerId").isEmpty() && !data.get("chargerId").equals(null) ? Long.valueOf(data.get("chargerId")) : 0L;
+        Long connectorId = !data.get("connectorId").isEmpty() && !data.get("connectorId").equals(null) ? Long.valueOf(data.get("connectorId")) : 0L;
+        String paymentUUID = !data.get("paymentUUID").isEmpty() && !data.get("paymentUUID").equals(null) ? data.get("paymentUUID").toString() : "";
         HashMap params = new HashMap();
         params.put("chargerId", chargerId);
         params.put("connectorId", connectorId);
