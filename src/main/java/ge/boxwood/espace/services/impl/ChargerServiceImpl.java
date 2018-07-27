@@ -417,7 +417,7 @@ public class ChargerServiceImpl implements ChargerService {
                         }
                         else{
                             ret.put("CODE", -1);
-                            ret.put("DESC", "UNKNOWN_STATEMEN");
+                            ret.put("DESC", "UNKNOWN_STATEMENT");
                             ret.put("MESSAGE", "UNKNOWN_ERROR");
                         }
                         stepLoggerService.logStep("ChargerService", "stop", ret);
