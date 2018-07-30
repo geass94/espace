@@ -67,7 +67,7 @@
                 <td data-bind="text: method"></td>
                 <td ></td>
                 <td data-bind="text: timestamp"></td>
-                <td data-bind="foreach: params">
+                <td data-bind="foreach: $parent.params">
                     <p data-bind="text: $data.key + ': ' + $data.value"></p>
                 </td>
             </tr>
