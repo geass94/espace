@@ -28,7 +28,9 @@ public class StepLoggerServiceImpl implements StepLoggerService {
         if (currentUser != null){
             String username = currentUser.getName();
             User user = userService.getByUsername(username);
-
+            if(user == null){
+                user = userService.getByUsername("root");
+            }
             StepLogger stepLogger = new StepLogger();
             stepLogger.setEntryPoint(entryPoint);
             stepLogger.setMethod(method);
