@@ -13,6 +13,7 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
     <script src="/admin/js/core.js"></script>
     <script src="/admin/js/logs.js"></script>
 </head>
@@ -65,8 +66,8 @@
                 <td data-bind="text: log.id"></td>
                 <td data-bind="text: log.entryPoint"></td>
                 <td data-bind="text: log.method"></td>
-                <td ></td>
-                <td data-bind="text: timestamp"></td>
+                <td data-bind="text: user.username"></td>
+                <td data-bind="text: moment(timestamp).format('YYYY-MM-DD HH:mm:ss')"></td>
                 <td data-bind="keyvalue: params">
                     <p style="max-width: 250px; word-break: break-word;" data-bind="text: key + ' : ' + value"></p>
                 </td>
