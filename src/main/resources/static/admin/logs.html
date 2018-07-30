@@ -67,8 +67,8 @@
                 <td data-bind="text: log.method"></td>
                 <td ></td>
                 <td data-bind="text: timestamp"></td>
-                <td data-bind="foreach: { data: params() }">
-                    <p data-bind="text: $data.key + ': ' + $data.value"></p>
+                <td data-bind="keyvalue: params">
+                    <p data-bind="text: key + ': ' + value"></p>
                 </td>
             </tr>
             </tbody>
