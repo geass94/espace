@@ -30,7 +30,7 @@ public class StepLogger extends BaseEntity {
     public void setEntryPoint(String entryPoint) {
         this.entryPoint = entryPoint;
     }
-    @JsonIgnoreProperties(ignoreUnknown=true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public User getUser() {
         return user;
     }
