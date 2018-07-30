@@ -60,15 +60,15 @@
                 <th>Params</th>
             </tr>
             </thead>
-            <tbody data-bind="foreach: logs">
+            <tbody data-bind="foreach: { data: logs, as: 'log' }">
             <tr>
-                <td data-bind="text: id"></td>
-                <td data-bind="text: entryPoint"></td>
-                <td data-bind="text: method"></td>
+                <td data-bind="text: log.id"></td>
+                <td data-bind="text: log.entryPoint"></td>
+                <td data-bind="text: log.method"></td>
                 <td ></td>
                 <td data-bind="text: timestamp"></td>
-                <td data-bind="foreach: $parent.params">
-                    <p data-bind="text: $parent.key + ': ' + $parent.value"></p>
+                <td data-bind="foreach: { data: params, as: 'param' }">
+                    <p data-bind="text: param.key + ': ' + param.value"></p>
                 </td>
             </tr>
             </tbody>
