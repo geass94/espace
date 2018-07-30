@@ -70,7 +70,8 @@
                 <td data-bind="text: timestamp"></td>
                 <td>
                     <!-- ko foreach: $data.params -->
-                        <p data-bind="text: parents[0].key + ': ' + parents[0].value"></p>
+                    as
+                        <span data-bind="text: parents[0].key + ': ' + parents[0].value"></span>
                     <!-- /ko -->
                 </td>
             </tr>
