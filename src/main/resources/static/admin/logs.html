@@ -60,23 +60,18 @@
                 <th>Params</th>
             </tr>
             </thead>
-            <!-- ko foreach: logs -->
-            <tbody>
+            <tbody data-bind="foreach: logs">
             <tr>
                 <td data-bind="text: id"></td>
                 <td data-bind="text: entryPoint"></td>
                 <td data-bind="text: method"></td>
                 <td ></td>
                 <td data-bind="text: timestamp"></td>
-                <td>
-                    <!-- ko foreach: $data.params -->
-                    as
-                        <span data-bind="text: $parents[0].key + ': ' + $parents[0].value"></span>
-                    <!-- /ko -->
+                <td data-bind="foreach: $parent.params">
+                    <p data-bind="text: $parent.key + ': ' + $parent.value"></p>
                 </td>
             </tr>
             </tbody>
-            <!-- /ko -->
         </table>
     </div>
 </div>
