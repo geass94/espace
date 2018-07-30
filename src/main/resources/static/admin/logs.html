@@ -71,7 +71,7 @@
                 <td>
                     <!-- ko foreach: $data.params -->
                     as
-                        <span data-bind="text: parents[0].key + ': ' + parents[0].value"></span>
+                        <span data-bind="text: $parents[0].key + ': ' + $parents[0].value"></span>
                     <!-- /ko -->
                 </td>
             </tr>
