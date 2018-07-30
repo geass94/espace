@@ -1,11 +1,16 @@
 package ge.boxwood.espace.controllers.admin;
 
+import ge.boxwood.espace.ErrorStalker.StepLoggerService;
 import ge.boxwood.espace.models.*;
 import ge.boxwood.espace.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.sql.Blob;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -24,6 +29,8 @@ public class RequestController {
     private ChargerService chargerService;
     @Autowired
     private SettingsService settingsService;
+    @Autowired
+    private StepLoggerService stepLoggerService;
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
@@ -127,5 +134,11 @@ public class RequestController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateSettings(@PathVariable("id")Long id, @RequestBody Settings settings){
         return ResponseEntity.ok(settingsService.update(id, settings));
+    }
+
+    @GetMapping("/logs")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getLogs(){
+        return ResponseEntity.ok(stepLoggerService.getAll());
     }
 }

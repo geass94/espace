@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @DependsOn(value = { "customUserDetailsService" })
@@ -50,5 +51,10 @@ public class StepLoggerServiceImpl implements StepLoggerService {
             System.out.println("=====STEP LOGGER END=====");
             System.out.println("----------------------------------------------------------------");
         }
+    }
+
+    @Override
+    public List<StepLogger> getAll() {
+        return stepLoggerRepo.findAll();
     }
 }
