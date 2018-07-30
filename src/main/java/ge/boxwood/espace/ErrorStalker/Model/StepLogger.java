@@ -1,5 +1,6 @@
 package ge.boxwood.espace.ErrorStalker.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ge.boxwood.espace.models.BaseEntity;
 import ge.boxwood.espace.models.User;
 
@@ -29,7 +30,7 @@ public class StepLogger extends BaseEntity {
     public void setEntryPoint(String entryPoint) {
         this.entryPoint = entryPoint;
     }
-
+    @JsonIgnoreProperties(ignoreUnknown=true)
     public User getUser() {
         return user;
     }
