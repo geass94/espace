@@ -67,7 +67,9 @@
                 <td data-bind="text: method"></td>
                 <td ></td>
                 <td data-bind="text: timestamp"></td>
-                <td data-bind="text: id"></td>
+                <td data-bind="foreach: params">
+                    <p> <span data-bind="foreachprop: props"></span> => <span data-bind="foreachprop: value"></span></p>
+                </td>
             </tr>
             </tbody>
         </table>
