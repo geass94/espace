@@ -68,7 +68,7 @@
                 <td ></td>
                 <td data-bind="text: timestamp"></td>
                 <td data-bind="foreach: params">
-                    <p> <span data-bind="foreachprop: props"></span> => <span data-bind="foreachprop: value"></span></p>
+                    <p data-bind="text: $data[0].key + ': ' + $data[0].value"></p>
                 </td>
             </tr>
             </tbody>
