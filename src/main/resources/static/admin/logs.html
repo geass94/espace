@@ -66,7 +66,7 @@
                 <td data-bind="text: log.id"></td>
                 <td data-bind="text: log.entryPoint"></td>
                 <td data-bind="text: log.method"></td>
-                <td data-bind="text: user.username"></td>
+                <td data-bind="text: log.user.username"></td>
                 <td data-bind="text: moment(timestamp).format('YYYY-MM-DD HH:mm:ss')"></td>
                 <td data-bind="keyvalue: params">
                     <p style="max-width: 250px; word-break: break-word;" data-bind="text: key + ' : ' + value"></p>
